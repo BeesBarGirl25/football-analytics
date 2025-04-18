@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Competition Analysis{% endblock %}
+
+{% block dropdowns %}
+    {% include 'partials/competition_dropdowns.html' %}
+{% endblock %}
+
+
+{% block content %}
+    <h1>Competition Analysis</h1>
+    <p>Content specific to this page will go here.</p>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/competition.js') }}"></script>
+{% endblock %}

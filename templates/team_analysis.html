@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Team Analysis{% endblock %}
+
+{% block dropdowns %}
+    <select class="searchable-dropdown" style="width: 200px;">
+        <option value="arsenal">Arsenal</option>
+        <option value="chelsea">Chelsea</option>
+        <!-- etc. -->
+    </select>
+
+    <select class="searchable-dropdown" style="width: 200px;">
+        <option value="premier-league">Premier League</option>
+        <option value="champions-league">Champions League</option>
+        <!-- etc. -->
+    </select>
+
+    <select class="searchable-dropdown" style="width: 200px;">
+        <option value="2023-24">2023-24 Season</option>
+        <!-- etc. -->
+    </select>
+{% endblock %}
+
+{% block content %}
+    <h1>Team Analysis</h1>
+    <p>Content specific to this page will go here.</p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('.searchable-dropdown').select2();
+    });
+</script>
+{% endblock %}
