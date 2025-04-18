@@ -1,0 +1,231 @@
+body {
+   margin: 0;
+   font-family: 'Segoe UI', sans-serif;
+   background-color: #121212;
+   color: #e0e0e0;
+   overflow: visible;
+   overflow-x: hidden;
+   overflow-y: auto;
+   position: relative;
+}
+
+.wrapper {
+    display: grid;
+    grid-template-areas:
+        "sidebar top-navbar"
+        "sidebar content";
+    grid-template-columns: 60px 1fr;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    grid-area: sidebar;
+    background-color: #1f1f1f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 60px;
+    height: 100%;
+    overflow-y: auto;
+    gap: 20px;
+}
+
+.icon-button {
+    color: #90caf9;
+    text-decoration: none;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.icon-button:hover {
+    transform: scale(1.2);
+}
+
+.main-panel {
+   display: flex;
+   flex-direction: column;
+   flex-grow: 1;
+   height: auto;
+   overflow-y: auto;
+}
+
+.top-navbar {
+    grid-area: top-navbar;
+    background-color: #1f1f1f;
+    padding: 5px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #333;
+    height: 45px;
+    z-index: 1000;
+}
+
+.top-navbar .logo {
+    color: #90caf9;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.dropdowns {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding-right: 7.5%;
+    color: grey;
+}
+
+.content {
+    grid-area: content;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #121212;
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- SELECT2 CUSTOM DARK THEME --- */
+
+/* Main box */
+.select2-container .select2-selection--single {
+    background-color: #222222;
+    border: 1px solid #444;
+    color: #e0e0e0; /* Increased contrast */
+    padding: 6px 12px;
+    border-radius: 6px;
+    min-height: 38px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Selected text */
+.select2-selection__rendered {
+    color: #e0e0e0 !important;
+    line-height: 38px;
+}
+
+/* Placeholder */
+.select2-selection__placeholder {
+    color: #bbbbbb !important; /* Softer placeholder contrast */
+}
+
+/* Arrow icon */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 38px;
+    right: 10px;
+}
+
+/* Dropdown panel */
+.select2-container--default .select2-dropdown {
+    background-color: #1e1e1e; /* Match content panel */
+    border: 1px solid #333;
+    z-index: 1060 !important;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8); /* Subtle shadow */
+}
+
+/* Options inside dropdown */
+.select2-container--default .select2-results__option {
+    color: #e0e0e0;
+    background-color: #1e1e1e;
+    padding: 8px 12px;
+}
+
+/* Highlight on hover/focus */
+.select2-container--default .select2-results__option--highlighted {
+    background-color: #2a2a2a;
+    color: #90caf9;
+}
+
+/* --- END OF SELECT2 STYLING --- */
+
+.analysis-container {
+   flex-grow: 1;
+   display: flex;
+   flex-direction: column;
+   overflow-y: auto;
+   background-color: #1e1e1e;
+   border-radius: 12px;
+   padding: 1.5rem;
+   color: #e0e0e0;
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.analysis-nav {
+    display: flex;
+    width: 100%;
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+}
+
+.tab-btn {
+    flex: 1;
+    background-color: #2d2d2d;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 8px;
+    color: #dcdcdc;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+    font-weight: bold;
+}
+
+.tab-btn:hover {
+    background-color: #3d3d3d;
+}
+
+.tab-btn.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.analysis-content {
+   flex-grow: 1;
+   overflow-y: auto;
+}
+
+.analysis-content.hidden {
+    display: none;
+}
+
+.graphs-container {
+    display: grid; /* Use grid layout */
+    grid-template-columns: repeat(12, 1fr); /* 12-column grid for customization */
+    grid-auto-rows: 200px; /* Default row height */
+    gap: 20px; /* Spacing between grid items */
+    margin-top: 20px;
+}
+
+.graph-container {
+    background-color: #1f1f1f;
+    border: 1px solid #333;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #e0e0e0;
+    text-align: center; /* Center text, if necessary */
+}
+
+/* Customize the sizes of the divs */
+.large {
+    grid-column: span 6; /* Span 6/12 columns (50% width) */
+    grid-row: span 2; /* Take 2 rows in height */
+}
+
+.medium {
+    grid-column: span 4; /* Span 4/12 columns (33.33% width) */
+    grid-row: span 1; /* Default height (1 row) */
+}
+
+.small {
+    grid-column: span 2; /* Span 2/12 columns (16.67% width) */
+    grid-row: span 1; /* Default height */
+}

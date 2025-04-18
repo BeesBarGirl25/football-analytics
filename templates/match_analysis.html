@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Match Analysis{% endblock %}
+
+{% block dropdowns %}
+    {% include 'partials/competition_dropdowns.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="analysis-container">
+    <div class="analysis-nav">
+        <button class="tab-btn active" data-tab="overview">Overview</button>
+        <button class="tab-btn" data-tab="home">Home Team</button>
+        <button class="tab-btn" data-tab="away">Away Team</button>
+        <button class="tab-btn" data-tab="player">Player</button>
+    </div>
+
+    <div class="analysis-content" id="overview">
+        <div id="graphs-container" class="graphs-container">
+            <div id="graph-container-1" class="graph-container large">
+                <!-- Large graph -->
+            </div>
+            <div id="graph-container-2" class="graph-container small">
+                <!-- Small graph -->
+            </div>
+            <div id="graph-container-3" class="graph-container medium">
+                <!-- Medium graph -->
+            </div>
+            <div id="graph-container-4" class="graph-container small">
+                <!-- Another small graph -->
+            </div>
+        </div>
+    </div>
+    <div class="analysis-content hidden" id="home">Home team analysis goes here.</div>
+    <div class="analysis-content hidden" id="away">Away team analysis goes here.</div>
+    <div class="analysis-content hidden" id="player">Player analysis goes here.</div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('.searchable-dropdown').select2();
+    });
+</script>
+<script src="{{ url_for('static', filename='js/match_analysis.js') }}"></script>
+{% endblock %}
