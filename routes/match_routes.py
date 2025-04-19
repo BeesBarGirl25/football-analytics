@@ -50,8 +50,6 @@ def generate_match_graph():
     try:
         # Get the match data from the POST request
         match_data = request.json.get("matchData")
-        logger.debug(f"Match data received: {match_data}")
-
         # Validate that match data is provided
         if not match_data:
             return jsonify({"error": "No match data provided"}), 400
@@ -68,11 +66,6 @@ def generate_match_graph():
         graph_figure = generate_match_graph_plot(match_df)
 
         graph_json = pio.to_json(graph_figure, pretty=True)
-
-        logger.debug(f"Generated graph data: {graph_figure}")
-        logger.debug(f"Graph JSON: {graph_json}")
-
-        # Return the graph as a JSON object
         return jsonify(graph_json)
     except Exception as e:
         logger.error(f"Unexpected error in generate_match_graph: {e}")

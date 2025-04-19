@@ -57,13 +57,8 @@ async function renderGraph(matchData) {
 
         // Parse the JSON response from the backend
         const result = await response.json();
-        console.log("[Debug]: Received graph:", result);
-
         // Deserialize the graph JSON
         const graph = JSON.parse(result); // Parse the graph string into JSON objects
-        console.log("[Debug]: Parsed graph data:", graph.data);
-        console.log("[Debug]: Parsed graph layout:", graph.layout);
-
         // Verify that data and layout exist
         if (!graph.data || !graph.layout) {
             throw new Error("Graph data or layout is missing!");

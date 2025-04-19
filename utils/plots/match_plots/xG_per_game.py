@@ -38,7 +38,7 @@ def generate_match_graph_plot(match_data):
             x=x_team1_stats,
             y=y_cum_xg_team1,
             mode='lines',
-            name=f'{team_1_name} Cumulative xG',
+            name=f'{team_1_name} xG',
             line=dict(color='red', dash='dash')
         ),
         go.Scatter(
@@ -53,7 +53,7 @@ def generate_match_graph_plot(match_data):
             x=x_team2_stats,
             y=y_cum_xg_team2,
             mode='lines',
-            name=f'{team_2_name} Cumulative xG',
+            name=f'{team_2_name} xG',
             line=dict(color='blue', dash='dash')
         ),
         go.Scatter(
@@ -103,7 +103,7 @@ def generate_match_graph_plot(match_data):
     # Define the layout of the graph
     layout = go.Layout(
         title=dict(
-            text='Interactive Goals and xG Comparison',
+            text='xG and Goals per Game',
             font=dict(color='white', size=18),
             x=0.5
         ),
