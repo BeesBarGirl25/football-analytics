@@ -1,7 +1,13 @@
 from flask import Blueprint, jsonify, render_template
 from utils.extensions import cache
 from statsbombpy import sb
+import numpy as np
 import logging
+from flask import request
+from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
+import pandas as pd
+import plotly.io as pio  # Import this for converting Plotly figures to JSON
+
 
 logger = logging.getLogger(__name__)
 
@@ -36,4 +42,42 @@ def get_matches(competition_id, season_id):
 @cache.cached(timeout=3600)
 def get_match_events(match_id):
     events = sb.events(match_id)
-    return jsonify(events.to_dict(orient='records'))
+    match_cleaned = events.fillna(-999)
+    return jsonify(match_cleaned.to_dict(orient='records'))
+
+@match_bp.route('/api/generate_match_graph', methods=['POST'])
+def generate_match_graph():
+    try:
+        # Get the match data from the POST request
+        match_data = request.json.get("matchData")
+        logger.debug(f"Match data received: {match_data}")
+
+        # Validate that match data is provided
+        if not match_data:
+            return jsonify({"error": "No match data provided"}), 400
+
+        # Convert match_data (JSON) into a pandas DataFrame
+        try:
+            match_df = pd.DataFrame(match_data)
+            logger.debug(f"Converted match_data to DataFrame: {match_df}")
+        except Exception as df_error:
+            logger.error(f"Error converting JSON to DataFrame: {df_error}")
+            return jsonify({"error": "Failed to convert match data to DataFrame"}), 500
+
+        # Pass the DataFrame to the graph generation function
+        graph_figure = generate_match_graph_plot(match_df)
+
+        graph_json = pio.to_json(graph_figure, pretty=True)
+
+        logger.debug(f"Generated graph data: {graph_figure}")
+        logger.debug(f"Graph JSON: {graph_json}")
+
+        # Return the graph as a JSON object
+        return jsonify(graph_json)
+    except Exception as e:
+        logger.error(f"Unexpected error in generate_match_graph: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+
+
