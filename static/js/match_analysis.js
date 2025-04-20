@@ -72,6 +72,70 @@ async function renderGraph(matchData) {
     }
 }
 
+async function renderMatchSummary(matchData) {
+    try {
+        // Fetch match summary from the backend
+        const response = await fetch('/api/generate_match_summary', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ matchData }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch match summary: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        console.log(result)
+
+        // 1. Update Scoreline
+        const homeTeamElement = document.getElementById('home-team');
+        const awayTeamElement = document.getElementById('away-team');
+        const scoreElement = document.getElementById('score');
+
+        homeTeamElement.textContent = result.home_team || 'Home Team';
+        awayTeamElement.textContent = result.away_team || 'Away Team';
+        scoreElement.textContent = `${result.home_score} - ${result.away_score}`;
+
+        // 2. Populate Home Team Events
+        populateEventList('home-goals-list', result.home_goals);
+        populateEventList('home-assists-list', result.home_assists);
+        populateEventList('home-yellow-cards-list', result.home_yellow);
+        populateEventList('home-red-cards-list', result.home_red);
+
+        // 3. Populate Away Team Events
+        populateEventList('away-goals-list', result.away_goals);
+        populateEventList('away-assists-list', result.away_assists);
+        populateEventList('away-yellow-cards-list', result.away_yellow);
+        populateEventList('away-red-cards-list', result.away_red);
+    } catch (error) {
+        console.error('Error rendering match summary:', error);
+    }
+}
+
+// Helper function to populate event lists dynamically
+function populateEventList(elementId, events) {
+    const listElement = document.getElementById(elementId);
+    listElement.innerHTML = ''; // Clear the list
+
+    if (events && events.length > 0) {
+        events.forEach(event => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('event-item');
+            listItem.textContent = event; // Add event details
+            listElement.appendChild(listItem);
+        });
+    } else {
+        const emptyItem = document.createElement('li');
+        emptyItem.classList.add('event-item', 'empty');
+        emptyItem.textContent = 'No events recorded.';
+        listElement.appendChild(emptyItem);
+    }
+}
+
+
+
 // Event listener - Match dropdown
 $('#match-select').on('change', async function () {
     const matchId = $(this).val();
@@ -83,6 +147,8 @@ $('#match-select').on('change', async function () {
 
         // Pass matchData directly to renderGraph
         await renderGraph(matchData);
+
+        await renderMatchSummary(matchData);
     } catch (error) {
         console.error("Failed to update plots:", error);
     }
