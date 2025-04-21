@@ -59,33 +59,41 @@ def goal_assist_data(match_data):
 
     # Format the results with combined minutes for multiple goals/assists
     formatted_goals_home = [
-        ' '.join([f"{minute}'" for minute in minutes]) + f" {player} {'⚽' * len(minutes)}"
+        ' '.join([f"{minute}'" for minute in minutes]) + f" {format_player_name(player)} {'⚽' * len(minutes)}"
         for player, minutes in goals_home.items()
     ]
     formatted_assists_home = [
-        ' '.join([f"{minute}'" for minute in minutes]) + f" {player} {'👟' * len(minutes)}"
+        ' '.join([f"{minute}'" for minute in minutes]) + f" {format_player_name(player)} {'👟' * len(minutes)}"
         for player, minutes in assists_home.items()
     ]
     formatted_goals_away = [
-        ' '.join([f"{minute}'" for minute in minutes]) + f" {player} {'⚽' * len(minutes)}"
+        ' '.join([f"{minute}'" for minute in minutes]) + f" {format_player_name(player)} {'⚽' * len(minutes)}"
         for player, minutes in goals_away.items()
     ]
     formatted_assists_away = [
-        ' '.join([f"{minute}'" for minute in minutes]) + f" {player} {'👟' * len(minutes)}"
+        ' '.join([f"{minute}'" for minute in minutes]) + f" {format_player_name(player)} {'👟' * len(minutes)}"
         for player, minutes in assists_away.items()
     ]
+
+    logging.debug(f"Max period: {match_data['period'].max()}")
 
     home_score = match_data[(match_data['team'] == home_team) & (match_data['shot_outcome'] == 'Goal') & ((match_data['period'] == 1) | (match_data['period'] == 2))].shape[0]
     away_score = match_data[(match_data['team'] == away_team) & (match_data['shot_outcome'] == 'Goal') & ((match_data['period'] == 1) | (match_data['period'] == 2))].shape[0]
 
-    return formatted_goals_home, formatted_assists_home, formatted_goals_away, formatted_assists_away, home_score, away_score, home_team, away_team
+    home_score_extra_time = match_data[(match_data['team'] == home_team) & (match_data['shot_outcome'] == 'Goal') & ((match_data['period'] == 1) | (match_data['period'] == 2) | (match_data['period'] == 3) | (match_data['period'] == 4)) & (match_data['period'].max() != 2)].shape[0]
+    away_score_extra_time = match_data[(match_data['team'] == away_team) & (match_data['shot_outcome'] == 'Goal') & ((match_data['period'] == 1) | (match_data['period'] == 2) | (match_data['period'] == 3) | (match_data['period'] == 4)) & (match_data['period'].max() != 2)].shape[0]
+
+    home_score_penalties = match_data[(match_data['team'] == home_team) & (match_data['shot_outcome'] == 'Goal') & (match_data['period'] == 5)].shape[0]
+    away_score_penalties = match_data[(match_data['team'] == away_team) & (match_data['shot_outcome'] == 'Goal') & (match_data['period'] == 5)].shape[0]
+
+    return formatted_goals_home, formatted_assists_home, formatted_goals_away, formatted_assists_away, home_score, away_score, home_team, away_team, home_score_extra_time, away_score_extra_time, home_score_penalties, away_score_penalties
 
 
 
 def discipline_analysis(match_data):
 
     def generate_strings(dataframe):
-        return [f"Player: {row['player']}, Minute: {row['minute']}" for _, row in dataframe.iterrows()]
+        return [f"{row['minute']}' {format_player_name(row['player'])}" for _, row in dataframe.iterrows()]
 
     if 'bad_behaviour_card' not in match_data.columns:
         return [],[],[],[]
@@ -98,3 +106,19 @@ def discipline_analysis(match_data):
         away_team_yellow = away_team_data[away_team_data['bad_behaviour_card'] == 'Yellow Card']
         away_team_red = away_team_data[away_team_data['bad_behaviour_card'] == 'Red Card']
         return generate_strings(home_team_yellow), generate_strings(home_team_red), generate_strings(away_team_yellow), generate_strings(away_team_red)
+
+
+def format_player_name(player_name):
+    """
+    Format an individual player's name as 'L.Messi'.
+
+    Args:
+        player_name (str): Full name of the player (e.g., 'Lionel Messi').
+
+    Returns:
+        str: Formatted name (e.g., 'L.Messi').
+    """
+    if isinstance(player_name, str) and ' ' in player_name:
+        name = player_name.split(' ')
+        return f"{name[0][0]}.{name[-1]}"
+    return player_name

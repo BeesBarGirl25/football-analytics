@@ -85,7 +85,7 @@ def generate_match_overview():
             logger.error(f"Error converting JSON to DataFrame: {df_error}")
             return jsonify({"error": "Failed to convert match data to DataFrame"}), 500
 
-        home_goals, home_assists, away_goals, away_assists, home_score, away_score, home_team, away_team = goal_assist_data(match_df)
+        home_goals, home_assists, away_goals, away_assists, home_score, away_score, home_team, away_team, home_team_extra_time, away_team_extra_time, home_team_penalties, away_team_penalties = goal_assist_data(match_df)
         logger.debug(f"goal_assist_data results: "
                      f"home_goals={home_goals}, away_goals={away_goals}, "
                      f"home_assists={type(home_assists)}, away_assists={type(away_assists)}, "
@@ -110,7 +110,11 @@ def generate_match_overview():
             "home_score": home_score,
             "away_score": away_score,
             "home_team": home_team,
-            "away_team": away_team
+            "away_team": away_team,
+            "home_team_extra_time": home_team_extra_time,
+            "away_team_extra_time": away_team_extra_time,
+            "home_team_penalties": home_team_penalties,
+            "away_team_penalties": away_team_penalties
         })
 
     except Exception as e:

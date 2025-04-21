@@ -160,6 +160,7 @@ body {
     display: flex;
     width: 100%;
     gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .tab-btn {
@@ -186,20 +187,26 @@ body {
 
 .analysis-content {
    flex-grow: 1;
+   display: flex; /* Ensures its children can stretch */
+   flex-direction: column; /* Stack its children vertically */
    overflow-y: auto;
+   padding-top: 1rem;
 }
+
 
 .analysis-content.hidden {
     display: none;
 }
 
 .graphs-container {
-    display: grid; /* Use grid layout */
-    grid-template-columns: repeat(12, 1fr); /* 12-column grid for customization */
-    grid-auto-rows: 200px; /* Default row height */
-    gap: 20px; /* Spacing between grid items */
-    margin-top: 20px;
+   flex-grow: 1; /* This allows it to fill the remaining height */
+   display: grid;
+   grid-template-columns: repeat(12, 1fr); /* 12-column grid */
+   grid-auto-rows: minmax(200px, 1fr); /* Allow rows to grow dynamically */
+   gap: 20px; /* Spacing between the grid items */
+   height: 100%; /* Ensures the container takes the full height */
 }
+
 
 .graph-container {
     background-color: #1f1f1f;
@@ -251,6 +258,7 @@ body {
     border-bottom: 1px solid #333;
     background-color: #2d2d2d;
     flex-shrink: 0;
+    border-radius: 6px;
 }
 
 .match-scoreline .scoreline-team {
@@ -258,15 +266,9 @@ body {
     color: #90caf9;
     line-height: 1.2;
     padding: 0 8px;
+    font-weight: bold;
 }
 
-.match-scoreline .scoreline-team.home {
-    text-align: right;
-}
-
-.match-scoreline .scoreline-team.away {
-    text-align: left;
-}
 
 .match-scoreline .score {
     font-size: 20px;
@@ -275,49 +277,85 @@ body {
     white-space: nowrap;
 }
 
-.match-events {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 12px;
-    overflow-y: auto;
-    flex-grow: 1;
+.match-scoreline {
+    display: flex;
+    flex-direction: column; /* Stack rows vertically */
+    align-items: center;    /* Center the whole block horizontally */
+    gap: 8px;               /* Add spacing between rows */
+    width: 100%;            /* Full width of the parent container */
+    padding: 10px 0;        /* Optional: Padding around the content */
+    box-sizing: border-box; /* Include padding in the width */
+    text-align: center;     /* Center-align text within team names and scores */
 }
 
-.team-events {
-    padding: 12px;
-    background-color: #2d2d2d;
-    border-radius: 6px;
-    border: 1px solid #333;
-    height: fit-content;
+.score-row {
+    display: flex;          /* Align team names and score in a single row */
+    justify-content: space-between; /* Equal spacing between elements */
+    align-items: center;    /* Vertical alignment */
+    width: 100%;            /* Row takes up full width of the container */
+    max-width: 600px;       /* Optional: Set max-width for better layout control */
 }
 
-.team-name {
-    margin: 0 0 12px 0;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #444;
-    font-size: 16px;
-    color: #90caf9;
+.scoreline-team {
+    flex: 1;                /* Teams take up equal space */
+    text-align: center;     /* Center-align each team name */
+    font-size: 1.2rem;      /* Adjust font size for better visibility */
+    font-weight: bold;      /* Make team names bold */
+}
+
+.score {
+    flex: 0;                /* Score has fixed width */
+    font-size: 1.8rem;      /* Bigger font for the actual score */
     font-weight: bold;
 }
 
+.additional-scoreline {
+    font-size: 0.5rem;        /* Smaller size for additional scores */
+    font-weight: italic;
+    color: #90caf9;         /* Highlight additional scores with a distinct color */
+    margin-top: 2px;        /* Add a bit of spacing between rows */
+    text-align: center;     /* Ensure additional scores are always centered */
+}
+
+#match-events {
+    display: grid; /* Enable grid layout */
+    grid-template-columns: 1fr 1fr; /* Two equal columns for Home and Away teams */
+    gap: 20px; /* Space between the columns */
+    height: 100%; /* Ensure it fills the parent container height */
+    padding: 10px; /* Spacing around the container content */
+    box-sizing: border-box; /* Padding included in total dimensions */
+}
+
+.team-events {
+    display: flex; /* Use flexbox to stack categories within the column */
+    flex-direction: column; /* Align categories vertically */
+    gap: 10px; /* Space between categories inside the column */
+    overflow-y: auto; /* Enable vertical scroll if content exceeds height */
+    height: 100%; /* Make team events take up the full height */
+}
+
 .event-category {
-    margin: 8px 0;
+    flex: 1; /* Allow individual categories to grow evenly within their column */
 }
 
 .event-category-title {
     font-weight: bold;
-    color: #e0e0e0;
-    margin-bottom: 4px;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: #90caf9;
+    margin-bottom: 5px; /* Adds spacing underneath the title */
 }
 
 .event-list {
-    margin: 0;
+    list-style: none; /* Remove default bullet points */
     padding: 0;
-    list-style: none;
+    margin: 0;
+}
+
+.event-list li {
+    padding: 5px 10px;
+    margin-bottom: 5px;
+    background-color: #2d2d2d; /* Background styling for list items */
+    border-radius: 8px; /* Slightly rounded corners */
+    color: #e0e0e0; /* Text color for good contrast */
 }
 
 .event-item {

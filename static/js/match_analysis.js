@@ -98,6 +98,31 @@ async function renderMatchSummary(matchData) {
         awayTeamElement.textContent = result.away_team || 'Away Team';
         scoreElement.textContent = `${result.home_score} - ${result.away_score}`;
 
+                // Additional scorelines (extra time and penalties)
+        const scorelineElement = document.getElementById('match-scoreline');
+
+        // Remove any previously added additional scores
+        const existingExtras = document.querySelectorAll('.additional-scoreline');
+        existingExtras.forEach(extra => extra.remove());
+
+        // Add extra time score if present
+        if (result.home_team_extra_time !== 0 || result.away_team_extra_time !== 0) {
+            const extraTimeScoreElement = document.createElement('div');
+            extraTimeScoreElement.classList.add('additional-scoreline', 'extra-time');
+            extraTimeScoreElement.textContent = `ET: ${result.home_team_extra_time} - ${result.away_team_extra_time}`;
+            scorelineElement.appendChild(extraTimeScoreElement);
+        }
+
+        // Add penalty score if present
+        if (result.home_team_penalties !== 0 || result.away_team_penalties !== 0) {
+            const penaltyScoreElement = document.createElement('div');
+            penaltyScoreElement.classList.add('additional-scoreline', 'penalty');
+            penaltyScoreElement.textContent = `Pen: ${result.home_team_penalties} - ${result.away_team_penalties}`;
+            scorelineElement.appendChild(penaltyScoreElement);
+        }
+
+
+
         // 2. Populate Home Team Events
         populateEventList('home-goals-list', result.home_goals);
         populateEventList('home-assists-list', result.home_assists);
@@ -115,22 +140,27 @@ async function renderMatchSummary(matchData) {
 }
 
 // Helper function to populate event lists dynamically
-function populateEventList(elementId, events) {
-    const listElement = document.getElementById(elementId);
-    listElement.innerHTML = ''; // Clear the list
+function populateEventList(categoryId, eventData) {
+    const categoryElement = document.getElementById(categoryId);
+    const categoryContainer = categoryElement.parentElement;
+    const categoryHeading = categoryContainer.querySelector('.event-category-title');
 
-    if (events && events.length > 0) {
-        events.forEach(event => {
+    // Clear previous data
+    categoryElement.innerHTML = '';
+
+    if (eventData && eventData.length > 0) {
+        // Populate items
+        eventData.forEach(event => {
             const listItem = document.createElement('li');
-            listItem.classList.add('event-item');
-            listItem.textContent = event; // Add event details
-            listElement.appendChild(listItem);
+            listItem.textContent = event;
+            categoryElement.appendChild(listItem);
         });
+
+        // Show heading if data exists
+        categoryHeading.style.display = 'block';
     } else {
-        const emptyItem = document.createElement('li');
-        emptyItem.classList.add('event-item', 'empty');
-        emptyItem.textContent = 'No events recorded.';
-        listElement.appendChild(emptyItem);
+        // Hide heading if no data exists
+        categoryHeading.style.display = 'none';
     }
 }
 
