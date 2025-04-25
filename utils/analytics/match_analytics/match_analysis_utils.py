@@ -15,8 +15,6 @@ def goal_assist_data(match_data):
     home_team, away_team = match_data['team'].unique()
     goals = match_data[match_data['shot_outcome'] == 'Goal']
 
-    logging.debug(f"goals: {goals}")
-
     goals_home = {}
     assists_home = {}
     goals_away = {}
@@ -50,10 +48,6 @@ def goal_assist_data(match_data):
                     assists_away[assist_player].append(
                         str(assist['minute'].iloc[0]))  # Store all assist minutes for this player
 
-    logging.debug(f"goals_home: {goals_home}")
-    logging.debug(f"assists_home: {assists_home}")
-    logging.debug(f"goals_away: {goals_away}")
-    logging.debug(f"assists_away: {assists_away}")
 
 
 
@@ -74,8 +68,6 @@ def goal_assist_data(match_data):
         ' '.join([f"{minute}'" for minute in minutes]) + f" {format_player_name(player)} {'👟' * len(minutes)}"
         for player, minutes in assists_away.items()
     ]
-
-    logging.debug(f"Max period: {match_data['period'].max()}")
 
     home_score = match_data[(match_data['team'] == home_team) & (match_data['shot_outcome'] == 'Goal') & ((match_data['period'] == 1) | (match_data['period'] == 2))].shape[0]
     away_score = match_data[(match_data['team'] == away_team) & (match_data['shot_outcome'] == 'Goal') & ((match_data['period'] == 1) | (match_data['period'] == 2))].shape[0]

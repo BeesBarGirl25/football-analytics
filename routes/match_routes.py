@@ -9,6 +9,7 @@ from flask import request
 from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
 import pandas as pd
 import plotly.io as pio  # Import this for converting Plotly figures to JSON
+from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
 
 
 logger = logging.getLogger(__name__)
@@ -86,15 +87,9 @@ def generate_match_overview():
             return jsonify({"error": "Failed to convert match data to DataFrame"}), 500
 
         home_goals, home_assists, away_goals, away_assists, home_score, away_score, home_team, away_team, home_team_extra_time, away_team_extra_time, home_team_penalties, away_team_penalties = goal_assist_data(match_df)
-        logger.debug(f"goal_assist_data results: "
-                     f"home_goals={home_goals}, away_goals={away_goals}, "
-                     f"home_assists={type(home_assists)}, away_assists={type(away_assists)}, "
-                     f"home_score={home_score}, away_score={away_score}")
+
 
         home_yellow, home_red, away_yellow, away_red = discipline_analysis(match_df)
-        logger.debug(f"discipline_analysis results: "
-                     f"home_yellow={type(home_yellow)}, home_red={type(home_red)}, "
-                     f"away_yellow={type(away_yellow)}, away_red={type(away_red)}")
 
 
 
@@ -121,5 +116,25 @@ def generate_match_overview():
         logger.error(f"Unexpected error in generate_match_summary: {e}")
         return jsonify({"error": str(e)}), 500
 
+
+@match_bp.route('/api/generate_momentum_graph', methods=['POST'])
+def generate_momentum_graph():
+    try:
+        match_data = request.json.get("matchData")
+        if not match_data:
+            return jsonify({"error": "No match data provided"}), 400
+        try:
+            match_df = pd.DataFrame(match_data)
+
+            graph_figure = generate_momentum_graph_plot(match_df)
+            graph_json = pio.to_json(graph_figure, pretty=True)
+            logger.debug(f"Converted match_data to DataFrame")
+            return jsonify(graph_json)
+        except Exception as df_error:
+            logger.error(f"Error converting JSON to DataFrame: {df_error}")
+            return jsonify({"error": "Failed to convert match data to DataFrame"}), 500
+    except Exception as e:
+        logger.error(f"Unexpected error in generate_momentum_graph: {e}")
+        return jsonify({"error": str(e)}), 500
 
 

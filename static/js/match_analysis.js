@@ -72,6 +72,36 @@ async function renderGraph(matchData) {
     }
 }
 
+async function renderMomentumGraph(matchData) {
+    try {
+        const response = await fetch('/api/generate_momentum_graph', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ matchData }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch graph: {response.status}`);
+        }
+
+        const result = await response.json();
+        const graph = JSON.parse(result);
+
+        console.log("Graph data: ", graph.data);
+        console.log("Layout Data: ", graph.data);
+
+        if (!graph.data | !graph.layout) {
+            throw new Error("Graph data or layout is missing!");
+        }
+
+        Plotly.newPlot('graph-container-3', graph.data, graph.layout);
+        console.log("[Debug]: Graph rendered succesfully.");
+    } catch (error) {
+        console.error("[Error]: Failed to render graph:", error)
+    }
+}
+
+
 async function renderMatchSummary(matchData) {
     try {
         // Fetch match summary from the backend
@@ -179,6 +209,7 @@ $('#match-select').on('change', async function () {
         await renderGraph(matchData);
 
         await renderMatchSummary(matchData);
+        await renderMomentumGraph(matchData);
     } catch (error) {
         console.error("Failed to update plots:", error);
     }
