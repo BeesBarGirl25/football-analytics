@@ -20,11 +20,27 @@ def load_xT():
 
 
 def generate_momentum_graph_plot(match_data):
-    match_data = match_data[['minute', 'possession_team', 'type', 'location', 'pass_outcome', 'pass_end_location']]
-    filtered_data = match_data.loc[match_data['type'] == 'Pass']
-    filtered_data.loc[:, 'pass_outcome'] = filtered_data['pass_outcome'].fillna('Successful')
+    match_data = match_data[['minute', 'possession_team', 'type', 'location', 'pass_outcome', 'pass_end_location', 'carry_end_location']]
+    filtered_data = match_data.loc[(match_data['type'] == 'Pass') | (match_data['type'] == 'Carry')]
+
+    # Handle pass_outcome for Pass type, and carry_end_location for Carry type
+    filtered_data.loc[filtered_data['type'] == 'Pass', 'pass_outcome'] = filtered_data.loc[
+        filtered_data['type'] == 'Pass', 'pass_outcome'].fillna('Successful')
+
+    # Split 'location' into start_x and start_y for all rows
     filtered_data[['start_x', 'start_y']] = pd.DataFrame(filtered_data['location'].tolist(), index=filtered_data.index)
-    filtered_data[['end_x', 'end_y']] = pd.DataFrame(filtered_data['pass_end_location'].tolist(),index=filtered_data.index)
+
+    # For Pass type: set end_x and end_y from 'pass_end_location'
+    filtered_data.loc[filtered_data['type'] == 'Pass', 'end_x'] = filtered_data.loc[
+        filtered_data['type'] == 'Pass', 'pass_end_location'].apply(lambda x: x[0] if isinstance(x, list) else None)
+    filtered_data.loc[filtered_data['type'] == 'Pass', 'end_y'] = filtered_data.loc[
+        filtered_data['type'] == 'Pass', 'pass_end_location'].apply(lambda x: x[1] if isinstance(x, list) else None)
+
+    # For Carry type: set end_x and end_y from 'carry_end_location'
+    filtered_data.loc[filtered_data['type'] == 'Carry', 'end_x'] = filtered_data.loc[
+        filtered_data['type'] == 'Carry', 'carry_end_location'].apply(lambda x: x[0] if isinstance(x, list) else None)
+    filtered_data.loc[filtered_data['type'] == 'Carry', 'end_y'] = filtered_data.loc[
+        filtered_data['type'] == 'Carry', 'carry_end_location'].apply(lambda x: x[1] if isinstance(x, list) else None)
 
     logging.debug(f"filtered_data: {filtered_data}")
     xT = load_xT()
@@ -54,33 +70,77 @@ def generate_momentum_graph_plot(match_data):
 
     home_team_x = home_team_data['minute'].tolist()
     home_team_y = home_team_data['xT'].tolist()
+    home_team_y = [0 if x < 0 else x for x in home_team_y]
     away_team_x = away_team_data['minute'].tolist()
     away_team_y = away_team_data['xT'].tolist()
-    away_team_y = [-1 * x for x in away_team_y]
+    away_team_y = [-x if x > 0 else 0 for x in away_team_y]
 
+    # Find the maximum absolute value for symmetry
+    max_value = max(max(home_team_y), abs(min(away_team_y)))
 
-    # Create Plotly Bar traces
+    # Add a small buffer so the bars don't touch the x-axis
+    buffer = max_value * 0.1
+    max_range = max_value + buffer
+
+    # Create Bar traces
     home_trace = go.Bar(
         x=home_team_x,
         y=home_team_y,
         name=home_team,
-        marker_color='red'
+        marker=dict(
+            color='blue',
+            line=dict(color='rgba(0, 0, 255, 0.3)', width=3)
+        ),
+        width=0.6,
     )
 
     away_trace = go.Bar(
         x=away_team_x,
         y=away_team_y,
         name=away_team,
-        marker_color='blue'
+        marker=dict(
+            color='red',
+            line=dict(color='rgba(255, 0, 0, 0.3)', width=3)
+        ),
+        width=0.6,
     )
 
-    # Define layout using go.Layout
     layout = go.Layout(
-        barmode='overlay',
-        bargap=0.2,
+        xaxis=dict(
+            title='Minutes',
+            color='white',
+            gridcolor='rgba(255, 255, 255, 0.05)',
+            showline=True,
+            linecolor='rgba(255, 255, 255, 0.2)',
+            automargin=True,
+            autorange=True,
+            zeroline=True,
+            zerolinecolor='rgba(255,255,255,0.6)',
+            zerolinewidth=2,
+        ),
+        yaxis=dict(
+            range=[-max_range, max_range],  # Symmetrical around 0
+            showgrid=False,
+            zeroline=True,
+            zerolinecolor='rgba(255,255,255,0.6)',
+            zerolinewidth=2,
+            visible=False
+        ),
+        barmode='relative',  # overlay instead of relative
+        bargap=0.1,
         autosize=True,
         plot_bgcolor="rgba(0, 0, 0, 0)",
         paper_bgcolor="rgba(0, 0, 0, 0)",
+        margin=dict(l=20, r=20, t=20, b=40),
+        legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=-0.25,
+            xanchor='center',
+            x=0.5,
+            font=dict(color='white', size=12),
+            bgcolor='rgba(0,0,0,0)'
+        )
     )
 
     # Return a dictionary to match the desired format

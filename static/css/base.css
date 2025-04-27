@@ -202,10 +202,11 @@ body {
    flex-grow: 1; /* This allows it to fill the remaining height */
    display: grid;
    grid-template-columns: repeat(12, 1fr); /* 12-column grid */
-   grid-auto-rows: minmax(200px, 1fr); /* Allow rows to grow dynamically */
+   grid-template-rows: repeat(12, 1fr); /* 12 rows */
    gap: 20px; /* Spacing between the grid items */
    height: 100%; /* Ensures the container takes the full height */
 }
+
 
 
 .graph-container {
@@ -227,8 +228,13 @@ body {
 }
 
 .medium {
-    grid-column: span 4; /* Span 4/12 columns (33.33% width) */
-    grid-row: span 1; /* Default height (1 row) */
+   grid-column: span 4; /* Span 4/12 columns (33.33% width) */
+   grid-row: span 8; /* Default height (1 row) */
+   width: 100%; /* Occupy full width of container */
+   height: 100%; /* Occupy full height of container */
+   margin: 0; /* Remove any margin specific to the graph */
+   padding: 0; /* Remove any padding specific to the graph */
+
 }
 
 .small {
@@ -237,8 +243,8 @@ body {
 }
 
 .tall {
-    grid-column: span 3;
-    grid-row: span 2;
+    grid-column: span 4;
+    grid-row: span 12;
 }
 
 #graph-container-2 {
@@ -390,3 +396,13 @@ body {
 .match-events::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+.graph-container-3 {
+    display: flex;
+    flex-grow: 1; /* Allow it to grow and fill the entire available space */
+    margin: 0; /* Remove any margin */
+    padding: 0; /* Remove any padding */
+    width: 100%; /* Take full width of the parent */
+    height: 100%; /* Take full height of the parent */
+}
+
