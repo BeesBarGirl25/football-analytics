@@ -20,59 +20,18 @@
             <div id="graph-container-1" class="graph-container medium">
             </div>
             <div id="graph-container-2" class="graph-container tall">
-                <!-- Match Scoreline -->
-               <div id="match-scoreline" class="match-scoreline">
-                    <!-- Row for main score with team names -->
-                    <div class="score-row">
-                        <div id="home-team" class="scoreline-team home"></div>
-                        <div id="score" class="score"></div>
-                        <div id="away-team" class="scoreline-team away"></div>
+                <div class="team-tables">
+                    <div class="team-table">
+                        <h3 id="home-team-name">Home Team</h3>
+                        <table id="home-team-table">
+                            <tbody></tbody>
+                        </table>
                     </div>
-                    <!-- Rows for additional scores -->
-                    <div class="additional-scoreline extra-time"></div>
-                    <div class="additional-scoreline penalty"></div>
-                </div>
-
-                <!-- Match Events -->
-                <div id="match-events" class="match-events">
-                    <!-- Home Team Events -->
-                    <div id="home-team-events" class="team-events home">
-                        <div id="home-goals" class="event-category">
-                            <div class="event-category-title">Goals</div>
-                            <ul id="home-goals-list" class="event-list"></ul>
-                        </div>
-                        <div id="home-assists" class="event-category">
-                            <div class="event-category-title">Assists</div>
-                            <ul id="home-assists-list" class="event-list"></ul>
-                        </div>
-                        <div id="home-yellow-cards" class="event-category">
-                            <div class="event-category-title">Yellow Cards</div>
-                            <ul id="home-yellow-cards-list" class="event-list"></ul>
-                        </div>
-                        <div id="home-red-cards" class="event-category">
-                            <div class="event-category-title">Red Cards</div>
-                            <ul id="home-red-cards-list" class="event-list"></ul>
-                        </div>
-                    </div>
-
-                    <!-- Away Team Events -->
-                    <div id="away-team-events" class="team-events away">
-                        <div id="away-goals" class="event-category">
-                            <div class="event-category-title">Goals</div>
-                            <ul id="away-goals-list" class="event-list"></ul>
-                        </div>
-                        <div id="away-assists" class="event-category">
-                            <div class="event-category-title">Assists</div>
-                            <ul id="away-assists-list" class="event-list"></ul>
-                        </div>
-                        <div id="away-yellow-cards" class="event-category">
-                            <div class="event-category-title">Yellow Cards</div>
-                            <ul id="away-yellow-cards-list" class="event-list"></ul>
-                        </div>
-                        <div id="away-red-cards" class="event-category">
-                            <div class="event-category-title">Red Cards</div>
-                            <ul id="away-red-cards-list" class="event-list"></ul>
-                        </div>
+                    <div class="team-table">
+                        <h3 id="away-team-name">Away Team</h3>
+                        <table id="away-team-table">
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
             </div>

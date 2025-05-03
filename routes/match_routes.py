@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, render_template
 
-from utils.analytics.match_analytics.match_analysis_utils import goal_assist_data, discipline_analysis
+from utils.analytics.match_analytics.match_analysis_utils import goal_assist_stats, extract_player_names
 from utils.extensions import cache
 from statsbombpy import sb
 import numpy as np
@@ -86,30 +86,26 @@ def generate_match_overview():
             logger.error(f"Error converting JSON to DataFrame: {df_error}")
             return jsonify({"error": "Failed to convert match data to DataFrame"}), 500
 
-        home_goals, home_assists, away_goals, away_assists, home_score, away_score, home_team, away_team, home_team_extra_time, away_team_extra_time, home_team_penalties, away_team_penalties = goal_assist_data(match_df)
+        home_team_df, away_team_df, home_team, away_team = goal_assist_stats(match_df)
+        home_team_data = []
+        for _, row in home_team_df.iterrows():
+            home_team_data.append({
+                'player': row['player'],
+                'contributions': list(row['contributions'])
+            })
 
-
-        home_yellow, home_red, away_yellow, away_red = discipline_analysis(match_df)
-
-
+        away_team_data = []
+        for _, row in away_team_df.iterrows():
+            away_team_data.append({
+                'player': row['player'],
+                'contributions': list(row['contributions'])
+            })
 
         return jsonify({
-            "home_goals": home_goals.tolist() if isinstance(home_goals, pd.Series) else home_goals,
-            "away_goals": away_goals.tolist() if isinstance(away_goals, pd.Series) else away_goals,
-            "home_assists": home_assists.tolist() if isinstance(home_assists, pd.Series) else home_assists,
-            "away_assists": away_assists.tolist() if isinstance(away_assists, pd.Series) else away_assists,
-            "home_yellow": home_yellow.tolist() if isinstance(home_yellow, pd.Series) else home_yellow,
-            "home_red": home_red.tolist() if isinstance(home_red, pd.Series) else home_red,
-            "away_yellow": away_yellow.tolist() if isinstance(away_yellow, pd.Series) else away_yellow,
-            "away_red": away_red.tolist() if isinstance(away_red, pd.Series) else away_red,
-            "home_score": home_score,
-            "away_score": away_score,
-            "home_team": home_team,
-            "away_team": away_team,
-            "home_team_extra_time": home_team_extra_time,
-            "away_team_extra_time": away_team_extra_time,
-            "home_team_penalties": home_team_penalties,
-            "away_team_penalties": away_team_penalties
+            'home': home_team_data,
+            'away': away_team_data,
+            'homeTeam': home_team,
+            'awayTeam': away_team
         })
 
     except Exception as e:

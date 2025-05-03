@@ -247,82 +247,6 @@ body {
     grid-row: span 12;
 }
 
-#graph-container-2 {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background-color: #1f1f1f;
-}
-
-.match-scoreline {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 12px;
-    text-align: center;
-    padding: 10px;
-    border-bottom: 1px solid #333;
-    background-color: #2d2d2d;
-    flex-shrink: 0;
-    border-radius: 6px;
-}
-
-.match-scoreline .scoreline-team {
-    font-size: 16px;
-    color: #90caf9;
-    line-height: 1.2;
-    padding: 0 8px;
-    font-weight: bold;
-}
-
-
-.match-scoreline .score {
-    font-size: 20px;
-    color: #e0e0e0;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.match-scoreline {
-    display: flex;
-    flex-direction: column; /* Stack rows vertically */
-    align-items: center;    /* Center the whole block horizontally */
-    gap: 8px;               /* Add spacing between rows */
-    width: 100%;            /* Full width of the parent container */
-    padding: 10px 0;        /* Optional: Padding around the content */
-    box-sizing: border-box; /* Include padding in the width */
-    text-align: center;     /* Center-align text within team names and scores */
-}
-
-.score-row {
-    display: flex;          /* Align team names and score in a single row */
-    justify-content: space-between; /* Equal spacing between elements */
-    align-items: center;    /* Vertical alignment */
-    width: 100%;            /* Row takes up full width of the container */
-    max-width: 600px;       /* Optional: Set max-width for better layout control */
-}
-
-.scoreline-team {
-    flex: 1;                /* Teams take up equal space */
-    text-align: center;     /* Center-align each team name */
-    font-size: 1.2rem;      /* Adjust font size for better visibility */
-    font-weight: bold;      /* Make team names bold */
-}
-
-.score {
-    flex: 0;                /* Score has fixed width */
-    font-size: 1.8rem;      /* Bigger font for the actual score */
-    font-weight: bold;
-}
-
-.additional-scoreline {
-    font-size: 0.5rem;        /* Smaller size for additional scores */
-    font-weight: italic;
-    color: #90caf9;         /* Highlight additional scores with a distinct color */
-    margin-top: 2px;        /* Add a bit of spacing between rows */
-    text-align: center;     /* Ensure additional scores are always centered */
-}
-
 #match-events {
     display: grid; /* Enable grid layout */
     grid-template-columns: 1fr 1fr; /* Two equal columns for Home and Away teams */
@@ -406,3 +330,79 @@ body {
     height: 100%; /* Take full height of the parent */
 }
 
+#graph-container-2 {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    max-width: 1200px;
+    flex-wrap: wrap;
+}
+
+.team-table {
+    flex: 1 1 45%;
+    background-color: #1e1e1e;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.3);
+}
+
+.team-table h2 {
+    text-align: center;
+    color: #00bcd4;
+    margin-bottom: 12px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #fff;
+    font-size: 0.7rem;
+}
+
+th, td {
+    text-align: center;
+    border-bottom: 1px solid #444;
+}
+
+th {
+    background-color: #2c2c2c;
+    font-weight: bold;
+    color: #00bcd4;
+}
+
+tr:hover {
+    background-color: #2a2a2a;
+    transition: 0.3s;
+}
+
+/* Emoji contributions */
+.emoji {
+    font-size: 0.6rem;
+    margin: 0 2px;
+    animation: pop 0.3s ease-out;
+}
+
+.goal { color: gold; }
+.assist { color: lightgreen; }
+.subbed-on { color: lightblue; }
+.subbed-off { color: orange; }
+.yellow-card { color: yellow; }
+.red-card { color: red; }
+
+@keyframes pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.team-tables {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 2rem;
+    width: 100%;
+}
+
+.team-table {
+    flex: 1;
+    overflow-x: auto;
+}
