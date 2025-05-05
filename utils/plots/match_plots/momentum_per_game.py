@@ -42,9 +42,8 @@ def generate_momentum_graph_plot(match_data):
     filtered_data.loc[filtered_data['type'] == 'Carry', 'end_y'] = filtered_data.loc[
         filtered_data['type'] == 'Carry', 'carry_end_location'].apply(lambda x: x[1] if isinstance(x, list) else None)
 
-    logging.debug(f"filtered_data: {filtered_data}")
+
     xT = load_xT()
-    logging.debug(f"xT: {xT}")
     xT = np.array(xT)
     xt_rows, xt_cols = xT.shape
     filtered_data['x1_bin'] = pd.cut(filtered_data['start_x'], bins=xt_cols, labels=False)

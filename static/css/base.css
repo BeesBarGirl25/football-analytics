@@ -406,3 +406,19 @@ tr:hover {
     flex: 1;
     overflow-x: auto;
 }
+
+.score-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.score-header h3 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.score-header p {
+    font-size: 16px;
+    color: gray;
+    margin: 5px 0 0;
+}

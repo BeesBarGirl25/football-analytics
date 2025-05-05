@@ -117,8 +117,22 @@ async function renderMatchSummary(matchData) {
         const result = await response.json();
         console.log("[Debug] Match Summary Result:", result);
         // Update the team names dynamically
-        $('#home-team-name').text(result.homeTeam);
-        $('#away-team-name').text(result.awayTeam);
+        // Extract necessary data from response
+        const scoreline = result.scoreline; // Contains the main scoreline: e.g., "Home Team 1 - 2 Away Team"
+        const extraTimeDetails = result.extra_time_details; // Extra info: e.g., "(ET: 1 - 0, Pen: 5 - 4)"
+
+        // Populate the score header dynamically
+        document.getElementById('combined-score-header').textContent = scoreline;
+
+        // Update the extra details (or hide if not applicable)
+        const extraDetails = document.getElementById('extra-details');
+        if (extraTimeDetails) {
+            extraDetails.textContent = extraTimeDetails;
+            extraDetails.style.display = 'block';
+        } else {
+            extraDetails.style.display = 'none';
+        }
+
 
         // Populate contribution tables
         populateTable('home-team-table', result.home);

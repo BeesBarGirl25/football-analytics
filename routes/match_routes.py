@@ -86,7 +86,7 @@ def generate_match_overview():
             logger.error(f"Error converting JSON to DataFrame: {df_error}")
             return jsonify({"error": "Failed to convert match data to DataFrame"}), 500
 
-        home_team_df, away_team_df, home_team, away_team = goal_assist_stats(match_df)
+        home_team_df, away_team_df, home_team, away_team, home_team_normal_time, away_team_normal_time, home_team_extra_time, away_team_extra_time, home_team_penalties, away_team_penalties = goal_assist_stats(match_df)
         home_team_data = []
         for _, row in home_team_df.iterrows():
             home_team_data.append({
@@ -101,11 +101,32 @@ def generate_match_overview():
                 'contributions': list(row['contributions'])
             })
 
+        # Create the combined scoreline
+        scoreline = f"{home_team} {home_team_normal_time} - {away_team_normal_time} {away_team}"
+        extra_time_details = None
+
+        # Add extra time and penalties if they exist
+        if home_team_extra_time > 0 or away_team_extra_time > 0:
+            extra_time_details = f"(ET: {home_team_extra_time} - {away_team_extra_time})"
+        if home_team_penalties > 0 or away_team_penalties > 0:
+            if extra_time_details:
+                extra_time_details += f", (Pen: {home_team_penalties} - {away_team_penalties})"
+            else:
+                extra_time_details = f"(Pen: {home_team_penalties} - {away_team_penalties})"
+
         return jsonify({
             'home': home_team_data,
             'away': away_team_data,
             'homeTeam': home_team,
-            'awayTeam': away_team
+            'awayTeam': away_team,
+            'homeTeamNormalTime': home_team_normal_time,
+            'awayTeamNormalTime': away_team_normal_time,
+            'homeTeamExtraTime': home_team_extra_time,
+            'awayTeamExtraTime': away_team_extra_time,
+            'homeTeamPenalties': home_team_penalties,
+            'awayTeamPenalties': away_team_penalties,
+            'scoreline': scoreline,
+            'extraTimeDetails': extra_time_details
         })
 
     except Exception as e:
