@@ -114,8 +114,8 @@ def goal_assist_stats(match_data):
         assist_emoji = '🅰️'
         yellow_card_emoji = '🟨'
         red_card_emoji = '🟥'
-        sub_on_emoji = '🔼'
-        sub_off_emoji = '🔽'
+        sub_on_emoji = '🔺'  # Red triangle pointed up
+        sub_off_emoji = '🔻'  # Red triangle pointed down
 
         player_matrix['contributions'] = (
             player_matrix['goals'].apply(lambda x: goal_emoji * x) +

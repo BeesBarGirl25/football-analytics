@@ -116,13 +116,14 @@ async function renderMatchSummary(matchData) {
 
         const result = await response.json();
         console.log("[Debug] Match Summary Result:", result);
-        // Update the team names dynamically
-        // Extract necessary data from response
-        const scoreline = result.scoreline; // Contains the main scoreline: e.g., "Home Team 1 - 2 Away Team"
-        const extraTimeDetails = result.extra_time_details; // Extra info: e.g., "(ET: 1 - 0, Pen: 5 - 4)"
+        const extraTimeDetails = result.extraTimeDetails; // Extra info: e.g., "(ET: 1 - 0, Pen: 5 - 4)"
 
         // Populate the score header dynamically
-        document.getElementById('combined-score-header').textContent = scoreline;
+        document.getElementById('home-team-name').textContent = result.homeTeam
+        document.getElementById('away-team-name').textContent = result.awayTeam
+        document.getElementById('home-team-score').textContent = result.homeTeamNormalTime
+        document.getElementById('away-team-score').textContent = result.awayTeamNormalTime
+        document.getElementById('score-seperator').textContent = '-'
 
         // Update the extra details (or hide if not applicable)
         const extraDetails = document.getElementById('extra-details');
@@ -171,6 +172,10 @@ $('#match-select').on('change', async function () {
     try {
         // Fetch match data (from cache or API)
         const matchData = await fetchMatchData(matchId);
+
+        document.getElementById('graph-container-1').classList.remove('hidden');
+        document.getElementById('graph-container-2').classList.remove('hidden');
+        document.getElementById('graph-container-3').classList.remove('hidden');
 
         // Run the rendering functions in parallel
         await Promise.all([

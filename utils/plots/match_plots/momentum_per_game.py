@@ -105,15 +105,19 @@ def generate_momentum_graph_plot(match_data):
     )
 
     layout = go.Layout(
+        title=dict(
+            text='Momentum',
+            font=dict(color='white', size=14),
+            x=0.5
+        ),
         xaxis=dict(
-            title='Minutes',
             color='white',
             gridcolor='rgba(255, 255, 255, 0.05)',
-            showline=True,
+            showline=False,
             linecolor='rgba(255, 255, 255, 0.2)',
             automargin=True,
             autorange=True,
-            zeroline=True,
+            zeroline=False,
             zerolinecolor='rgba(255,255,255,0.6)',
             zerolinewidth=2,
         ),
@@ -130,16 +134,8 @@ def generate_momentum_graph_plot(match_data):
         autosize=True,
         plot_bgcolor="rgba(0, 0, 0, 0)",
         paper_bgcolor="rgba(0, 0, 0, 0)",
-        margin=dict(l=20, r=20, t=20, b=40),
-        legend=dict(
-            orientation='h',
-            yanchor='bottom',
-            y=-0.25,
-            xanchor='center',
-            x=0.5,
-            font=dict(color='white', size=12),
-            bgcolor='rgba(0,0,0,0)'
-        )
+        margin=dict(l=10, r=10, t=30, b=30),
+        showlegend=False
     )
 
     # Return a dictionary to match the desired format

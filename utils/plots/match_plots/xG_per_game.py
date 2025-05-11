@@ -33,35 +33,52 @@ def generate_match_graph_plot(match_data):
 
     # Initialize Plotly traces (data)
     data = [
-        # Team 1 traces
+        # Real data traces (hidden from legend)
         go.Scatter(
             x=x_team1_stats,
             y=y_cum_xg_team1,
             mode='lines',
-            name=f'{team_1_name} xG',
-            line=dict(color='red', dash='dash')
+            name='',
+            line=dict(color='blue', dash='dash'),
+            showlegend=False
         ),
         go.Scatter(
             x=x_team1_stats,
             y=y_cum_goals_team1,
             mode='lines',
-            name=f'{team_1_name} Goals',
-            line=dict(color='red')
+            name='',
+            line=dict(color='blue'),
+            showlegend=False
         ),
-        # Team 2 traces
         go.Scatter(
             x=x_team2_stats,
             y=y_cum_xg_team2,
             mode='lines',
-            name=f'{team_2_name} xG',
-            line=dict(color='blue', dash='dash')
+            name='',
+            line=dict(color='red', dash='dash'),
+            showlegend=False
         ),
         go.Scatter(
             x=x_team2_stats,
             y=y_cum_goals_team2,
             mode='lines',
-            name=f'{team_2_name} Goals',
-            line=dict(color='blue')
+            name='',
+            line=dict(color='red'),
+            showlegend=False
+        ),
+        # Legend dummy for xG
+        go.Scatter(
+            x=[None], y=[None],
+            mode='lines',
+            line=dict(color='white', dash='dash'),
+            name='xG'
+        ),
+        # Legend dummy for Goals
+        go.Scatter(
+            x=[None], y=[None],
+            mode='lines',
+            line=dict(color='white'),
+            name='Goals'
         )
     ]
 
@@ -104,37 +121,35 @@ def generate_match_graph_plot(match_data):
     layout = go.Layout(
         title=dict(
             text='xG and Goals per Game',
-            font=dict(color='white', size=18),
+            font=dict(color='white', size=14),
             x=0.5
         ),
         xaxis=dict(
-            title='Minutes',
             color='white',
             gridcolor='rgba(255, 255, 255, 0.1)',
             showline=True,
             linecolor='rgba(255, 255, 255, 0.2)'
         ),
         yaxis=dict(
-            title='Goals',
             color='white',
             gridcolor='rgba(255, 255, 255, 0.1)',
             showline=True,
             linecolor='rgba(255, 255, 255, 0.2)',
-            range=[0, y_max + 1]  # Add buffer
+            range=[0, y_max + 1]
         ),
         legend=dict(
-            orientation='h',  # horizontal layout
+            orientation='h',
+            x=0,
+            y=1,
+            xanchor='left',
             yanchor='top',
-            y=-0.25,  # adjust vertically (play with -0.3 or -0.35 if needed)
-            xanchor='center',
-            x=0.5,  # center it horizontally
-            font=dict(color='white', size=12),
+            font=dict(color='white', size=11),
             bgcolor='rgba(0,0,0,0)'  # transparent background
         ),
         autosize=True,
-        margin=dict(l=40, r=40, t=60, b=100),
         plot_bgcolor="rgba(0, 0, 0, 0)",
         paper_bgcolor="rgba(0, 0, 0, 0)",
+        margin=dict(l=10, r=10, t=30, b=30),
         shapes=shapes,
         annotations=annotations
     )
