@@ -80,7 +80,7 @@ body {
 
 .content {
     grid-area: content;
-    padding: 20px;
+    padding: 0.5rem;
     box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
@@ -91,58 +91,43 @@ body {
 }
 
 /* --- SELECT2 CUSTOM DARK THEME --- */
-
-/* Main box */
 .select2-container .select2-selection--single {
     background-color: #222222;
     border: 1px solid #444;
-    color: #e0e0e0; /* Increased contrast */
+    color: #e0e0e0;
     padding: 6px 12px;
     border-radius: 6px;
     min-height: 38px;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
-
-/* Selected text */
 .select2-selection__rendered {
     color: #e0e0e0 !important;
     line-height: 38px;
 }
-
-/* Placeholder */
 .select2-selection__placeholder {
-    color: #bbbbbb !important; /* Softer placeholder contrast */
+    color: #bbbbbb !important;
 }
-
-/* Arrow icon */
 .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: 38px;
     right: 10px;
 }
-
-/* Dropdown panel */
 .select2-container--default .select2-dropdown {
-    background-color: #1e1e1e; /* Match content panel */
+    background-color: #1e1e1e;
     border: 1px solid #333;
     z-index: 1060 !important;
     border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8); /* Subtle shadow */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
 }
-
-/* Options inside dropdown */
 .select2-container--default .select2-results__option {
     color: #e0e0e0;
     background-color: #1e1e1e;
     padding: 8px 12px;
 }
-
-/* Highlight on hover/focus */
 .select2-container--default .select2-results__option--highlighted {
     background-color: #2a2a2a;
     color: #90caf9;
 }
-
-/* --- END OF SELECT2 STYLING --- */
+/* --- END SELECT2 --- */
 
 .analysis-container {
    flex-grow: 1;
@@ -151,7 +136,7 @@ body {
    overflow-y: auto;
    background-color: #1e1e1e;
    border-radius: 12px;
-   padding: 1.5rem;
+   padding: 0.5rem;
    color: #e0e0e0;
    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
@@ -175,11 +160,9 @@ body {
     text-align: center;
     font-weight: bold;
 }
-
 .tab-btn:hover {
     background-color: #3d3d3d;
 }
-
 .tab-btn.active {
     background-color: #007bff;
     color: #fff;
@@ -187,25 +170,25 @@ body {
 
 .analysis-content {
    flex-grow: 1;
-   display: flex; /* Ensures its children can stretch */
-   flex-direction: column; /* Stack its children vertically */
-   overflow-y: auto;
-   padding-top: 1rem;
+   display: flex;
+   flex-direction: column;
+   padding-top: 0 !important;
+   margin-top: 0 !important;
 }
-
 
 .analysis-content.hidden {
     display: none;
 }
 
 .graphs-container {
-   flex-grow: 1; /* This allows it to fill the remaining height */
-   display: grid;
-   grid-template-columns: repeat(12, 1fr); /* 12-column grid */
-   grid-auto-rows: minmax(200px, 1fr); /* Allow rows to grow dynamically */
-   gap: 20px; /* Spacing between the grid items */
-   height: 100%; /* Ensures the container takes the full height */
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1fr; /* left: graphs, center: table, right: empty */
+    grid-template-rows: 1fr 1fr;
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
 }
+
 
 
 .graph-container {
@@ -217,176 +200,149 @@ body {
     justify-content: center;
     overflow: hidden;
     color: #e0e0e0;
-    text-align: center; /* Center text, if necessary */
+    text-align: center;
 }
 
-/* Customize the sizes of the divs */
-.large {
-    grid-column: span 6; /* Span 6/12 columns (50% width) */
-    grid-row: span 2; /* Take 2 rows in height */
+#graph-container-1 {
+    grid-column: 1;
+    grid-row: 1;
 }
 
-.medium {
-    grid-column: span 4; /* Span 4/12 columns (33.33% width) */
-    grid-row: span 1; /* Default height (1 row) */
-}
-
-.small {
-    grid-column: span 2; /* Span 2/12 columns (16.67% width) */
-    grid-row: span 1; /* Default height */
-}
-
-.tall {
-    grid-column: span 3;
-    grid-row: span 2;
+#graph-container-3 {
+    grid-column: 1;
+    grid-row: 2;
 }
 
 #graph-container-2 {
+    grid-column: 2;
+    grid-row: 1 / span 2; /* takes full height (both rows) */
+}
+
+
+
+.hidden {
+    visibility: hidden;
+}
+
+.graph-container-3 {
+    display: flex;
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* === FIXED: Vertically center scoreline in graph-container-2 === */
+#graph-container-2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    background-color: #1e1e1e;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.graph-inner {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    background-color: #1f1f1f;
-}
-
-.match-scoreline {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    gap: 12px;
-    text-align: center;
-    padding: 10px;
-    border-bottom: 1px solid #333;
-    background-color: #2d2d2d;
-    flex-shrink: 0;
-    border-radius: 6px;
-}
-
-.match-scoreline .scoreline-team {
-    font-size: 16px;
-    color: #90caf9;
-    line-height: 1.2;
-    padding: 0 8px;
-    font-weight: bold;
+    justify-content: flex-start; /* start = top of inner box */
+    width: 100%;
+    height: 100%;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    gap: 1rem;
 }
 
 
-.match-scoreline .score {
-    font-size: 20px;
-    color: #e0e0e0;
-    font-weight: bold;
+#match-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#combined-score-header,
+#combined-score-header h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
     white-space: nowrap;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-.match-scoreline {
-    display: flex;
-    flex-direction: column; /* Stack rows vertically */
-    align-items: center;    /* Center the whole block horizontally */
-    gap: 8px;               /* Add spacing between rows */
-    width: 100%;            /* Full width of the parent container */
-    padding: 10px 0;        /* Optional: Padding around the content */
-    box-sizing: border-box; /* Include padding in the width */
-    text-align: center;     /* Center-align text within team names and scores */
+.score-header {
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-.score-row {
-    display: flex;          /* Align team names and score in a single row */
-    justify-content: space-between; /* Equal spacing between elements */
-    align-items: center;    /* Vertical alignment */
-    width: 100%;            /* Row takes up full width of the container */
-    max-width: 600px;       /* Optional: Set max-width for better layout control */
+.home-team-name {
+    color: blue;
 }
 
-.scoreline-team {
-    flex: 1;                /* Teams take up equal space */
-    text-align: center;     /* Center-align each team name */
-    font-size: 1.2rem;      /* Adjust font size for better visibility */
-    font-weight: bold;      /* Make team names bold */
+.away-team-name {
+    color: red;
 }
 
-.score {
-    flex: 0;                /* Score has fixed width */
-    font-size: 1.8rem;      /* Bigger font for the actual score */
+.team-score {
+    color: #ffffff;
     font-weight: bold;
+    font-size: 1.6rem;
 }
 
-.additional-scoreline {
-    font-size: 0.5rem;        /* Smaller size for additional scores */
-    font-weight: italic;
-    color: #90caf9;         /* Highlight additional scores with a distinct color */
-    margin-top: 2px;        /* Add a bit of spacing between rows */
-    text-align: center;     /* Ensure additional scores are always centered */
+.score-separator {
+    color: #bbbbbb;
+    font-weight: normal;
+    font-size: 1.5rem;
 }
 
-#match-events {
-    display: grid; /* Enable grid layout */
-    grid-template-columns: 1fr 1fr; /* Two equal columns for Home and Away teams */
-    gap: 20px; /* Space between the columns */
-    height: 100%; /* Ensure it fills the parent container height */
-    padding: 10px; /* Spacing around the container content */
-    box-sizing: border-box; /* Padding included in total dimensions */
-}
-
-.team-events {
-    display: flex; /* Use flexbox to stack categories within the column */
-    flex-direction: column; /* Align categories vertically */
-    gap: 10px; /* Space between categories inside the column */
-    overflow-y: auto; /* Enable vertical scroll if content exceeds height */
-    height: 100%; /* Make team events take up the full height */
-}
-
-.event-category {
-    flex: 1; /* Allow individual categories to grow evenly within their column */
-}
-
-.event-category-title {
-    font-weight: bold;
-    color: #90caf9;
-    margin-bottom: 5px; /* Adds spacing underneath the title */
-}
-
-.event-list {
-    list-style: none; /* Remove default bullet points */
-    padding: 0;
-    margin: 0;
-}
-
-.event-list li {
-    padding: 5px 10px;
-    margin-bottom: 5px;
-    background-color: #2d2d2d; /* Background styling for list items */
-    border-radius: 8px; /* Slightly rounded corners */
-    color: #e0e0e0; /* Text color for good contrast */
-}
-
-.event-item {
-    padding: 3px 0;
-    color: #bdbdbd;
-    font-size: 12px;
+.team-tables {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+    flex-wrap: nowrap;
 }
 
-.event-item .minute {
-    color: #666;
-    font-size: 11px;
-    margin-left: 6px;
+.team-table {
+    flex: 1;
+    background-color: #2a2a2a;
+    padding: 0.5rem;
+    border-radius: 10px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    max-width: 48%;
+    overflow-x: auto;
 }
 
-/* Scrollbar styling */
-.match-events::-webkit-scrollbar {
-    width: 6px;
+.team-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
 }
 
-.match-events::-webkit-scrollbar-track {
-    background: #1f1f1f;
+.team-table td {
+    padding: 4px 6px;
+    border-bottom: 1px solid #444;
+    text-align: left;
+    color: #ddd;
+    line-height: 1.2;
 }
 
-.match-events::-webkit-scrollbar-thumb {
-    background: #444;
-    border-radius: 3px;
-}
-
-.match-events::-webkit-scrollbar-thumb:hover {
-    background: #555;
+.team-table tr:hover {
+    background-color: #3a3a3a;
+    transition: background-color 0.2s ease-in-out;
 }

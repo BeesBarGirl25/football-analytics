@@ -72,9 +72,38 @@ async function renderGraph(matchData) {
     }
 }
 
+async function renderMomentumGraph(matchData) {
+    try {
+        const response = await fetch('/api/generate_momentum_graph', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ matchData }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch graph: {response.status}`);
+        }
+
+        const result = await response.json();
+        const graph = JSON.parse(result);
+
+        console.log("Graph data: ", graph.data);
+        console.log("Layout Data: ", graph.data);
+
+        if (!graph.data | !graph.layout) {
+            throw new Error("Graph data or layout is missing!");
+        }
+
+        Plotly.newPlot('graph-container-3', graph.data, graph.layout);
+        console.log("[Debug]: Graph rendered succesfully.");
+    } catch (error) {
+        console.error("[Error]: Failed to render graph:", error)
+    }
+}
+
+
 async function renderMatchSummary(matchData) {
     try {
-        // Fetch match summary from the backend
         const response = await fetch('/api/generate_match_summary', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -86,82 +115,51 @@ async function renderMatchSummary(matchData) {
         }
 
         const result = await response.json();
+        console.log("[Debug] Match Summary Result:", result);
+        const extraTimeDetails = result.extraTimeDetails; // Extra info: e.g., "(ET: 1 - 0, Pen: 5 - 4)"
 
-        console.log(result)
+        // Populate the score header dynamically
+        document.getElementById('home-team-name').textContent = result.homeTeam
+        document.getElementById('away-team-name').textContent = result.awayTeam
+        document.getElementById('home-team-score').textContent = result.homeTeamNormalTime
+        document.getElementById('away-team-score').textContent = result.awayTeamNormalTime
+        document.getElementById('score-seperator').textContent = '-'
 
-        // 1. Update Scoreline
-        const homeTeamElement = document.getElementById('home-team');
-        const awayTeamElement = document.getElementById('away-team');
-        const scoreElement = document.getElementById('score');
-
-        homeTeamElement.textContent = result.home_team || 'Home Team';
-        awayTeamElement.textContent = result.away_team || 'Away Team';
-        scoreElement.textContent = `${result.home_score} - ${result.away_score}`;
-
-                // Additional scorelines (extra time and penalties)
-        const scorelineElement = document.getElementById('match-scoreline');
-
-        // Remove any previously added additional scores
-        const existingExtras = document.querySelectorAll('.additional-scoreline');
-        existingExtras.forEach(extra => extra.remove());
-
-        // Add extra time score if present
-        if (result.home_team_extra_time !== 0 || result.away_team_extra_time !== 0) {
-            const extraTimeScoreElement = document.createElement('div');
-            extraTimeScoreElement.classList.add('additional-scoreline', 'extra-time');
-            extraTimeScoreElement.textContent = `ET: ${result.home_team_extra_time} - ${result.away_team_extra_time}`;
-            scorelineElement.appendChild(extraTimeScoreElement);
-        }
-
-        // Add penalty score if present
-        if (result.home_team_penalties !== 0 || result.away_team_penalties !== 0) {
-            const penaltyScoreElement = document.createElement('div');
-            penaltyScoreElement.classList.add('additional-scoreline', 'penalty');
-            penaltyScoreElement.textContent = `Pen: ${result.home_team_penalties} - ${result.away_team_penalties}`;
-            scorelineElement.appendChild(penaltyScoreElement);
+        // Update the extra details (or hide if not applicable)
+        const extraDetails = document.getElementById('extra-details');
+        if (extraTimeDetails) {
+            extraDetails.textContent = extraTimeDetails;
+            extraDetails.style.display = 'block';
+        } else {
+            extraDetails.style.display = 'none';
         }
 
 
-
-        // 2. Populate Home Team Events
-        populateEventList('home-goals-list', result.home_goals);
-        populateEventList('home-assists-list', result.home_assists);
-        populateEventList('home-yellow-cards-list', result.home_yellow);
-        populateEventList('home-red-cards-list', result.home_red);
-
-        // 3. Populate Away Team Events
-        populateEventList('away-goals-list', result.away_goals);
-        populateEventList('away-assists-list', result.away_assists);
-        populateEventList('away-yellow-cards-list', result.away_yellow);
-        populateEventList('away-red-cards-list', result.away_red);
+        // Populate contribution tables
+        populateTable('home-team-table', result.home);
+        populateTable('away-team-table', result.away);
     } catch (error) {
         console.error('Error rendering match summary:', error);
     }
 }
 
-// Helper function to populate event lists dynamically
-function populateEventList(categoryId, eventData) {
-    const categoryElement = document.getElementById(categoryId);
-    const categoryContainer = categoryElement.parentElement;
-    const categoryHeading = categoryContainer.querySelector('.event-category-title');
+function populateTable(tableId, players) {
+    const tableBody = document.querySelector(`#${tableId} tbody`);
+    tableBody.innerHTML = '';  // Clear existing content
 
-    // Clear previous data
-    categoryElement.innerHTML = '';
+    players.forEach(player => {
+        const row = document.createElement('tr');
 
-    if (eventData && eventData.length > 0) {
-        // Populate items
-        eventData.forEach(event => {
-            const listItem = document.createElement('li');
-            listItem.textContent = event;
-            categoryElement.appendChild(listItem);
-        });
+        const playerCell = document.createElement('td');
+        playerCell.textContent = player.player;
 
-        // Show heading if data exists
-        categoryHeading.style.display = 'block';
-    } else {
-        // Hide heading if no data exists
-        categoryHeading.style.display = 'none';
-    }
+        const contributionsCell = document.createElement('td');
+        contributionsCell.textContent = player.contributions.join('');
+
+        row.appendChild(playerCell);
+        row.appendChild(contributionsCell);
+        tableBody.appendChild(row);
+    });
 }
 
 
@@ -175,10 +173,16 @@ $('#match-select').on('change', async function () {
         // Fetch match data (from cache or API)
         const matchData = await fetchMatchData(matchId);
 
-        // Pass matchData directly to renderGraph
-        await renderGraph(matchData);
+        document.getElementById('graph-container-1').classList.remove('hidden');
+        document.getElementById('graph-container-2').classList.remove('hidden');
+        document.getElementById('graph-container-3').classList.remove('hidden');
 
-        await renderMatchSummary(matchData);
+        // Run the rendering functions in parallel
+        await Promise.all([
+            renderGraph(matchData),
+            renderMatchSummary(matchData),
+            renderMomentumGraph(matchData)
+        ]);
     } catch (error) {
         console.error("Failed to update plots:", error);
     }

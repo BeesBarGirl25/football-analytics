@@ -17,82 +17,57 @@
 
     <div class="analysis-content" id="overview">
         <div id="graphs-container" class="graphs-container">
-            <div id="graph-container-1" class="graph-container large">
-            </div>
-            <div id="graph-container-2" class="graph-container tall">
-                <!-- Match Scoreline -->
-               <div id="match-scoreline" class="match-scoreline">
-                    <!-- Row for main score with team names -->
-                    <div class="score-row">
-                        <div id="home-team" class="scoreline-team home"></div>
-                        <div id="score" class="score"></div>
-                        <div id="away-team" class="scoreline-team away"></div>
-                    </div>
-                    <!-- Rows for additional scores -->
-                    <div class="additional-scoreline extra-time"></div>
-                    <div class="additional-scoreline penalty"></div>
-                </div>
 
-                <!-- Match Events -->
-                <div id="match-events" class="match-events">
-                    <!-- Home Team Events -->
-                    <div id="home-team-events" class="team-events home">
-                        <div id="home-goals" class="event-category">
-                            <div class="event-category-title">Goals</div>
-                            <ul id="home-goals-list" class="event-list"></ul>
-                        </div>
-                        <div id="home-assists" class="event-category">
-                            <div class="event-category-title">Assists</div>
-                            <ul id="home-assists-list" class="event-list"></ul>
-                        </div>
-                        <div id="home-yellow-cards" class="event-category">
-                            <div class="event-category-title">Yellow Cards</div>
-                            <ul id="home-yellow-cards-list" class="event-list"></ul>
-                        </div>
-                        <div id="home-red-cards" class="event-category">
-                            <div class="event-category-title">Red Cards</div>
-                            <ul id="home-red-cards-list" class="event-list"></ul>
+            <div id="graph-container-1" class="graph-container medium hidden">
+                <!-- Optional graph content -->
+            </div>
+
+            <div id="graph-container-2" class="graph-container tall hidden">
+                <div class="graph-inner">
+
+                    <div id="match-summary">
+                        <div class="score-header">
+                            <h3 id="combined-score-header">
+                                <span id="home-team-name" class="home-team-name"></span>
+                                <span id="home-team-score" class="team-score"></span>
+                                <span id="score-seperator" class="score-seperator"></span>
+                                <span id="away-team-score" class="team-score"></span>
+                                <span id="away-team-name" class="away-team-name"></span>
+                            </h3>
+                            <p id="extra-details"></p>
                         </div>
                     </div>
 
-                    <!-- Away Team Events -->
-                    <div id="away-team-events" class="team-events away">
-                        <div id="away-goals" class="event-category">
-                            <div class="event-category-title">Goals</div>
-                            <ul id="away-goals-list" class="event-list"></ul>
+                    <div class="team-tables">
+                        <div class="team-table">
+                            <table id="home-team-table">
+                                <tbody></tbody>
+                            </table>
                         </div>
-                        <div id="away-assists" class="event-category">
-                            <div class="event-category-title">Assists</div>
-                            <ul id="away-assists-list" class="event-list"></ul>
-                        </div>
-                        <div id="away-yellow-cards" class="event-category">
-                            <div class="event-category-title">Yellow Cards</div>
-                            <ul id="away-yellow-cards-list" class="event-list"></ul>
-                        </div>
-                        <div id="away-red-cards" class="event-category">
-                            <div class="event-category-title">Red Cards</div>
-                            <ul id="away-red-cards-list" class="event-list"></ul>
+                        <div class="team-table">
+                            <table id="away-team-table">
+                                <tbody></tbody>
+                            </table>
                         </div>
                     </div>
+
                 </div>
             </div>
-            <div id="graph-container-3" class="graph-container small">
-                <!-- Medium graph -->
+
+            <div id="graph-container-3" class="graph-container medium hidden">
+                <!-- Optional graph content -->
             </div>
-            <div id="graph-container-4" class="graph-container small">
-                <!-- Another small graph -->
-            </div>
+
         </div>
     </div>
+
     <div class="analysis-content hidden" id="home">Home team analysis goes here.</div>
     <div class="analysis-content hidden" id="away">Away team analysis goes here.</div>
     <div class="analysis-content hidden" id="player">Player analysis goes here.</div>
 </div>
 {% endblock %}
 
-
 {% block scripts %}
-
 <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
 <script>
     $(document).ready(function() {
