@@ -10,6 +10,8 @@ from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
 import pandas as pd
 import plotly.io as pio  # Import this for converting Plotly figures to JSON
 from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
+from utils.plots.match_plots.match_heatmap import generate_match_heatmap_plot
+from flask import Response
 
 
 logger = logging.getLogger(__name__)
@@ -71,6 +73,25 @@ def generate_match_graph():
     except Exception as e:
         logger.error(f"Unexpected error in generate_match_graph: {e}")
         return jsonify({"error": str(e)}), 500
+
+@match_bp.route('/api/generate_match_heatmap', methods=['POST'])
+def generate_match_heatmap():
+    try:
+        match_data = request.json.get("matchData")
+        if not match_data:
+            return jsonify({"error": "No match data provided"}), 400
+
+        match_df = pd.DataFrame(match_data)
+        graph_dict = generate_match_heatmap_plot(match_df)
+        logger.debug(f"Converted match_data to DataFrame")
+        logger.debug(f"Generated heatmap")
+        logger.debug(f"Returning graph_dict")
+        logger.debug(f"graph_dict: {graph_dict}")
+        return jsonify(graph_dict)
+    except Exception as e:
+        logger.error(f"Unexpected error in generate_match_heatmap: {e}")
+        return jsonify({"error": str(e)}), 500
+
 
 @match_bp.route('/api/generate_match_summary', methods=['POST'])
 def generate_match_overview():

@@ -87,9 +87,6 @@ async function renderMomentumGraph(matchData) {
         const result = await response.json();
         const graph = JSON.parse(result);
 
-        console.log("Graph data: ", graph.data);
-        console.log("Layout Data: ", graph.data);
-
         if (!graph.data | !graph.layout) {
             throw new Error("Graph data or layout is missing!");
         }
@@ -98,6 +95,35 @@ async function renderMomentumGraph(matchData) {
         console.log("[Debug]: Graph rendered succesfully.");
     } catch (error) {
         console.error("[Error]: Failed to render graph:", error)
+    }
+}
+
+async function renderHeatmapGraph(matchData) {
+    try {
+        const response = await fetch('/api/generate_match_heatmap', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({ matchData }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch graph: {response.status}`);
+        }
+
+        const graph = await response.json();  // already an object
+
+
+
+        console.log("[DEBUG]: Heatmap data: ", graph);
+
+        if (!graph.data) {
+            throw new Error("Graph Data is missing!");
+        }
+
+        Plotly.newPlot('graph-container-4', graph.data, graph.layout);
+        console.log("[DEBUG]: Graph rendered successfully.");
+    } catch (error) {
+        console.error("[ERROR]: Failed to render graph: ", error)
     }
 }
 
@@ -176,12 +202,14 @@ $('#match-select').on('change', async function () {
         document.getElementById('graph-container-1').classList.remove('hidden');
         document.getElementById('graph-container-2').classList.remove('hidden');
         document.getElementById('graph-container-3').classList.remove('hidden');
+        document.getElementById('graph-container-4').classList.remove('hidden');
 
         // Run the rendering functions in parallel
         await Promise.all([
             renderGraph(matchData),
             renderMatchSummary(matchData),
-            renderMomentumGraph(matchData)
+            renderMomentumGraph(matchData),
+            renderHeatmapGraph(matchData)
         ]);
     } catch (error) {
         console.error("Failed to update plots:", error);

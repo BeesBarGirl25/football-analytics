@@ -5,7 +5,7 @@ from utils.extensions import cache
 import logging
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.WARN,
     format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
 )
 
