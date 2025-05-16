@@ -42,6 +42,14 @@ def player_analysis():
 app.register_blueprint(competition_bp)
 app.register_blueprint(match_bp)
 
+@app.route('/debug/competitions')
+def debug_competitions():
+    comps = Competition.query.all()
+    if not comps:
+        return "No competitions found."
+    return "<br>".join(f"{c.id} – {c.name}" for c in comps)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
