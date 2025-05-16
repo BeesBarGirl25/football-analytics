@@ -1,4 +1,4 @@
-from app import db
+from utils.db import db
 
 class Competition(db.Model):
     id = db.Column(db.Integer, primary_key=True)
