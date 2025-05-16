@@ -10,6 +10,8 @@ from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
 import pandas as pd
 import plotly.io as pio  # Import this for converting Plotly figures to JSON
 from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
+from app import db
+from models import Match
 
 
 logger = logging.getLogger(__name__)
@@ -28,17 +30,18 @@ def match_analysis():
 def get_matches(competition_id, season_id):
     logger.debug(f"Competition_id: {competition_id}, Season_id: {season_id}")
 
-    matches = sb.matches(competition_id=competition_id, season_id=season_id)
+    matches = Match.query.filter_by(season_id=season_id).all()
 
     simplified = [
         {
-            'match_id': row['match_id'],
-            'home_team': row['home_team'],  # just use the string
-            'away_team': row['away_team']
+            'match_id': match.id,
+            'home_team': match.home_team,
+            'away_team': match.away_team
         }
-        for idx, row in matches.iterrows()
+        for match in matches
     ]
     return jsonify(simplified)
+
 
 
 @match_bp.route('/api/events/<int:match_id>')
