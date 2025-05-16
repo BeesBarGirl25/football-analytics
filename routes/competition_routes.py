@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, render_template
 from utils.statsbomb_utils import get_all_competitions
 from utils.extensions import cache
-from app import db
+from utils.db import db
+
 from models import Competition, Season
 
 

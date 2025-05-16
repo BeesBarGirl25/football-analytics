@@ -5,6 +5,7 @@ from utils.extensions import cache
 import logging
 from flask_sqlalchemy import SQLAlchemy
 import os
+from utils.db import db  # ⬅️ Instead of 'from flask_sqlalchemy import SQLAlchemy'
 
 
 logging.basicConfig(
@@ -16,14 +17,14 @@ app = Flask(__name__)
 cache.init_app(app)
 
 db_uri = os.environ.get("DATABASE_URL", "sqlite:///local.db")
-
 if db_uri.startswith("postgres://"):
     db_uri = db_uri.replace("postgres://", "postgresql://", 1)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+
+db.init_app(app)  # ✅ Attach it to the app
+
+# Import models AFTER db is attached
 from models import Competition, Season, Match
 
 

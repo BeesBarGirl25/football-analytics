@@ -10,7 +10,8 @@ from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
 import pandas as pd
 import plotly.io as pio  # Import this for converting Plotly figures to JSON
 from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
-from app import db
+from utils.db import db
+
 from models import Match
 
 
