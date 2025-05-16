@@ -13,3 +13,5 @@ matplotlib
 pandas
 statsbombpy
 plotly
+Flask-SQLAlchemy==3.1.1
+
