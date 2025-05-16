@@ -6,6 +6,7 @@ import logging
 from flask_sqlalchemy import SQLAlchemy
 import os
 
+
 logging.basicConfig(
     level=logging.DEBUG,
     format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
@@ -22,6 +23,8 @@ if db_uri.startswith("postgres://"):
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+from models import Competition, Season, Match
+
 
 @app.route('/')
 def index():
