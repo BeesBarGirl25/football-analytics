@@ -9,10 +9,12 @@ def load_data():
         db.session.merge(comp)
 
         season = Season(
-            id=row['season_id'],
+            id=row['season_id'],  # internal ID (primary key)
+            season_id=row['season_id'],  # external StatsBomb season ID
             competition_id=row['competition_id'],
             year=row['season_name']
         )
+
         db.session.merge(season)
 
         matches = sb.matches(competition_id=row['competition_id'], season_id=row['season_id'])
