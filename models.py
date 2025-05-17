@@ -5,7 +5,8 @@ class Competition(db.Model):
     name = db.Column(db.String(100))
 
 class Season(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)         # internal DB ID (used in foreign keys)
+    season_id = db.Column(db.Integer, nullable=False)    # external StatsBomb season ID
     competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'), nullable=False)
     year = db.Column(db.String(10))
 

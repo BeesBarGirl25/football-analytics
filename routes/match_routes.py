@@ -12,7 +12,7 @@ import plotly.io as pio  # Import this for converting Plotly figures to JSON
 from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
 from utils.db import db
 
-from models import Match
+from models import Match, Season
 
 
 logger = logging.getLogger(__name__)
@@ -29,9 +29,19 @@ def match_analysis():
 @match_bp.route('/api/matches/<int:competition_id>/<int:season_id>')
 @cache.cached(timeout=3600)
 def get_matches(competition_id, season_id):
-    logger.debug(f"Competition_id: {competition_id}, Season_id: {season_id}")
+    logger.debug(f"Competition_id: {competition_id}, Season_id (external): {season_id}")
 
-    matches = Match.query.filter_by(season_id=season_id).all()
+    # Lookup internal DB season ID using external StatsBomb season_id
+    season = (
+        db.session.query(Season)
+        .filter_by(competition_id=competition_id, season_id=season_id)
+        .first()
+    )
+
+    if not season:
+        return jsonify({"error": "No matching season found in the database."}), 404
+
+    matches = Match.query.filter_by(season_id=season.id).all()
 
     simplified = [
         {
@@ -42,6 +52,7 @@ def get_matches(competition_id, season_id):
         for match in matches
     ]
     return jsonify(simplified)
+
 
 
 
