@@ -25,7 +25,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)  # ✅ Attach it to the app
 
 # Import models AFTER db is attached
-from models import Competition, Season, Match
+from models import Competition, Season, Match, MatchPlot
 
 
 @app.route('/')

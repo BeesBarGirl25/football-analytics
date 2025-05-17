@@ -16,3 +16,14 @@ class Match(db.Model):
     home_team = db.Column(db.String(100))
     away_team = db.Column(db.String(100))
     scoreline = db.Column(db.String(20))
+
+class MatchPlot(db.Model):
+    __tablename__ = 'match_plots'
+
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), primary_key=True)
+    xg_graph_json = db.Column(db.Text, nullable=True)
+    momentum_graph_json = db.Column(db.Text, nullable=True)
+    match_summary_json = db.Column(db.Text, nullable=True)
+
+    # Optional: relationship to Match if needed for joins
+    match = db.relationship('Match', backref=db.backref('plot', uselist=False))
