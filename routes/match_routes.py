@@ -25,7 +25,6 @@ match_bp = Blueprint('match', __name__)
 def match_analysis():
     return render_template('match_analysis.html')
 
-
 @match_bp.route('/api/matches/<season_id>')
 @cache.cached(timeout=3600)
 def get_matches(season_id):
@@ -40,6 +39,7 @@ def get_matches(season_id):
         for match in matches
     ]
     return jsonify(simplified)
+
 
 
 

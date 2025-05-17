@@ -52,3 +52,4 @@ def api_seasons(competition_id):
 
     return jsonify(data)
 
+
