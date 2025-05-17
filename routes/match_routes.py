@@ -26,22 +26,10 @@ def match_analysis():
     return render_template('match_analysis.html')
 
 
-@match_bp.route('/api/matches/<int:competition_id>/<int:season_id>')
+@match_bp.route('/api/matches/<season_id>')
 @cache.cached(timeout=3600)
-def get_matches(competition_id, season_id):
-    logger.debug(f"Competition_id: {competition_id}, Season_id (external): {season_id}")
-
-    # Lookup internal DB season ID using external StatsBomb season_id
-    season = (
-        db.session.query(Season)
-        .filter_by(competition_id=competition_id, season_id=season_id)
-        .first()
-    )
-
-    if not season:
-        return jsonify({"error": "No matching season found in the database."}), 404
-
-    matches = Match.query.filter_by(season_id=season.id).all()
+def get_matches(season_id):
+    matches = Match.query.filter_by(season_id=season_id).all()
 
     simplified = [
         {

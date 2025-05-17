@@ -16,7 +16,7 @@ def api_competitions():
         db.session.query(
             Competition.id.label('competition_id'),
             Competition.name.label('competition_name'),
-            Season.season_id.label('season_id'),      # external ID
+            Season.id.label('season_id'),
             Season.year.label('season_name')
         )
         .join(Season, Competition.id == Season.competition_id)
@@ -27,7 +27,7 @@ def api_competitions():
         {
             'competition_id': r.competition_id,
             'competition_name': r.competition_name,
-            'season_id': r.season_id,                # external ID
+            'season_id': r.season_id,
             'season_name': r.season_name
         }
         for r in results
@@ -35,18 +35,20 @@ def api_competitions():
 
     return jsonify(comps)
 
+
 @competition_bp.route('/api/seasons/<int:competition_id>')
 def api_seasons(competition_id):
     seasons = (
         Season.query
         .filter_by(competition_id=competition_id)
-        .with_entities(Season.season_id.label('season_id'), Season.year.label('season_name'))  # external ID
+        .with_entities(Season.id.label('season_id'), Season.year.label('season_name'))
         .all()
     )
 
     data = [
-        {'season_id': s.season_id, 'season_name': s.season_name}  # using external season_id
+        {'season_id': s.season_id, 'season_name': s.season_name}
         for s in seasons
     ]
 
     return jsonify(data)
+
