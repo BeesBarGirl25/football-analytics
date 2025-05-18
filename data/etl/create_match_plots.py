@@ -14,6 +14,9 @@ import plotly.io as pio
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("create_match_plots")
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("sqlalchemy.engine.Engine").setLevel(logging.WARNING)
+logging.getLogger("matplotlib").setLevel(logging.WARNING)
 
 # Flask app context (required to use SQLAlchemy)
 from app import app
@@ -68,10 +71,21 @@ def create_all_match_plots():
                 summary_json = json.dumps(match_summary, indent=2)
 
                 # Save to DB (update or insert)
-                plot_entry = MatchPlot.query.get(match.id) or MatchPlot(match_id=match.id)
-                plot_entry.xg_graph_json = xg_json
-                plot_entry.momentum_graph_json = momentum_json
-                plot_entry.match_summary_json = summary_json
+                # Prepare individual plots as a dictionary
+                plots = {
+                    "xg_graph": xg_json,
+                    "momentum_graph": momentum_json,
+                    "match_summary": summary_json
+                }
+
+                for plot_type, plot_json in plots.items():
+                    if plot_json:
+                        plot_entry = MatchPlot(
+                            match_id=match.id,
+                            plot_type=plot_type,
+                            plot_json=plot_json
+                        )
+                        db.session.merge(plot_entry)
 
                 db.session.merge(plot_entry)
                 logger.info(f"✅ Saved plot data for match {match.id}")
