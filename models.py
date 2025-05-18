@@ -20,10 +20,13 @@ class Match(db.Model):
 class MatchPlot(db.Model):
     __tablename__ = 'match_plots'
 
-    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), primary_key=True)
-    xg_graph_json = db.Column(db.Text, nullable=True)
-    momentum_graph_json = db.Column(db.Text, nullable=True)
-    match_summary_json = db.Column(db.Text, nullable=True)
+    id = db.Column(db.Integer, primary_key=True)
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    plot_type = db.Column(db.String(50), nullable=False)  # e.g. 'xg', 'momentum', 'summary'
+    plot_json = db.Column(db.Text, nullable=False)
 
-    # Optional: relationship to Match if needed for joins
-    match = db.relationship('Match', backref=db.backref('plot', uselist=False))
+    __table_args__ = (
+        db.UniqueConstraint('match_id', 'plot_type', name='unique_match_plot'),
+    )
+
+    match = db.relationship('Match', backref='plots')
