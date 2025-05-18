@@ -7,7 +7,7 @@ from statsbombpy import sb
 from flask import Flask
 from app import app
 from utils.db import db
-from models import Match, MatchPlot
+from models import Match, MatchPlot, Season
 from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
 from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
 from utils.analytics.match_analytics.match_analysis_utils import goal_assist_stats
@@ -32,7 +32,9 @@ print(f"Using DB URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 def create_all_match_plots():
     with app.app_context():
-        matches = Match.query.all()
+        missing_competitions = [12, 55, 35, 53, 72]  # update this as needed
+
+        matches = Match.query.join(Season).filter(Season.competition_id.in_(missing_competitions)).all()
         logger.info(f"Processing {len(matches)} matches...")
 
         for match in matches:
