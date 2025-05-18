@@ -29,16 +29,18 @@ def get_matches(season_id):
 @match_bp.route('/api/plots/<int:match_id>')
 @cache.cached(timeout=3600)
 def get_match_plots(match_id):
-    plot = MatchPlot.query.get(match_id)
-    if not plot:
+    plots = MatchPlot.query.filter_by(match_id=match_id).all()
+
+    if not plots:
         return jsonify({"error": "No plot data found for this match."}), 404
 
     try:
-        return jsonify({
-            "xg_graph": json.loads(plot.xg_graph_json) if plot.xg_graph_json else {},
-            "momentum_graph": json.loads(plot.momentum_graph_json) if plot.momentum_graph_json else {},
-            "match_summary": json.loads(plot.match_summary_json) if plot.match_summary_json else {}
-        })
+        result = {}
+        for plot in plots:
+            result[plot.plot_type] = json.loads(plot.plot_json)
+
+        return jsonify(result)
     except Exception as e:
-        logger.error(f"Error parsing plot data for match {match_id}: {e}")
+        logger.error(f"Error parsing plot data for match {match_id}: {e}", exc_info=True)
         return jsonify({"error": "Failed to parse plot data"}), 500
+
