@@ -22,11 +22,7 @@ class MatchPlot(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
-    plot_type = db.Column(db.String(50), nullable=False)  # e.g. 'xg', 'momentum', 'summary'
+    plot_type = db.Column(db.String(50), nullable=False)  # e.g. "xg_graph", "momentum_graph", etc.
     plot_json = db.Column(db.Text, nullable=False)
 
-    __table_args__ = (
-        db.UniqueConstraint('match_id', 'plot_type', name='unique_match_plot'),
-    )
-
-    match = db.relationship('Match', backref='plots')
+    match = db.relationship("Match", backref=db.backref("plots", lazy=True))
