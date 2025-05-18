@@ -13,7 +13,6 @@ import logging
 
 
 with app.app_context():
-    db.init_app(app)
 
     matches = Match.query.all()
     for match in matches:
