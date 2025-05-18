@@ -26,6 +26,9 @@ logging.getLogger("sqlalchemy.engine.Engine").setLevel(logging.WARNING)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("create_match_plots")
 
+print(f"Using DB URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
+
+
 
 def create_all_match_plots():
     with app.app_context():
