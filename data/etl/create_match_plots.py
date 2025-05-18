@@ -90,6 +90,10 @@ def create_all_match_plots():
                         db.session.add(new_plot)
                         logger.debug(f"➕ Inserted plot: {match.id} [{plot_type}]")
 
+                # Force session flush + commit
+                db.session.flush()
+                db.session.commit()
+
                 logger.info(f"✅ Saved plot data for match {match.id}")
 
             except Exception as e:
