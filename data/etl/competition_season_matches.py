@@ -1,90 +1,35 @@
-import json
-import logging
-import pandas as pd
-import plotly.io as pio
-import warnings
+from app import app, db
+from models import Competition, Season, Match
 from statsbombpy import sb
-from flask import Flask
-from app import app
-from utils.db import db
-from models import Match, MatchPlot
-from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
-from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
-from utils.analytics.match_analytics.match_analysis_utils import goal_assist_stats
 
-# Suppress warning spam
-warnings.filterwarnings("ignore", category=UserWarning)
-warnings.filterwarnings("ignore", category=FutureWarning)
-warnings.filterwarnings("ignore", category=pd.errors.SettingWithCopyWarning)
-
-# Logging setup
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("create_match_plots")
-
-
-def create_all_match_plots():
+def load_data():
     with app.app_context():
-        matches = Match.query.all()
-        logger.info(f"Processing {len(matches)} matches...")
+        competitions = sb.competitions()
+        for _, row in competitions.iterrows():
+            comp = Competition(id=row['competition_id'], name=row['competition_name'])
+            db.session.merge(comp)
 
-        for match in matches:
-            try:
-                logger.info(f"Processing match {match.id}...")
+            season_id = f"{row['competition_id']}-{row['season_id']}"
+            season = Season(
+                id=season_id,
+                season_id=row['season_id'],
+                competition_id=row['competition_id'],
+                year=row['season_name']
+            )
+            db.session.merge(season)
 
-                events = sb.events(match.id).fillna(-999)
-                match_df = pd.DataFrame(events)
-
-                xg_plot = generate_match_graph_plot(match_df)
-                momentum_plot = generate_momentum_graph_plot(match_df)
-                home_df, away_df, home_team, away_team, home_norm, away_norm, home_et, away_et, home_pen, away_pen = goal_assist_stats(match_df)
-
-                # Match summary JSON
-                home_data = [{"player": row["player"], "contributions": list(row["contributions"])} for _, row in home_df.iterrows()]
-                away_data = [{"player": row["player"], "contributions": list(row["contributions"])} for _, row in away_df.iterrows()]
-
-                scoreline = f"{home_team} {home_norm} - {away_norm} {away_team}"
-                extra = None
-                if home_et or away_et:
-                    extra = f"(ET: {home_et} - {away_et})"
-                if home_pen or away_pen:
-                    pens = f"(Pen: {home_pen} - {away_pen})"
-                    extra = f"{extra}, {pens}" if extra else pens
-
-                match_summary = {
-                    "home": home_data,
-                    "away": away_data,
-                    "homeTeam": home_team,
-                    "awayTeam": away_team,
-                    "homeTeamNormalTime": home_norm,
-                    "awayTeamNormalTime": away_norm,
-                    "homeTeamExtraTime": home_et,
-                    "awayTeamExtraTime": away_et,
-                    "homeTeamPenalties": home_pen,
-                    "awayTeamPenalties": away_pen,
-                    "scoreline": scoreline,
-                    "extraTimeDetails": extra
-                }
-
-                plot_dict = {
-                    "xg_graph": pio.to_json(xg_plot, pretty=True),
-                    "momentum_graph": pio.to_json(momentum_plot, pretty=True),
-                    "match_summary": json.dumps(match_summary, indent=2)
-                }
-
-                for plot_type, plot_json in plot_dict.items():
-                    existing = MatchPlot.query.filter_by(match_id=match.id, plot_type=plot_type).first()
-                    plot_entry = existing or MatchPlot(match_id=match.id, plot_type=plot_type)
-                    plot_entry.plot_json = plot_json
-                    db.session.merge(plot_entry)
-
-                logger.info(f"✅ Saved plot data for match {match.id}")
-
-            except Exception as e:
-                logger.error(f"❌ Failed to process match {getattr(match, 'id', 'unknown')}: {e}", exc_info=True)
+            matches = sb.matches(competition_id=row['competition_id'], season_id=row['season_id'])
+            for _, match in matches.iterrows():
+                m = Match(
+                    id=match['match_id'],
+                    season_id=season_id,
+                    home_team=match['home_team'],
+                    away_team=match['away_team'],
+                    scoreline=f"{match['home_score']}-{match['away_score']}"
+                )
+                db.session.merge(m)
 
         db.session.commit()
-        logger.info("🎉 All match plots processed and committed.")
-
 
 if __name__ == "__main__":
-    create_all_match_plots()
+    load_data()

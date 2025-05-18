@@ -29,32 +29,31 @@ logger = logging.getLogger("create_match_plots")
 
 def create_all_match_plots():
     with app.app_context():
-        all_matches = Match.query.all()
-        logger.info(f"Processing {len(all_matches)} matches...")
+        matches = Match.query.all()
+        logger.info(f"Processing {len(matches)} matches...")
 
-        for match in all_matches:
+        for match in matches:
             try:
                 logger.info(f"Processing match {match.id}...")
 
                 events = sb.events(match.id).fillna(-999)
                 match_df = pd.DataFrame(events)
 
-                # Generate plots
                 xg_plot = generate_match_graph_plot(match_df)
                 momentum_plot = generate_momentum_graph_plot(match_df)
                 home_df, away_df, home_team, away_team, home_norm, away_norm, home_et, away_et, home_pen, away_pen = goal_assist_stats(match_df)
 
-                # Generate match summary JSON
+                # Match summary JSON
                 home_data = [{"player": row["player"], "contributions": list(row["contributions"])} for _, row in home_df.iterrows()]
                 away_data = [{"player": row["player"], "contributions": list(row["contributions"])} for _, row in away_df.iterrows()]
 
                 scoreline = f"{home_team} {home_norm} - {away_norm} {away_team}"
-                extra_details = None
-                if home_et > 0 or away_et > 0:
-                    extra_details = f"(ET: {home_et} - {away_et})"
-                if home_pen > 0 or away_pen > 0:
-                    extra = f"(Pen: {home_pen} - {away_pen})"
-                    extra_details = f"{extra_details}, {extra}" if extra_details else extra
+                extra = None
+                if home_et or away_et:
+                    extra = f"(ET: {home_et} - {away_et})"
+                if home_pen or away_pen:
+                    pens = f"(Pen: {home_pen} - {away_pen})"
+                    extra = f"{extra}, {pens}" if extra else pens
 
                 match_summary = {
                     "home": home_data,
@@ -68,31 +67,35 @@ def create_all_match_plots():
                     "homeTeamPenalties": home_pen,
                     "awayTeamPenalties": away_pen,
                     "scoreline": scoreline,
-                    "extraTimeDetails": extra_details
+                    "extraTimeDetails": extra
                 }
 
-                # Convert to JSON
-                plots = {
+                # Prepare plots
+                plot_dict = {
                     "xg_graph": pio.to_json(xg_plot, pretty=True),
                     "momentum_graph": pio.to_json(momentum_plot, pretty=True),
                     "match_summary": json.dumps(match_summary, indent=2)
                 }
 
-                # Save each plot as its own row
-                for plot_type, plot_json in plots.items():
-                    db.session.merge(MatchPlot(
-                        match_id=match.id,
-                        plot_type=plot_type,
-                        plot_json=plot_json
-                    ))
+                for plot_type, plot_json in plot_dict.items():
+                    existing = MatchPlot.query.filter_by(match_id=match.id, plot_type=plot_type).first()
+                    if existing:
+                        existing.plot_json = plot_json
+                        logger.debug(f"🔄 Updated plot: {match.id} [{plot_type}]")
+                    else:
+                        new_plot = MatchPlot(match_id=match.id, plot_type=plot_type, plot_json=plot_json)
+                        db.session.add(new_plot)
+                        logger.debug(f"➕ Inserted plot: {match.id} [{plot_type}]")
 
                 logger.info(f"✅ Saved plot data for match {match.id}")
 
             except Exception as e:
-                logger.error(f"❌ Failed to process match {getattr(match, 'id', 'unknown')}: {e}", exc_info=False)
+                logger.error(f"❌ Failed to process match {getattr(match, 'id', 'unknown')}: {e}", exc_info=True)
 
         db.session.commit()
-        logger.info("🎉 All match plots processed and committed.")
+        total = MatchPlot.query.count()
+        logger.info(f"🎉 All match plots committed. Total rows in match_plots: {total}")
+
 
 
 if __name__ == "__main__":
