@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, render_template
-from utils.statsbomb_utils import get_all_competitions
 from utils.extensions import cache
+from utils.db import db
+from models import Competition, Season
 
 competition_bp = Blueprint('competition_bp', __name__)
 
@@ -8,17 +9,47 @@ competition_bp = Blueprint('competition_bp', __name__)
 def competition_analysis():
     return render_template('competition_analysis.html')
 
-
-@cache.cached(timeout=86400)
 @competition_bp.route('/api/competitions')
+@cache.cached(timeout=86400)
 def api_competitions():
-    df = get_all_competitions()
-    unique_comps = df[['competition_name', 'competition_id', 'season_name', 'season_id']].drop_duplicates()
-    return jsonify(unique_comps.to_dict(orient='records'))
+    results = (
+        db.session.query(
+            Competition.id.label('competition_id'),
+            Competition.name.label('competition_name'),
+            Season.id.label('season_id'),
+            Season.year.label('season_name')
+        )
+        .join(Season, Competition.id == Season.competition_id)
+        .all()
+    )
+
+    comps = [
+        {
+            'competition_id': r.competition_id,
+            'competition_name': r.competition_name,
+            'season_id': r.season_id,
+            'season_name': r.season_name
+        }
+        for r in results
+    ]
+
+    return jsonify(comps)
+
 
 @competition_bp.route('/api/seasons/<int:competition_id>')
 def api_seasons(competition_id):
-    df = get_all_competitions()
-    filtered = df[df['competition_id'] == competition_id]
-    seasons = filtered[['season_id', 'season_name']].drop_duplicates()
-    return jsonify(seasons.to_dict(orient='records'))
+    seasons = (
+        Season.query
+        .filter_by(competition_id=competition_id)
+        .with_entities(Season.id.label('season_id'), Season.year.label('season_name'))
+        .all()
+    )
+
+    data = [
+        {'season_id': s.season_id, 'season_name': s.season_name}
+        for s in seasons
+    ]
+
+    return jsonify(data)
+
+

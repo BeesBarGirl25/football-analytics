@@ -42,24 +42,21 @@ def goal_assist_stats(match_data):
             assist_rows = team_data[team_data['pass_goal_assist'] == True][['player']]
 
         goal_rows = team_data[(team_data['type'] == 'Shot') & (team_data['shot_outcome'] == 'Goal')][['player']]
-        logging.info(f"Team: {team}")
-        logging.info(f"goal_rows: {goal_rows}")
+
         for period in team_data[(team_data['type'] == 'Shot') & (team_data['shot_outcome'] == 'Goal')][
             'period'].tolist():
-            logging.info(f"Period: {period}")
-            logging.info(f"period type: {type(period)}")
+
 
             # Ensure 'period' is treated as a string or integer as appropriate
             if period in [1, 2] and team_data['period'].max() < 3:
                 # Normal time score
-                logging.info(f"Normal time score")
+
                 if team == home_team:
                     home_team_score_normal_time += 1
                 else:
                     away_team_score_normal_time += 1
 
             elif period in [1, 2] and team_data['period'].max() > 2:
-                logging.info(f"Normal Time Extra time score")
                 # Normal and extra time combined
                 if team == home_team:
                     home_team_score_normal_time += 1
@@ -69,7 +66,6 @@ def goal_assist_stats(match_data):
                     away_team_extra_time_score += 1
 
             elif period in [3, 4]:
-                logging.info(f"Extra time score")
                 # Extra time score
                 if team == home_team:
                     home_team_extra_time_score += 1
@@ -77,19 +73,12 @@ def goal_assist_stats(match_data):
                     away_team_extra_time_score += 1
 
             elif period == 5:
-                logging.info(f"Penalty shootout score")
                 # Penalty shootout score
                 if team == home_team:
                     home_team_penalty_score += 1
                 else:
                     away_team_penalty_score += 1
 
-        logging.info(f"Home team score: {home_team_score_normal_time}")
-        logging.info(f"Away team score: {away_team_score_normal_time}")
-        logging.info(f"Home team extra time score: {home_team_extra_time_score}")
-        logging.info(f"Away team extra time score: {away_team_extra_time_score}")
-        logging.info(f"Home team penalty score: {home_team_penalty_score}")
-        logging.info(f"Away team penalty score: {away_team_penalty_score}")
 
 
 
