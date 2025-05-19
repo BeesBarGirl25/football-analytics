@@ -4,6 +4,20 @@ import pandas as pd
 from scipy.ndimage import gaussian_filter
 import plotly.graph_objects as go
 
+def _generate_pitch_shapes():
+    return [
+        dict(type="rect", x0=0, y0=0, x1=120, y1=80, line=dict(color="white")),
+        dict(type="line", x0=0, y0=40, x1=120, y1=40, line=dict(color="white")),
+        dict(type="circle", x0=60-9.15, y0=40-9.15, x1=60+9.15, y1=40+9.15, line=dict(color="white")),
+        dict(type="rect", x0=0, y0=30, x1=18, y1=50, line=dict(color="white")),
+        dict(type="rect", x0=102, y0=30, x1=120, y1=50, line=dict(color="white")),
+        dict(type="rect", x0=0, y0=36, x1=6, y1=44, line=dict(color="white")),
+        dict(type="rect", x0=114, y0=36, x1=120, y1=44, line=dict(color="white")),
+        dict(type="circle", x0=11-0.3, y0=40-0.3, x1=11+0.3, y1=40+0.3, fillcolor="white", line=dict(color="white")),
+        dict(type="circle", x0=109-0.3, y0=40-0.3, x1=109+0.3, y1=40+0.3, fillcolor="white", line=dict(color="white"))
+    ]
+
+
 def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
     bins = (24, 16)
     sigma = 2.5
@@ -58,3 +72,4 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
 
     # ✅ This is key
     return json.dumps(fig.to_plotly_json(), indent=2)
+
