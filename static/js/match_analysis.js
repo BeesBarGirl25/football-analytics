@@ -12,6 +12,7 @@ $('#match-select').on('change', async function () {
         const xg = result.xg_graph;
         const momentum = result.momentum_graph;
         const summary = result.match_summary;
+        const heatmap = result.dominance_heatmap;
 
         // Show containers
         document.getElementById('graph-container-1').classList.remove('hidden');
@@ -33,6 +34,12 @@ $('#match-select').on('change', async function () {
         } else {
             console.warn("[Warning]: Momentum graph data missing");
         }
+
+        if (heatmap?.data && heatmap?.layout) {
+            Plotly.newPlot('graph-container-4', heatmap.data, heatmap.layout);
+            console.log("[DEBUG]: Dominance heatmap rendered");
+        }
+
 
         // Populate match summary
         document.getElementById('home-team-name').textContent = summary.homeTeam ?? '–';

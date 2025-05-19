@@ -218,6 +218,20 @@ body {
     grid-row: 1 / span 2; /* takes full height (both rows) */
 }
 
+#graph-container-4 {
+    grid-column: 3;
+    grid-row: 1 / span 2; /* takes full height (both rows) */
+}
+
+#graph-container-4 .js-plotly-plot,
+#graph-container-4 .plot-container {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#graph-container-4 .main-svg {
+    height: 100% !important;
+}
 
 
 .hidden {
