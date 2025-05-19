@@ -8,6 +8,7 @@ $('#match-select').on('change', async function () {
 
         const result = await response.json();
 
+        console.log("[DEBUG] Results: ", result)
         // Use fields directly (they're already JSON)
         const xg = result.xg_graph;
         const momentum = result.momentum_graph;
