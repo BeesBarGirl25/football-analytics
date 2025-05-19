@@ -54,9 +54,9 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
 
     # Create Plotly heatmap
     fig = go.Figure(data=go.Heatmap(
-        z=dominance.T,
-        x=x_centers,
-        y=y_centers,
+        z=dominance.T,  # Transpose to make orientation vertical
+        x=y_centers,  # y becomes x
+        y=x_centers,  # x becomes y
         zmin=0,
         zmax=1,
         colorscale='RdBu',
@@ -75,4 +75,6 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
         shapes=_generate_pitch_shapes()
     )
 
-    return json.dumps(fig.to_plotly_json())
+    fig_dict = fig.to_plotly_json()  # ✅ Standard JS-safe dict
+    return json.dumps(fig_dict)  # ✅ Proper JSON for frontend use
+
