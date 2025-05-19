@@ -19,6 +19,7 @@ $('#match-select').on('change', async function () {
         document.getElementById('graph-container-1').classList.remove('hidden');
         document.getElementById('graph-container-2').classList.remove('hidden');
         document.getElementById('graph-container-3').classList.remove('hidden');
+        document.getElementById('graph-container-4').classList.remove('hidden');
 
         // Render xG graph
         if (xg?.data && xg?.layout) {

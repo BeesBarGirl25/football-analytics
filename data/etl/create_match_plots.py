@@ -33,9 +33,8 @@ print(f"Using DB URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 def create_all_match_plots():
     with app.app_context():
-        missing_competitions = [12, 55, 35, 53, 72]  # update this as needed
+        matches = Match.query.all()
 
-        matches = Match.query.join(Season).filter(Season.competition_id.in_(missing_competitions)).all()
         logger.info(f"Processing {len(matches)} matches...")
 
         for match in matches:
