@@ -4,25 +4,10 @@ import pandas as pd
 from scipy.ndimage import gaussian_filter
 import plotly.graph_objects as go
 
-def _generate_pitch_shapes():
-    return [
-        dict(type="rect", x0=0, y0=0, x1=120, y1=80, line=dict(color="white")),
-        dict(type="line", x0=0, y0=40, x1=120, y1=40, line=dict(color="white")),
-        dict(type="circle", x0=60-9.15, y0=40-9.15, x1=60+9.15, y1=40+9.15, line=dict(color="white")),
-        dict(type="rect", x0=0, y0=30, x1=18, y1=50, line=dict(color="white")),
-        dict(type="rect", x0=102, y0=30, x1=120, y1=50, line=dict(color="white")),
-        dict(type="rect", x0=0, y0=36, x1=6, y1=44, line=dict(color="white")),
-        dict(type="rect", x0=114, y0=36, x1=120, y1=44, line=dict(color="white")),
-        dict(type="circle", x0=11-0.3, y0=40-0.3, x1=11+0.3, y1=40+0.3, fillcolor="white", line=dict(color="white")),
-        dict(type="circle", x0=109-0.3, y0=40-0.3, x1=109+0.3, y1=40+0.3, fillcolor="white", line=dict(color="white"))
-    ]
-
-
 def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
     bins = (24, 16)
     sigma = 2.5
 
-    # Extract usable location data
     location_data = match_data[['location', 'team']].dropna()
     location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list))]
     location_data[['x', 'y']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
@@ -35,11 +20,9 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
     team_a_data = location_data[location_data['team'] == team_a]
     team_b_data = location_data[location_data['team'] == team_b]
 
-    # Define bins
     x_bins = np.linspace(0, 120, bins[0] + 1)
     y_bins = np.linspace(0, 80, bins[1] + 1)
 
-    # Compute 2D histograms
     a_hist, _, _ = np.histogram2d(team_a_data['x'], team_a_data['y'], bins=[x_bins, y_bins])
     b_hist, _, _ = np.histogram2d(team_b_data['x'], team_b_data['y'], bins=[x_bins, y_bins])
     total = a_hist + b_hist
@@ -48,15 +31,13 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
         dominance = np.divide(a_hist, total, out=np.full_like(total, 0.5), where=total != 0)
     dominance = gaussian_filter(dominance, sigma=sigma)
 
-    # Centers for plotting
     x_centers = 0.5 * (x_bins[:-1] + x_bins[1:])
     y_centers = 0.5 * (y_bins[:-1] + y_bins[1:])
 
-    # Create Plotly heatmap
     fig = go.Figure(data=go.Heatmap(
-        z=dominance.T,  # Transpose to make orientation vertical
-        x=y_centers,  # y becomes x
-        y=x_centers,  # x becomes y
+        z=dominance.T,
+        x=x_centers,
+        y=y_centers,
         zmin=0,
         zmax=1,
         colorscale='RdBu',
@@ -75,6 +56,5 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
         shapes=_generate_pitch_shapes()
     )
 
-    fig_dict = fig.to_plotly_json()  # ✅ Standard JS-safe dict
-    return json.dumps(fig_dict)  # ✅ Proper JSON for frontend use
-
+    # ✅ This is key
+    return json.dumps(fig.to_plotly_json(), indent=2)
