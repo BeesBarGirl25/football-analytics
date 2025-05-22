@@ -4,23 +4,36 @@ import pandas as pd
 from scipy.ndimage import gaussian_filter
 import plotly.graph_objects as go
 
-def _generate_pitch_shapes():
+# Pitch with vertical orientation (0,0 is bottom-left)
+def _generate_pitch_shapes_vertical():
     return [
-        dict(type="rect", x0=0, y0=0, x1=120, y1=80, line=dict(color="white")),
-        dict(type="line", x0=60, y0=0, x1=60, y1=80, line=dict(color="white")),
-        dict(type="circle", x0=60-9.15, y0=40-9.15, x1=60+9.15, y1=40+9.15, line=dict(color="white")),
-        dict(type="rect", x0=0, y0=30, x1=18, y1=50, line=dict(color="white")),
-        dict(type="rect", x0=102, y0=30, x1=120, y1=50, line=dict(color="white")),
-        dict(type="rect", x0=0, y0=36, x1=6, y1=44, line=dict(color="white")),
-        dict(type="rect", x0=114, y0=36, x1=120, y1=44, line=dict(color="white")),
-        dict(type="circle", x0=11-0.3, y0=40-0.3, x1=11+0.3, y1=40+0.3, fillcolor="white", line=dict(color="white")),
-        dict(type="circle", x0=109-0.3, y0=40-0.3, x1=109+0.3, y1=40+0.3, fillcolor="white", line=dict(color="white"))
+        # Pitch outline
+        dict(type="rect", x0=0, y0=0, x1=80, y1=120, line=dict(color="white")),
+
+        # Halfway line
+        dict(type="line", x0=40, y0=0, x1=40, y1=120, line=dict(color="white")),
+
+        # Centre circle
+        dict(type="circle", x0=40 - 9.15, y0=60 - 9.15, x1=40 + 9.15, y1=60 + 9.15, line=dict(color="white")),
+
+        # Penalty boxes
+        dict(type="rect", x0=30, y0=0, x1=50, y1=18, line=dict(color="white")),      # bottom
+        dict(type="rect", x0=30, y0=102, x1=50, y1=120, line=dict(color="white")),   # top
+
+        # 6-yard boxes
+        dict(type="rect", x0=36, y0=0, x1=44, y1=6, line=dict(color="white")),       # bottom
+        dict(type="rect", x0=36, y0=114, x1=44, y1=120, line=dict(color="white")),   # top
+
+        # Penalty spots
+        dict(type="circle", x0=39.7, y0=11.7, x1=40.3, y1=12.3, fillcolor="white", line=dict(color="white")),
+        dict(type="circle", x0=39.7, y0=108.7, x1=40.3, y1=109.3, fillcolor="white", line=dict(color="white"))
     ]
 
 def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
-    bins = (24, 16)
+    bins = (24, 16)  # (x, y)
     sigma = 2.5
 
+    # Preprocess location data
     location_data = match_data[['location', 'team']].dropna()
     location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list))]
     location_data[['x', 'y']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
@@ -33,9 +46,11 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
     team_a_data = location_data[location_data['team'] == team_a]
     team_b_data = location_data[location_data['team'] == team_b]
 
+    # Define bins over pitch size (StatsBomb: 120 x 80)
     x_bins = np.linspace(0, 120, bins[0] + 1)
     y_bins = np.linspace(0, 80, bins[1] + 1)
 
+    # Histograms
     a_hist, _, _ = np.histogram2d(team_a_data['x'], team_a_data['y'], bins=[x_bins, y_bins])
     b_hist, _, _ = np.histogram2d(team_b_data['x'], team_b_data['y'], bins=[x_bins, y_bins])
     total = a_hist + b_hist
@@ -44,11 +59,20 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
         dominance = np.divide(a_hist, total, out=np.full_like(total, 0.5), where=total != 0)
     dominance = gaussian_filter(dominance, sigma=sigma)
 
-    x_centers = 0.5 * (x_bins[:-1] + x_bins[1:])
-    y_centers = 0.5 * (y_bins[:-1] + y_bins[1:])
+    # Convert to vertical pitch
+    dominance = dominance.T  # y-axis first for Plotly
 
+    # Get bin centers
+    x_centers = 0.5 * (x_bins[:-1] + x_bins[1:])  # 24 x
+    y_centers = 0.5 * (y_bins[:-1] + y_bins[1:])  # 16 y
+
+    # Flip y-axis for top-to-bottom orientation
+    y_centers = y_centers[::-1]
+    dominance = dominance[::-1]
+
+    # Generate Plotly figure
     fig = go.Figure(data=go.Heatmap(
-        z=dominance.tolist(),  # No .T
+        z=dominance.tolist(),       # Must convert numpy to list
         x=x_centers.tolist(),
         y=y_centers.tolist(),
         zmin=0,
@@ -58,16 +82,16 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
         showscale=False
     ))
 
+    # Update layout to match vertical pitch orientation
     fig.update_layout(
-        xaxis=dict(range=[0, 120], visible=False),
-        yaxis=dict(range=[80, 0], visible=False, scaleanchor="x", scaleratio=2/3),  # flipped y
+        xaxis=dict(range=[0, 80], visible=False, scaleanchor="y", scaleratio=1.5),
+        yaxis=dict(range=[0, 120], visible=False),
         margin=dict(t=30, l=0, r=0, b=0),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        height=800,
-        width=500,
+        autosize=True,
         title=dict(text=f"Full Match Dominance: {team_a} vs {team_b}", x=0.5, font=dict(color='white', size=14)),
-        shapes=_generate_pitch_shapes()
+        shapes=_generate_pitch_shapes_vertical()
     )
 
     return json.dumps(fig.to_plotly_json(), indent=2)
