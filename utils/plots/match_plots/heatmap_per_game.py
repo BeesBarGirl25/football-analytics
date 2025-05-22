@@ -49,9 +49,9 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
     y_centers = 0.5 * (y_bins[:-1] + y_bins[1:])
 
     fig = go.Figure(data=go.Heatmap(
-        z=dominance.T,
-        x=x_centers,
-        y=y_centers,
+        z=dominance.T.tolist(),
+        x=x_centers.tolist(),
+        y=y_centers.tolist(),
         zmin=0,
         zmax=1,
         colorscale='RdBu',
@@ -60,8 +60,8 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
     ))
 
     fig.update_layout(
-        xaxis=dict(range=[0, 120], visible=False),
-        yaxis=dict(range=[0, 80], visible=False, scaleanchor="x", scaleratio=2/3),
+        xaxis=dict(range=[0, 120], visible=False, scaleanchor="y", scaleratio=1.5),
+        yaxis=dict(range=[0, 80], visible=False),
         margin=dict(t=30, l=0, r=0, b=0),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
