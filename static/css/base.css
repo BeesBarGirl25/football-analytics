@@ -361,23 +361,33 @@ body {
     transition: background-color 0.2s ease-in-out;
 }
 
-.button-toggle-row {
+.dominance-toggle-buttons {
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-bottom: 10px;
+    padding-bottom: 10px;
 }
 
-.button-toggle-row button {
+.toggle-btn {
     background-color: #1f1f1f;
     color: #e0e0e0;
     border: 1px solid #444;
-    padding: 5px 12px;
-    cursor: pointer;
     border-radius: 4px;
-    font-size: 0.9rem;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.button-toggle-row button:hover {
-    background-color: #333;
+.toggle-btn:hover {
+    background-color: #2a2a2a;
 }
+
+.toggle-btn.active {
+    background-color: #90caf9;
+    color: #121212;
+    font-weight: bold;
+    border-color: #90caf9;
+}
+
+

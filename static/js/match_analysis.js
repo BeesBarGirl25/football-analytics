@@ -79,6 +79,16 @@ $('#match-select').on('change', async function () {
         console.error("[Error]: Failed to load plots or summary", error);
     }
 });
+document.querySelectorAll('.toggle-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        const viewKey = button.getAttribute('data-view');
+        toggleDominanceView(viewKey);
+    });
+});
+
 function populateTable(tableId, players) {
     const tableBody = document.querySelector(`#${tableId} tbody`);
     tableBody.innerHTML = '';
