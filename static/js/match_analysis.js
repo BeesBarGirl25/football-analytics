@@ -3,7 +3,7 @@ let cachedDominancePlots = {};
 function toggleDominanceView(viewKey) {
     const plot = cachedDominancePlots[viewKey];
     if (plot?.data && plot?.layout) {
-        Plotly.newPlot('graph-container-4', plot.data, plot.layout);
+        Plotly.newPlot('dominance-plot-container', plot.data, plot.layout);
         console.log(`[DOMINANCE] Rendered: ${viewKey}`);
     } else {
         console.warn(`[DOMINANCE] Missing plot for: ${viewKey}`);

@@ -390,4 +390,18 @@ body {
     border-color: #90caf9;
 }
 
+#graph-container-4 .graph-inner.vertical {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    gap: 0.5rem;
+}
+
+.plotly-wrapper {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+}
+
 
