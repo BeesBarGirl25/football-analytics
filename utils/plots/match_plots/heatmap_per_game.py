@@ -6,28 +6,29 @@ import plotly.graph_objects as go
 
 def _generate_pitch_shapes_vertical():
     return [
-        dict(type="rect", x0=0, y0=0, x1=80, y1=120, line=dict(color="black")),
-        dict(type="line", x0=0, y0=60, x1=80, y1=60, line=dict(color="black")),
+        dict(type="rect", x0=0, y0=0, x1=80, y1=120, line=dict(color="black")),  # Full pitch
+        dict(type="line", x0=0, y0=60, x1=80, y1=60, line=dict(color="black")),  # Halfway line
         dict(type="circle", x0=40 - 9.15, y0=60 - 9.15, x1=40 + 9.15, y1=60 + 9.15, line=dict(color="black")),
-
         dict(type="rect", x0=30, y0=0, x1=50, y1=18, line=dict(color="black")),
         dict(type="rect", x0=30, y0=102, x1=50, y1=120, line=dict(color="black")),
-
         dict(type="rect", x0=36, y0=0, x1=44, y1=6, line=dict(color="black")),
         dict(type="rect", x0=36, y0=114, x1=44, y1=120, line=dict(color="black")),
-
         dict(type="circle", x0=39.7, y0=11.7, x1=40.3, y1=12.3, fillcolor="black", line=dict(color="black")),
         dict(type="circle", x0=39.7, y0=108.7, x1=40.3, y1=109.3, fillcolor="black", line=dict(color="black"))
     ]
 
-def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
+def generate_dominance_heatmap_json(match_data: pd.DataFrame, half: str = "full") -> dict:
     bins = (24, 16)
     sigma = 2.5
 
-    location_data = match_data[['location', 'team']].dropna()
+    location_data = match_data[['location', 'team', 'period']].dropna()
     location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list))]
-
     location_data[['x', 'y']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
+
+    if half == "first":
+        location_data = location_data[location_data['period'] == 1]
+    elif half == "second":
+        location_data = location_data[location_data['period'] == 2]
 
     teams = location_data['team'].unique()
     if len(teams) != 2:
@@ -51,24 +52,21 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
     y_centers = 0.5 * (y_bins[:-1] + y_bins[1:])
     x_centers = 0.5 * (x_bins[:-1] + x_bins[1:])
 
-    # Custom colorscale with narrower white band (centered around 0.5 ± 0.05)
-    custom_colorscale = [
-        [0.0, "rgb(178,24,43)"],    # red
-        [0.45, "rgb(253,219,199)"],
-        [0.49, "rgb(247,247,247)"],  # white start
-        [0.51, "rgb(247,247,247)"],  # white end
-        [0.55, "rgb(209,229,240)"],
-        [1.0, "rgb(33,102,172)"]     # blue
-    ]
-
     fig = go.Figure(data=go.Heatmap(
         z=dominance.tolist(),
         x=x_centers.tolist(),
         y=y_centers.tolist(),
         zmin=0,
         zmax=1,
-        colorscale=custom_colorscale,
-        reversescale=False,  # Team A = blue, Team B = red
+        colorscale=[
+            [0.0, "rgb(5,48,97)"],        # Team A = blue
+            [0.35, "rgb(67,147,195)"],
+            [0.49, "rgb(247,247,247)"],
+            [0.51, "rgb(253,219,199)"],
+            [0.65, "rgb(214,96,77)"],
+            [1.0, "rgb(103,0,31)"]         # Team B = red
+        ],
+        reversescale=False,
         showscale=False
     ))
 
@@ -79,12 +77,9 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame) -> str:
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         autosize=True,
-        title=dict(
-            text=f"Pitch Dominance",
-            x=0.5,
-            font=dict(color='white', size=14)
-        ),
+        title=dict(text=f"{half.capitalize()} Half Dominance: {team_a} vs {team_b}", x=0.5, font=dict(color='white', size=14)),
         shapes=_generate_pitch_shapes_vertical()
     )
 
-    return json.dumps(fig.to_plotly_json(), indent=2)
+    return fig.to_plotly_json()
+

@@ -360,3 +360,24 @@ body {
     background-color: #3a3a3a;
     transition: background-color 0.2s ease-in-out;
 }
+
+.button-toggle-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.button-toggle-row button {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    padding: 5px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.button-toggle-row button:hover {
+    background-color: #333;
+}

@@ -1,3 +1,15 @@
+let cachedDominancePlots = {};
+
+function toggleDominanceView(viewKey) {
+    const plot = cachedDominancePlots[viewKey];
+    if (plot?.data && plot?.layout) {
+        Plotly.newPlot('graph-container-4', plot.data, plot.layout);
+        console.log(`[DOMINANCE] Rendered: ${viewKey}`);
+    } else {
+        console.warn(`[DOMINANCE] Missing plot for: ${viewKey}`);
+    }
+}
+
 $('#match-select').on('change', async function () {
     const matchId = $(this).val();
     console.log("Match selected, ID:", matchId);
@@ -7,13 +19,18 @@ $('#match-select').on('change', async function () {
         if (!response.ok) throw new Error("Failed to fetch plot data");
 
         const result = await response.json();
+        console.log("[DEBUG] Results: ", result);
 
-        console.log("[DEBUG] Results: ", result)
-        // Use fields directly (they're already JSON)
         const xg = result.xg_graph;
         const momentum = result.momentum_graph;
         const summary = result.match_summary;
-        const heatmap = result.dominance_heatmap;
+
+        // Store heatmaps in cache for toggling
+        cachedDominancePlots = {
+            dominance_heatmap_full: result.dominance_heatmap_full,
+            dominance_heatmap_first: result.dominance_heatmap_first,
+            dominance_heatmap_second: result.dominance_heatmap_second
+        };
 
         // Show containers
         document.getElementById('graph-container-1').classList.remove('hidden');
@@ -21,29 +38,26 @@ $('#match-select').on('change', async function () {
         document.getElementById('graph-container-3').classList.remove('hidden');
         document.getElementById('graph-container-4').classList.remove('hidden');
 
-        // Render xG graph
+        // Render xG
         if (xg?.data && xg?.layout) {
             Plotly.newPlot('graph-container-1', xg.data, xg.layout);
             console.log("[Debug]: xG graph rendered");
         } else {
-            console.warn("[Warning]: xG graph data missing");
+            console.warn("[Warning]: xG graph missing");
         }
 
-        // Render momentum graph
+        // Render momentum
         if (momentum?.data && momentum?.layout) {
             Plotly.newPlot('graph-container-3', momentum.data, momentum.layout);
             console.log("[Debug]: Momentum graph rendered");
         } else {
-            console.warn("[Warning]: Momentum graph data missing");
+            console.warn("[Warning]: Momentum graph missing");
         }
 
-        if (heatmap?.data && heatmap?.layout) {
-            Plotly.newPlot('graph-container-4', heatmap.data, heatmap.layout);
-            console.log("[DEBUG]: Dominance heatmap rendered");
-        }
+        // Default: render full match dominance heatmap
+        toggleDominanceView('dominance_heatmap_full');
 
-
-        // Populate match summary
+        // Populate summary
         document.getElementById('home-team-name').textContent = summary.homeTeam ?? '–';
         document.getElementById('away-team-name').textContent = summary.awayTeam ?? '–';
         document.getElementById('home-team-score').textContent = summary.homeTeamNormalTime ?? '–';
@@ -65,7 +79,6 @@ $('#match-select').on('change', async function () {
         console.error("[Error]: Failed to load plots or summary", error);
     }
 });
-
 function populateTable(tableId, players) {
     const tableBody = document.querySelector(`#${tableId} tbody`);
     tableBody.innerHTML = '';
