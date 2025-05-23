@@ -77,7 +77,7 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, half: str = "full"
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         autosize=True,
-        title=dict(text=f"{half.capitalize()} Half Dominance: {team_a} vs {team_b}", x=0.5, font=dict(color='white', size=14)),
+        title=dict(text=f"{half.capitalize()} Half Dominance", x=0.5, font=dict(color='white', size=14)),
         shapes=_generate_pitch_shapes_vertical()
     )
 
