@@ -76,14 +76,15 @@ def create_all_match_plots():
                     "extraTimeDetails": extra
                 }
 
-                # Prepare plots
                 plot_dict = {
                     "xg_graph": pio.to_json(xg_plot, pretty=True),
                     "momentum_graph": pio.to_json(momentum_plot, pretty=True),
                     "match_summary": json.dumps(match_summary, indent=2),
-                    "dominance_heatmap": heatmap_plot,
-                    "dominance_heatmap_first": generate_dominance_heatmap_json(match_df[match_df['period'] == 1]),
-                    "dominance_heatmap_second": generate_dominance_heatmap_json(match_df[match_df['period'] == 2]),
+                    "dominance_heatmap": json.dumps(generate_dominance_heatmap_json(match_df)),
+                    "dominance_heatmap_first": json.dumps(
+                        generate_dominance_heatmap_json(match_df[match_df['period'] == 1])),
+                    "dominance_heatmap_second": json.dumps(
+                        generate_dominance_heatmap_json(match_df[match_df['period'] == 2])),
                 }
 
                 for plot_type, plot_json in plot_dict.items():
