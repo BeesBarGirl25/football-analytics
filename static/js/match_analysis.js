@@ -27,7 +27,7 @@ $('#match-select').on('change', async function () {
 
         // Store heatmaps in cache for toggling
         cachedDominancePlots = {
-            dominance_heatmap_full: result.dominance_heatmap_full,
+            dominance_heatmap_full: result.dominance_heatmap,
             dominance_heatmap_first: result.dominance_heatmap_first,
             dominance_heatmap_second: result.dominance_heatmap_second
         };
@@ -55,7 +55,7 @@ $('#match-select').on('change', async function () {
         }
 
         // Default: render full match dominance heatmap
-        toggleDominanceView('dominance_heatmap_full');
+        toggleDominanceView('dominance_heatmap');
 
         // Populate summary
         document.getElementById('home-team-name').textContent = summary.homeTeam ?? '–';
