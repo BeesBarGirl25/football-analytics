@@ -90,12 +90,12 @@ def create_all_match_plots():
                         generate_dominance_heatmap_json(match_df[match_df['period'] == 1])),
                     "dominance_heatmap_second": json.dumps(
                         generate_dominance_heatmap_json(match_df[match_df['period'] == 2])),
-                    "home_team_heatmap": generate_team_match_heatmap(home_team_data),
-                    "home_team_heatmap_first": generate_team_match_heatmap(home_team_data, "first"),
-                    "home_team_heatmap_second": generate_team_match_heatmap(home_team_data, "second"),
-                    "away_team_heatmap": generate_team_match_heatmap(away_team_data),
-                    "away_team_heatmap_first": generate_team_match_heatmap(away_team_data, "first"),
-                    "away_team_heatmap_second": generate_team_match_heatmap(away_team_data, "second")
+                    "home_team_heatmap": json.dumps(generate_team_match_heatmap(home_team_data)),
+                    "home_team_heatmap_first": json.dumps(generate_team_match_heatmap(home_team_data, "first")),
+                    "home_team_heatmap_second": json.dumps(generate_team_match_heatmap(home_team_data, "second")),
+                    "away_team_heatmap": json.dumps(generate_team_match_heatmap(away_team_data)),
+                    "away_team_heatmap_first": json.dumps(generate_team_match_heatmap(away_team_data, "first")),
+                    "away_team_heatmap_second": json.dumps(generate_team_match_heatmap(away_team_data, "second"))
                 }
 
                 for plot_type, plot_json in plot_dict.items():
