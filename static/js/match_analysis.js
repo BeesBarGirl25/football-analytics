@@ -111,8 +111,9 @@ $('#match-select').on('change', async function () {
         }
 
         togglePlotView('dominance_heatmap_full', 'dominance', 'dominance-plot-container');
-        togglePlotView('heatmap_heatmap_full', 'heatmap_home', 'heatmap-home-plot-container');
-        togglePlotView('heatmap_heatmap_full', 'heatmap_away', 'heatmap-away-plot-container');
+        togglePlotView('home_team_heatmap_full', 'home_team_heatmap', 'heatmap-home-plot-container');
+        togglePlotView('away_team_heatmap_full', 'away_team_heatmap', 'heatmap-away-plot-container');
+
 
         const summary = match_summary;
         document.getElementById('home-team-name').textContent = summary.homeTeam ?? '–';
