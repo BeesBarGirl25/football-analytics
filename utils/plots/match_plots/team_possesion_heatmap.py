@@ -1,4 +1,4 @@
-from heatmap_per_game import _generate_pitch_shapes_vertical
+from utils.plots.match_plots.heatmap_per_game import _generate_pitch_shapes_vertical
 import pandas as pd
 import numpy as np
 from scipy.ndimage import gaussian_filter
