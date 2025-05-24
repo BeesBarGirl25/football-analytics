@@ -25,6 +25,7 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, half: str = "full"
     location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list))]
     location_data[['y', 'x']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
 
+
     if half == "first":
         location_data = location_data[location_data['period'] == 1]
     elif half == "second":
