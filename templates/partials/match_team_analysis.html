@@ -1,10 +1,11 @@
-<div id="{{ graph_container_id }}" class="graph-container tall hidden">
+<div id="{{ graph_container_id }}" class="graph-container tall hidden" data-plot-group="{{ prefix }}">
     <div class="graph-inner vertical">
         <div class="heatmap-toggle-buttons">
-          <button class="toggle-btn active" data-view="heatmap_heatmap_full">Full Match</button>
-          <button class="toggle-btn" data-view="heatmap_heatmap_first">1st Half</button>
-          <button class="toggle-btn" data-view="heatmap_heatmap_second">2nd Half</button>
+            <button class="toggle-btn active" data-view="{{ prefix }}_heatmap_full">Full Match</button>
+            <button class="toggle-btn" data-view="{{ prefix }}_heatmap_first">1st Half</button>
+            <button class="toggle-btn" data-view="{{ prefix }}_heatmap_second">2nd Half</button>
         </div>
         <div id="{{ plot_container_id }}" class="plotly-wrapper"></div>
     </div>
 </div>
+

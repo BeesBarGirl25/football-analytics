@@ -84,17 +84,18 @@ $('#match-select').on('change', async function () {
             dominance_heatmap_second: result.dominance_heatmap_second
         };
 
-        cachedPlots.heatmap_home = {
-            heatmap_heatmap_full: result.home_team_heatmap,
-            heatmap_heatmap_first: result.home_team_heatmap_first,
-            heatmap_heatmap_second: result.home_team_heatmap_second
+        cachedPlots.home_team_heatmap = {
+            home_team_heatmap_full: result.home_team_heatmap,
+            home_team_heatmap_first: result.home_team_heatmap_first,
+            home_team_heatmap_second: result.home_team_heatmap_second
         };
 
-        cachedPlots.heatmap_away = {
-            heatmap_heatmap_full: result.away_team_heatmap,
-            heatmap_heatmap_first: result.away_team_heatmap_first,
-            heatmap_heatmap_second: result.away_team_heatmap_second
+        cachedPlots.away_team_heatmap = {
+            away_team_heatmap_full: result.away_team_heatmap,
+            away_team_heatmap_first: result.away_team_heatmap_first,
+            away_team_heatmap_second: result.away_team_heatmap_second
         };
+
 
         [1, 2, 3, 4].forEach(i => {
             const el = document.getElementById(`graph-container-${i}`);
