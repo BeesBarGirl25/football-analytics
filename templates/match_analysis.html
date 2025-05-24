@@ -63,7 +63,7 @@
     <div class="analysis-content hidden" id="home">
         <div class="graphs-container">
             {% set graph_container_id = 'graph-container-home-team-4' %}
-            {% set prefix = 'heatmap_home' %}
+            {% set prefix = 'home_team_heatmap' %}
             {% set plot_container_id = 'heatmap-home-plot-container' %}
             {% include 'partials/match_team_analysis.html' with context %}
         </div>
@@ -72,7 +72,7 @@
     <div class="analysis-content hidden" id="away">
         <div class="graphs-container">
             {% set graph_container_id = 'graph-container-away-team-4' %}
-            {% set prefix = 'heatmap_away' %}
+            {% set prefix = 'away_team_heatmap' %}
             {% set plot_container_id = 'heatmap-away-plot-container' %}
             {% include 'partials/match_team_analysis.html' with context %}
         </div>
