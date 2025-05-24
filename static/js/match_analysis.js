@@ -18,7 +18,7 @@ function togglePlotView(viewKey, plotGroup, containerId) {
     renderPlot(containerId, plot);
 }
 
-// ✅ Toggle tab visibility and re-render if needed
+// Toggle tab visibility
 document.querySelectorAll('.tab-btn').forEach(button => {
     button.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -26,17 +26,7 @@ document.querySelectorAll('.tab-btn').forEach(button => {
 
         button.classList.add('active');
         const tabId = button.getAttribute('data-tab');
-        const targetTab = document.getElementById(tabId);
-        targetTab.classList.remove('hidden');
-
-        // Re-render default plot for team tabs
-        setTimeout(() => {
-            if (tabId === 'home') {
-                togglePlotView('heatmap_heatmap_full', 'heatmap_home', 'heatmap-home-plot-container');
-            } else if (tabId === 'away') {
-                togglePlotView('heatmap_heatmap_full', 'heatmap_away', 'heatmap-away-plot-container');
-            }
-        }, 100);
+        document.getElementById(tabId).classList.remove('hidden');
     });
 });
 
@@ -89,8 +79,7 @@ $('#match-select').on('change', async function () {
         };
 
         [1, 2, 3, 4].forEach(i => {
-            const el = document.getElementById(`graph-container-${i}`);
-            if (el) el.classList.remove('hidden');
+            document.getElementById(`graph-container-${i}`).classList.remove('hidden');
         });
 
         if (xg_graph?.data && xg_graph?.layout) {

@@ -1,28 +1,133 @@
-/* === Graph Sizing Modifiers === */
-.graph-container.small {
-  height: 200px;
-  min-height: 150px;
+/* === Base Layout === */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  overflow-x: hidden;
+  position: relative;
 }
 
-.graph-container.medium {
-  height: 350px;
-  min-height: 300px;
+.wrapper {
+  display: grid;
+  grid-template-areas: "sidebar top-navbar" "sidebar content";
+  grid-template-columns: 60px 1fr;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.graph-container.tall {
+/* === Sidebar === */
+.sidebar {
+  grid-area: sidebar;
+  background-color: #1f1f1f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60px;
+  overflow-y: auto;
+  gap: 20px;
+}
+
+.icon-button {
+  color: #90caf9;
+  font-size: 1.5rem;
+  transition: transform 0.2s ease;
+}
+.icon-button:hover {
+  transform: scale(1.2);
+}
+
+/* === Top Navbar === */
+.top-navbar {
+  grid-area: top-navbar;
+  background-color: #1f1f1f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 20px;
+  border-bottom: 1px solid #333;
+  height: 45px;
+  z-index: 1000;
+}
+.top-navbar .logo {
+  color: #90caf9;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.dropdowns {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding-right: 7.5%;
+  color: grey;
+}
+
+/* === Content Area === */
+.content {
+  grid-area: content;
+  padding: 0.5rem;
+  background-color: #121212;
+  color: #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.analysis-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #1e1e1e;
+  padding: 0.5rem;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.analysis-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tab-btn {
+  flex: 1;
+  background-color: #2d2d2d;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  color: #dcdcdc;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+.tab-btn:hover {
+  background-color: #3d3d3d;
+}
+.tab-btn.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.analysis-content {
+  display: flex;
+  flex-direction: column;
+}
+.analysis-content.hidden {
+  display: none;
+}
+
+/* === Graph Layouts === */
+.graphs-container {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1rem;
+  width: 100%;
   height: 100%;
-  min-height: 400px;
 }
 
-/* Plot container sizing */
-.plotly-wrapper .js-plotly-plot,
-.plotly-wrapper .plot-container,
-.plotly-wrapper .main-svg {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* Retain existing graph-container styling */
 .graph-container {
   background-color: #1f1f1f;
   border: 1px solid #333;
@@ -35,30 +140,164 @@
   text-align: center;
 }
 
-/* Optional: retain grid placement if needed */
-#graph-container-1 {
-  grid-column: 1;
-  grid-row: 1;
+.graph-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem;
+  gap: 1rem;
+  box-sizing: border-box;
 }
 
-#graph-container-2 {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-}
-
-#graph-container-3 {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-#graph-container-4 {
-  grid-column: 3;
-  grid-row: 1 / span 2;
-}
-
-/* Plot wrapper for general use */
 .plotly-wrapper {
   flex-grow: 1;
   width: 100%;
   height: 100%;
+}
+.plotly-wrapper .js-plotly-plot,
+.plotly-wrapper .plot-container,
+.plotly-wrapper .main-svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* === Score Summary === */
+#match-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#combined-score-header {
+  font-size: 1.6rem;
+  font-weight: 600;
+  display: flex;
+  gap: 10px;
+  color: #fff;
+}
+
+.team-score {
+  font-weight: bold;
+  font-size: 1.6rem;
+  color: #fff;
+}
+
+.score-separator {
+  color: #bbb;
+  font-size: 1.5rem;
+}
+
+.home-team-name {
+  color: blue;
+}
+.away-team-name {
+  color: red;
+}
+
+.team-tables {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.team-table {
+  flex: 1;
+  background-color: #2a2a2a;
+  padding: 0.5rem;
+  border-radius: 10px;
+  max-width: 48%;
+  overflow-x: auto;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+}
+
+.team-table table {
+  width: 100%;
+  font-size: 0.72rem;
+  border-collapse: collapse;
+}
+
+.team-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #444;
+  text-align: left;
+  color: #ddd;
+}
+
+.team-table tr:hover {
+  background-color: #3a3a3a;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* === Toggle Buttons === */
+.dominance-toggle-buttons,
+.heatmap-toggle-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.toggle-btn {
+  background-color: #1f1f1f;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.toggle-btn:hover {
+  background-color: #2a2a2a;
+}
+.toggle-btn.active {
+  background-color: #90caf9;
+  color: #121212;
+  font-weight: bold;
+  border-color: #90caf9;
+}
+
+/* === Select2 Dark Theme === */
+.select2-container .select2-selection--single {
+  background-color: #222;
+  border: 1px solid #444;
+  color: #e0e0e0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  min-height: 38px;
+}
+.select2-selection__rendered {
+  color: #e0e0e0 !important;
+  line-height: 38px;
+}
+.select2-selection__placeholder {
+  color: #bbb !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 38px;
+  right: 10px;
+}
+.select2-container--default .select2-dropdown {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+.select2-container--default .select2-results__option {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  padding: 8px 12px;
+}
+.select2-container--default .select2-results__option--highlighted {
+  background-color: #2a2a2a;
+  color: #90caf9;
+}
+
+/* === Utility === */
+.hidden {
+  display: none !important;
+  visibility: hidden;
 }
