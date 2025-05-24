@@ -218,6 +218,20 @@ body {
     grid-row: 1 / span 2; /* takes full height (both rows) */
 }
 
+#graph-container-4 {
+    grid-column: 3;
+    grid-row: 1 / span 2; /* takes full height (both rows) */
+}
+
+#graph-container-4 .js-plotly-plot,
+#graph-container-4 .plot-container {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#graph-container-4 .main-svg {
+    height: 100% !important;
+}
 
 
 .hidden {
@@ -346,3 +360,48 @@ body {
     background-color: #3a3a3a;
     transition: background-color 0.2s ease-in-out;
 }
+
+.dominance-toggle-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding-bottom: 10px;
+}
+
+.toggle-btn {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.toggle-btn:hover {
+    background-color: #2a2a2a;
+}
+
+.toggle-btn.active {
+    background-color: #90caf9;
+    color: #121212;
+    font-weight: bold;
+    border-color: #90caf9;
+}
+
+#graph-container-4 .graph-inner.vertical {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    gap: 0.5rem;
+}
+
+.plotly-wrapper {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+}
+
+

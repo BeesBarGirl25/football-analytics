@@ -11,6 +11,7 @@ from models import Match, MatchPlot, Season
 from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
 from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
 from utils.analytics.match_analytics.match_analysis_utils import goal_assist_stats
+from utils.plots.match_plots.heatmap_per_game import generate_dominance_heatmap_json
 
 # Suppress common warning spam
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -32,9 +33,8 @@ print(f"Using DB URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 def create_all_match_plots():
     with app.app_context():
-        missing_competitions = [12, 55, 35, 53, 72]  # update this as needed
+        matches = Match.query.all()
 
-        matches = Match.query.join(Season).filter(Season.competition_id.in_(missing_competitions)).all()
         logger.info(f"Processing {len(matches)} matches...")
 
         for match in matches:
@@ -47,6 +47,7 @@ def create_all_match_plots():
                 xg_plot = generate_match_graph_plot(match_df)
                 momentum_plot = generate_momentum_graph_plot(match_df)
                 home_df, away_df, home_team, away_team, home_norm, away_norm, home_et, away_et, home_pen, away_pen = goal_assist_stats(match_df)
+                heatmap_plot = generate_dominance_heatmap_json(match_df)
 
                 # Match summary JSON
                 home_data = [{"player": row["player"], "contributions": list(row["contributions"])} for _, row in home_df.iterrows()]
@@ -75,11 +76,15 @@ def create_all_match_plots():
                     "extraTimeDetails": extra
                 }
 
-                # Prepare plots
                 plot_dict = {
                     "xg_graph": pio.to_json(xg_plot, pretty=True),
                     "momentum_graph": pio.to_json(momentum_plot, pretty=True),
-                    "match_summary": json.dumps(match_summary, indent=2)
+                    "match_summary": json.dumps(match_summary, indent=2),
+                    "dominance_heatmap": json.dumps(generate_dominance_heatmap_json(match_df)),
+                    "dominance_heatmap_first": json.dumps(
+                        generate_dominance_heatmap_json(match_df[match_df['period'] == 1])),
+                    "dominance_heatmap_second": json.dumps(
+                        generate_dominance_heatmap_json(match_df[match_df['period'] == 2])),
                 }
 
                 for plot_type, plot_json in plot_dict.items():
