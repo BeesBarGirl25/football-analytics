@@ -1,14 +1,51 @@
-let cachedDominancePlots = {};
+const cachedPlots = {
+    dominance: {},
+    heatmap_home: {},
+    heatmap_away: {}
+};
 
-function toggleDominanceView(viewKey) {
-    const plot = cachedDominancePlots[viewKey];
+function renderPlot(containerId, plot) {
     if (plot?.data && plot?.layout) {
-        Plotly.newPlot('dominance-plot-container', plot.data, plot.layout);
-        console.log(`[DOMINANCE] Rendered: ${viewKey}`);
+        Plotly.newPlot(containerId, plot.data, plot.layout);
+        console.log(`[PLOT] Rendered in: ${containerId}`);
     } else {
-        console.warn(`[DOMINANCE] Missing plot for: ${viewKey}`);
+        console.warn(`[PLOT] Missing data for: ${containerId}`);
     }
 }
+
+function togglePlotView(viewKey, plotGroup, containerId) {
+    const plot = cachedPlots[plotGroup][viewKey];
+    renderPlot(containerId, plot);
+}
+
+// Toggle tab visibility
+document.querySelectorAll('.tab-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
+
+        button.classList.add('active');
+        const tabId = button.getAttribute('data-tab');
+        document.getElementById(tabId).classList.remove('hidden');
+    });
+});
+
+// Generic toggle buttons for plot sections
+document.querySelectorAll('.toggle-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
+        if (allButtons) {
+            allButtons.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+        }
+        button.classList.add('active');
+
+        const viewKey = button.getAttribute('data-view');
+        const plotGroup = button.closest('.graph-container').dataset.plotGroup;
+        const containerId = button.closest('.graph-container').querySelector('.plotly-wrapper').id;
+
+        togglePlotView(viewKey, plotGroup, containerId);
+    });
+});
 
 $('#match-select').on('change', async function () {
     const matchId = $(this).val();
@@ -21,43 +58,43 @@ $('#match-select').on('change', async function () {
         const result = await response.json();
         console.log("[DEBUG] Results: ", result);
 
-        const xg = result.xg_graph;
-        const momentum = result.momentum_graph;
-        const summary = result.match_summary;
+        const { xg_graph, momentum_graph, match_summary } = result;
 
-        // Store heatmaps in cache for toggling
-        cachedDominancePlots = {
+        cachedPlots.dominance = {
             dominance_heatmap_full: result.dominance_heatmap,
             dominance_heatmap_first: result.dominance_heatmap_first,
             dominance_heatmap_second: result.dominance_heatmap_second
         };
 
-        // Show containers
-        document.getElementById('graph-container-1').classList.remove('hidden');
-        document.getElementById('graph-container-2').classList.remove('hidden');
-        document.getElementById('graph-container-3').classList.remove('hidden');
-        document.getElementById('graph-container-4').classList.remove('hidden');
+        cachedPlots.heatmap_home = {
+            heatmap_heatmap_full: result.home_team_heatmap,
+            heatmap_heatmap_first: result.home_team_heatmap_first,
+            heatmap_heatmap_second: result.home_team_heatmap_second
+        };
 
-        // Render xG
-        if (xg?.data && xg?.layout) {
-            Plotly.newPlot('graph-container-1', xg.data, xg.layout);
-            console.log("[Debug]: xG graph rendered");
-        } else {
-            console.warn("[Warning]: xG graph missing");
+        cachedPlots.heatmap_away = {
+            heatmap_heatmap_full: result.away_team_heatmap,
+            heatmap_heatmap_first: result.away_team_heatmap_first,
+            heatmap_heatmap_second: result.away_team_heatmap_second
+        };
+
+        [1, 2, 3, 4].forEach(i => {
+            document.getElementById(`graph-container-${i}`).classList.remove('hidden');
+        });
+
+        if (xg_graph?.data && xg_graph?.layout) {
+            Plotly.newPlot('graph-container-1', xg_graph.data, xg_graph.layout);
         }
 
-        // Render momentum
-        if (momentum?.data && momentum?.layout) {
-            Plotly.newPlot('graph-container-3', momentum.data, momentum.layout);
-            console.log("[Debug]: Momentum graph rendered");
-        } else {
-            console.warn("[Warning]: Momentum graph missing");
+        if (momentum_graph?.data && momentum_graph?.layout) {
+            Plotly.newPlot('graph-container-3', momentum_graph.data, momentum_graph.layout);
         }
 
-        // Default: render full match dominance heatmap
-        toggleDominanceView('dominance_heatmap');
+        togglePlotView('dominance_heatmap_full', 'dominance', 'dominance-plot-container');
+        togglePlotView('heatmap_heatmap_full', 'heatmap_home', 'heatmap-home-plot-container');
+        togglePlotView('heatmap_heatmap_full', 'heatmap_away', 'heatmap-away-plot-container');
 
-        // Populate summary
+        const summary = match_summary;
         document.getElementById('home-team-name').textContent = summary.homeTeam ?? '–';
         document.getElementById('away-team-name').textContent = summary.awayTeam ?? '–';
         document.getElementById('home-team-score').textContent = summary.homeTeamNormalTime ?? '–';
@@ -78,15 +115,6 @@ $('#match-select').on('change', async function () {
     } catch (error) {
         console.error("[Error]: Failed to load plots or summary", error);
     }
-});
-document.querySelectorAll('.toggle-btn').forEach(button => {
-    button.addEventListener('click', () => {
-        document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-
-        const viewKey = button.getAttribute('data-view');
-        toggleDominanceView(viewKey);
-    });
 });
 
 function populateTable(tableId, players) {

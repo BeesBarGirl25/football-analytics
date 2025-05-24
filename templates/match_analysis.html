@@ -16,15 +16,11 @@
     </div>
 
     <div class="analysis-content" id="overview">
-        <div id="graphs-container" class="graphs-container">
-
-            <div id="graph-container-1" class="graph-container medium hidden">
-                <!-- Optional graph content -->
-            </div>
+        <div class="graphs-container">
+            <div id="graph-container-1" class="graph-container medium hidden"></div>
 
             <div id="graph-container-2" class="graph-container tall hidden">
                 <div class="graph-inner">
-
                     <div id="match-summary">
                         <div class="score-header">
                             <h3 id="combined-score-header">
@@ -40,23 +36,18 @@
 
                     <div class="team-tables">
                         <div class="team-table">
-                            <table id="home-team-table">
-                                <tbody></tbody>
-                            </table>
+                            <table id="home-team-table"><tbody></tbody></table>
                         </div>
                         <div class="team-table">
-                            <table id="away-team-table">
-                                <tbody></tbody>
-                            </table>
+                            <table id="away-team-table"><tbody></tbody></table>
                         </div>
                     </div>
-
                 </div>
             </div>
 
-            <div id="graph-container-3" class="graph-container medium hidden">
-            </div>
-            <div id="graph-container-4" class="graph-container tall hidden">
+            <div id="graph-container-3" class="graph-container medium hidden"></div>
+
+            <div id="graph-container-4" class="graph-container tall hidden" data-plot-group="dominance">
                 <div class="graph-inner vertical">
                     <div class="dominance-toggle-buttons">
                         <button class="toggle-btn active" data-view="dominance_heatmap_full">Full Match</button>
@@ -66,17 +57,27 @@
                     <div id="dominance-plot-container" class="plotly-wrapper"></div>
                 </div>
             </div>
-
-
-
-
-
-
         </div>
     </div>
 
-    <div class="analysis-content hidden" id="home">Home team analysis goes here.</div>
-    <div class="analysis-content hidden" id="away">Away team analysis goes here.</div>
+    <div class="analysis-content hidden" id="home">
+        <div class="graphs-container">
+            {% set graph_container_id = 'graph-container-home-team-4' %}
+            {% set prefix = 'heatmap_home' %}
+            {% set plot_container_id = 'heatmap-home-plot-container' %}
+            {% include 'partials/match_team_analysis.html' with context %}
+        </div>
+    </div>
+
+    <div class="analysis-content hidden" id="away">
+        <div class="graphs-container">
+            {% set graph_container_id = 'graph-container-away-team-4' %}
+            {% set prefix = 'heatmap_away' %}
+            {% set plot_container_id = 'heatmap-away-plot-container' %}
+            {% include 'partials/match_team_analysis.html' with context %}
+        </div>
+    </div>
+
     <div class="analysis-content hidden" id="player">Player analysis goes here.</div>
 </div>
 {% endblock %}
