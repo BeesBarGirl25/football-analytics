@@ -29,7 +29,14 @@ document.querySelectorAll('.tab-btn').forEach(button => {
         const targetTab = document.getElementById(tabId);
         targetTab.classList.remove('hidden');
 
-        // Re-render default plot for team tabs
+        // ✅ Remove hidden class from container inside tab
+        if (tabId === 'home') {
+            document.getElementById('graph-container-home-team-4')?.classList.remove('hidden');
+        } else if (tabId === 'away') {
+            document.getElementById('graph-container-away-team-4')?.classList.remove('hidden');
+        }
+
+        // ✅ Re-render plot now that container is visible
         setTimeout(() => {
             if (tabId === 'home') {
                 togglePlotView('heatmap_heatmap_full', 'heatmap_home', 'heatmap-home-plot-container');
@@ -39,6 +46,7 @@ document.querySelectorAll('.tab-btn').forEach(button => {
         }, 100);
     });
 });
+
 
 // Generic toggle buttons for plot sections
 document.querySelectorAll('.toggle-btn').forEach(button => {
