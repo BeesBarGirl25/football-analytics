@@ -16,7 +16,7 @@ def _generate_pitch_shapes_vertical():
         dict(type="circle", x0=39.7, y0=108.7, x1=40.3, y1=109.3, fillcolor="black", line=dict(color="black"))
     ]
 
-def generate_dominance_heatmap(match_data: pd.DataFrame, home_team: str, away_team: str, half: str = "full") -> dict:
+def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, away_team: str, half: str = "full") -> dict:
     bins = (24, 16)
     sigma = 2.5
 
