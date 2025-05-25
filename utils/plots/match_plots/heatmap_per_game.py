@@ -70,8 +70,8 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, aw
 
     fig.update_layout(
         autosize=True,
-        xaxis=dict(visible=False, constrain='domain'),
-        yaxis=dict(visible=False, scaleanchor="x", constrain='domain'),
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False),
         margin=dict(t=30, l=0, r=0, b=0),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
