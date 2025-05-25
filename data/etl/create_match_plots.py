@@ -98,15 +98,13 @@ def create_all_match_plots():
                     "away_team_heatmap_second": json.dumps(generate_team_match_heatmap(away_team_data, "second"))
                 }
 
-                for plot_type, plot_dict_obj in plot_dict.items():
-                    json_str = json.dumps(plot_dict_obj)  # 🔥 SERIALIZE here
-
+                for plot_type, plot_json in plot_dict.items():
                     existing = MatchPlot.query.filter_by(match_id=match.id, plot_type=plot_type).first()
                     if existing:
-                        existing.plot_json = json_str
+                        existing.plot_json = plot_json
                         logger.debug(f"🔄 Updated plot: {match.id} [{plot_type}]")
                     else:
-                        new_plot = MatchPlot(match_id=match.id, plot_type=plot_type, plot_json=json_str)
+                        new_plot = MatchPlot(match_id=match.id, plot_type=plot_type, plot_json=plot_json)
                         db.session.add(new_plot)
                         logger.debug(f"➕ Inserted plot: {match.id} [{plot_type}]")
 
