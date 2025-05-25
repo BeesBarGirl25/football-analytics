@@ -25,12 +25,19 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, aw
     location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list))]
     location_data[['y', 'x']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
 
-
-    if half == "first":
-        location_data = location_data[location_data['period'] == 1]
+    # Normalize second half direction (attacking same direction as first half)
+    if half == "full":
+        first_half = location_data[location_data['period'] == 1].copy()
+        second_half = location_data[location_data['period'] == 2].copy()
+        second_half['y'] = 120 - second_half['y']
+        location_data = pd.concat([first_half, second_half])
     elif half == "second":
-        location_data = location_data[location_data['period'] == 2]
+        location_data = location_data[location_data['period'] == 2].copy()
+        location_data['y'] = 120 - location_data['y']
+    elif half == "first":
+        location_data = location_data[location_data['period'] == 1].copy()
 
+    # Team separation
     team_a, team_b = home_team, away_team
     team_a_data = location_data[location_data['team'] == team_a]
     team_b_data = location_data[location_data['team'] == team_b]
@@ -79,4 +86,3 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, aw
     )
 
     return fig.to_plotly_json()
-
