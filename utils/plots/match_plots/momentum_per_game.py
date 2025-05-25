@@ -19,7 +19,7 @@ def load_xT():
         raise RuntimeError(f"xT_Grid.csv file not found at: {file_path}") from e
 
 
-def generate_momentum_graph_plot(match_data):
+def generate_momentum_graph_plot(match_data: pd.DataFrame, home_team: str, away_team: str):
     match_data = match_data[['minute', 'possession_team', 'type', 'location', 'pass_outcome', 'pass_end_location', 'carry_end_location']]
     filtered_data = match_data.loc[(match_data['type'] == 'Pass') | (match_data['type'] == 'Carry')]
 
@@ -60,7 +60,7 @@ def generate_momentum_graph_plot(match_data):
         .reset_index()
     )
 
-    home_team, away_team = summed_data['possession_team'].unique()
+
     home_team_data = summed_data[summed_data['possession_team'] == home_team]
     away_team_data = summed_data[summed_data['possession_team'] == away_team]
 

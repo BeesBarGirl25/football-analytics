@@ -44,13 +44,13 @@ def create_all_match_plots():
 
                 events = sb.events(match.id).fillna(-999)
                 match_df = pd.DataFrame(events)
-
-                xg_plot = generate_match_graph_plot(match_df)
-                momentum_plot = generate_momentum_graph_plot(match_df)
-                home_df, away_df, home_team, away_team, home_norm, away_norm, home_et, away_et, home_pen, away_pen = goal_assist_stats(match_df)
-                heatmap_plot = generate_dominance_heatmap_json(match_df)
-
                 home_team, away_team = match_df['team'].unique()
+
+                xg_plot = generate_match_graph_plot(match_df, home_team, away_team)
+                momentum_plot = generate_momentum_graph_plot(match_df, home_team, away_team)
+                home_df, away_df, home_team, away_team, home_norm, away_norm, home_et, away_et, home_pen, away_pen = goal_assist_stats(match_df, home_team, away_team)
+
+
                 # Match summary JSON
                 home_data = [{"player": row["player"], "contributions": list(row["contributions"])} for _, row in home_df.iterrows()]
                 away_data = [{"player": row["player"], "contributions": list(row["contributions"])} for _, row in away_df.iterrows()]
@@ -85,11 +85,11 @@ def create_all_match_plots():
                     "xg_graph": pio.to_json(xg_plot, pretty=True),
                     "momentum_graph": pio.to_json(momentum_plot, pretty=True),
                     "match_summary": json.dumps(match_summary, indent=2),
-                    "dominance_heatmap": json.dumps(generate_dominance_heatmap_json(match_df)),
+                    "dominance_heatmap": json.dumps(generate_dominance_heatmap_json(match_df, home_team, away_team)),
                     "dominance_heatmap_first": json.dumps(
-                        generate_dominance_heatmap_json(match_df[match_df['period'] == 1])),
+                        generate_dominance_heatmap_json(match_df[match_df['period'] == 1], home_team, away_team)),
                     "dominance_heatmap_second": json.dumps(
-                        generate_dominance_heatmap_json(match_df[match_df['period'] == 2])),
+                        generate_dominance_heatmap_json(match_df[match_df['period'] == 2], home_team, away_team)),
                     "home_team_heatmap": json.dumps(generate_team_match_heatmap(home_team_data)),
                     "home_team_heatmap_first": json.dumps(generate_team_match_heatmap(home_team_data, "first")),
                     "home_team_heatmap_second": json.dumps(generate_team_match_heatmap(home_team_data, "second")),

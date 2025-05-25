@@ -1,7 +1,7 @@
 import pandas as pd
 import logging
 
-def cumulative_stats(team_data):
+def cumulative_stats(team_data: pd.DataFrame):
     team_data['goals']=team_data['shot_outcome'].apply(lambda x: 1 if x == 'Goal' else 0)
     team_data.replace(-999, 0, inplace=True)
     team_data=team_data.sort_values('minute')
@@ -14,8 +14,8 @@ def cumulative_stats(team_data):
 def extract_player_names(row):
     return [player['player']['name'] for player in row['lineup']]
 
-def goal_assist_stats(match_data):
-    home_team, away_team = match_data['team'].unique()
+def goal_assist_stats(match_data: pd.DataFrame, home_team:str, away_team:str ):
+
     home_team_score_normal_time = 0
     away_team_score_normal_time = 0
     home_team_extra_time_score = 0

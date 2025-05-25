@@ -17,7 +17,7 @@ def _generate_pitch_shapes_vertical():
         dict(type="circle", x0=39.7, y0=108.7, x1=40.3, y1=109.3, fillcolor="black", line=dict(color="black"))
     ]
 
-def generate_dominance_heatmap_json(match_data: pd.DataFrame, half: str = "full") -> dict:
+def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, away_team: str, half: str = "full") -> dict:
     bins = (24, 16)
     sigma = 2.5
 
@@ -31,11 +31,7 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, half: str = "full"
     elif half == "second":
         location_data = location_data[location_data['period'] == 2]
 
-    teams = location_data['team'].unique()
-    if len(teams) != 2:
-        raise ValueError(f"Expected 2 teams, found {teams}")
-
-    team_a, team_b = teams
+    team_a, team_b = home_team, away_team
     team_a_data = location_data[location_data['team'] == team_a]
     team_b_data = location_data[location_data['team'] == team_b]
 

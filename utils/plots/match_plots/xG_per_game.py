@@ -2,20 +2,16 @@ import plotly.graph_objects as go
 from utils.analytics.match_analytics.match_analysis_utils import cumulative_stats
 
 
-def generate_match_graph_plot(match_data):
+def generate_match_graph_plot(match_data: pd.DataFrame, home_team: str, away_team: str):
     # Filter match data for only the required columns
     match_data = match_data[['team', 'minute', 'shot_outcome', 'shot_statsbomb_xg', 'period']]
 
     # Separate stats for Team 1 and Team 2
-    team_1 = match_data[match_data['team'] == match_data['team'].unique()[0]]
-    team_2 = match_data[match_data['team'] == match_data['team'].unique()[1]]
+    team_1 = match_data[match_data['team'] == home_team]
+    team_2 = match_data[match_data['team'] == away_team]
 
     team_1_stats = cumulative_stats(team_1)
     team_2_stats = cumulative_stats(team_2)
-
-    # Extract team names dynamically
-    team_1_name = team_1_stats['team'].iloc[0]
-    team_2_name = team_2_stats['team'].iloc[0]
 
     # Dynamically determine the max values for x and y axes
     y_max = max(team_1_stats['cum_xg'].max(), team_1_stats['cum_goals'].max(),
