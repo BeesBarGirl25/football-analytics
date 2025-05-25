@@ -1,5 +1,6 @@
 import plotly.graph_objects as go
 from utils.analytics.match_analytics.match_analysis_utils import cumulative_stats
+import pandas as pd
 
 
 def generate_match_graph_plot(match_data: pd.DataFrame, home_team: str, away_team: str):
