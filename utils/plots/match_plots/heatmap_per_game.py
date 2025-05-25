@@ -1,4 +1,3 @@
-import json
 import numpy as np
 import pandas as pd
 from scipy.ndimage import gaussian_filter
@@ -6,8 +5,8 @@ import plotly.graph_objects as go
 
 def _generate_pitch_shapes_vertical():
     return [
-        dict(type="rect", x0=0, y0=0, x1=80, y1=120, line=dict(color="black")),  # Full pitch
-        dict(type="line", x0=0, y0=60, x1=80, y1=60, line=dict(color="black")),  # Halfway line
+        dict(type="rect", x0=0, y0=0, x1=80, y1=120, line=dict(color="black")),
+        dict(type="line", x0=0, y0=60, x1=80, y1=60, line=dict(color="black")),
         dict(type="circle", x0=40 - 9.15, y0=60 - 9.15, x1=40 + 9.15, y1=60 + 9.15, line=dict(color="black")),
         dict(type="rect", x0=30, y0=0, x1=50, y1=18, line=dict(color="black")),
         dict(type="rect", x0=30, y0=102, x1=50, y1=120, line=dict(color="black")),
@@ -17,17 +16,17 @@ def _generate_pitch_shapes_vertical():
         dict(type="circle", x0=39.7, y0=108.7, x1=40.3, y1=109.3, fillcolor="black", line=dict(color="black"))
     ]
 
-def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, away_team: str, half: str = "full") -> dict:
+def generate_activity_difference_heatmap_json(match_data: pd.DataFrame, home_team: str, away_team: str, half: str = "full") -> dict:
     bins = (24, 16)
     sigma = 2.5
 
-    activity_events = match_data[match_data['type'].isin(['Pass', 'Carry', 'Dribble', 'Shot'])]
-
+    # Limit to meaningful attacking events
+    activity_events = match_data[match_data['type'].isin(['Pass', 'Carry', 'Dribble', 'Shot'])].copy()
     location_data = activity_events[['location', 'team', 'period']].dropna()
     location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list))]
     location_data[['y', 'x']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
 
-    # Flip second half only for full match to normalize direction
+    # Normalize direction for full match
     if half == "full":
         first_half = location_data[location_data['period'] == 1].copy()
         second_half = location_data[location_data['period'] == 2].copy()
@@ -38,7 +37,7 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, aw
     elif half == "second":
         location_data = location_data[location_data['period'] == 2].copy()
 
-    # Separate team data
+    # Team separation
     team_a, team_b = home_team, away_team
     team_a_data = location_data[location_data['team'] == team_a]
     team_b_data = location_data[location_data['team'] == team_b]
@@ -48,31 +47,34 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, aw
 
     a_hist, _, _ = np.histogram2d(team_a_data['y'], team_a_data['x'], bins=[y_bins, x_bins])
     b_hist, _, _ = np.histogram2d(team_b_data['y'], team_b_data['x'], bins=[y_bins, x_bins])
-    total = a_hist + b_hist
 
-    with np.errstate(divide='ignore', invalid='ignore'):
-        dominance = np.divide(a_hist, total, out=np.full_like(total, 0.5), where=total != 0)
+    # Difference heatmap
+    dominance = a_hist - b_hist
     dominance = gaussian_filter(dominance, sigma=sigma)
+
+    # Debug print
+    print(f"[DEBUG] Total actions – {home_team}: {a_hist.sum()}, {away_team}: {b_hist.sum()}")
 
     y_centers = 0.5 * (y_bins[:-1] + y_bins[1:])
     x_centers = 0.5 * (x_bins[:-1] + x_bins[1:])
+
+    # Symmetrical range around 0
+    abs_max = np.max(np.abs(dominance))
 
     fig = go.Figure(data=go.Heatmap(
         z=dominance.tolist(),
         x=x_centers.tolist(),
         y=y_centers.tolist(),
-        zmin=0,
-        zmax=1,
+        zmin=-abs_max,
+        zmax=abs_max,
+        zmid=0,
         colorscale=[
-            [0.0, "rgb(5,48,97)"],        # Team A = blue
-            [0.35, "rgb(67,147,195)"],
-            [0.49, "rgb(247,247,247)"],
-            [0.51, "rgb(253,219,199)"],
-            [0.65, "rgb(214,96,77)"],
-            [1.0, "rgb(103,0,31)"]         # Team B = red
+            [0.0, "rgb(5,48,97)"],        # More away actions
+            [0.5, "rgb(247,247,247)"],    # Neutral
+            [1.0, "rgb(103,0,31)"]        # More home actions
         ],
-        reversescale=False,
-        showscale=False
+        showscale=True,
+        colorbar=dict(title="Activity Edge", tickformat=".0f")
     ))
 
     fig.update_layout(
@@ -82,7 +84,7 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, aw
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         autosize=True,
-        title=dict(text=f"{half.capitalize()} Half Dominance", x=0.5, font=dict(color='white', size=14)),
+        title=dict(text=f"{half.capitalize()} Half Activity Map", x=0.5, font=dict(color='white', size=14)),
         shapes=_generate_pitch_shapes_vertical()
     )
 
