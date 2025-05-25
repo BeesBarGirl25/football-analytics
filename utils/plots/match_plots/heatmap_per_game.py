@@ -21,7 +21,9 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, aw
     bins = (24, 16)
     sigma = 2.5
 
-    location_data = match_data[['location', 'team', 'period']].dropna()
+    activity_events = match_data[match_data['type'].isin(['Pass', 'Carry', 'Dribble', 'Shot'])]
+
+    location_data = activity_events[['location', 'team', 'period']].dropna()
     location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list))]
     location_data[['y', 'x']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
 
