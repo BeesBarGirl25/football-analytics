@@ -31,27 +31,26 @@ def generate_dominance_heatmap_json(match_df, home_team, away_team):
     away_data = location_data[location_data['team'] == away_team]
 
     def make_grid(data):
-        # ⚠️ x is width, y is length — swap for histogram2d
-        heatmap, _, _ = np.histogram2d(
-            data['x'], data['y'],
-            bins=(bins[1], bins[0]),
-            range=[[0, pitch_width], [0, pitch_length]]
+        heatmap, yedges, xedges = np.histogram2d(
+            data['y'], data['x'],  # y first (height), x second (width)
+            bins=(bins[0], bins[1]),
+            range=[[0, pitch_length], [0, pitch_width]]
         )
-        return gaussian_filter(heatmap, sigma=1)
+        return gaussian_filter(heatmap, sigma=1), xedges, yedges
 
-    home_grid = make_grid(home_data)
-    away_grid = make_grid(away_data)
+    home_grid, xedges, yedges = make_grid(home_data)
+    away_grid, _, _ = make_grid(away_data)
 
     max_val = max(home_grid.max(), away_grid.max(), 1)
     dominance_grid = (home_grid - away_grid) / max_val
 
-    x = np.linspace(2.5, pitch_width - 2.5, bins[1])
-    y = np.linspace(2.5, pitch_length - 2.5, bins[0])
+    x_centers = 0.5 * (xedges[:-1] + xedges[1:])
+    y_centers = 0.5 * (yedges[:-1] + yedges[1:])
 
     fig = go.Figure(data=go.Heatmap(
-        z=dominance_grid.T.tolist(),  # Transpose to align with vertical pitch
-        x=x.tolist(),
-        y=y.tolist(),
+        z=dominance_grid.tolist(),  # 🚫 No transpose needed
+        x=x_centers.tolist(),
+        y=y_centers.tolist(),
         zmin=-1,
         zmax=1,
         zmid=0,
@@ -76,3 +75,4 @@ def generate_dominance_heatmap_json(match_df, home_team, away_team):
     )
 
     return fig
+
