@@ -92,9 +92,9 @@ def create_all_match_plots():
                     "dominance_heatmap": json.dumps(
                         generate_dominance_heatmap_json(match_df, home_team, away_team)),
                     "dominance_heatmap_first": json.dumps(
-                        generate_dominance_heatmap_json(match_df[match_df['period'] == 1], home_team, away_team)),
+                        generate_dominance_heatmap_json(match_df[match_df['period'] == 1])),
                     "dominance_heatmap_second": json.dumps(
-                        generate_dominance_heatmap_json(match_df[match_df['period'] == 2], home_team, away_team)),
+                        generate_dominance_heatmap_json(match_df[match_df['period'] == 2])),
                     "home_team_heatmap": safe_plotly_json(generate_team_match_heatmap(home_team_data)),
                     "home_team_heatmap_first": safe_plotly_json(generate_team_match_heatmap(home_team_data, "first")),
                     "home_team_heatmap_second": safe_plotly_json(generate_team_match_heatmap(home_team_data, "second")),
