@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 from scipy.ndimage import gaussian_filter
 
 
+
 def _generate_pitch_shapes_vertical():
     return [
         dict(type="rect", x0=0, y0=0, x1=80, y1=120, line=dict(color="black")),

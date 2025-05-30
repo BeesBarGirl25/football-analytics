@@ -30,6 +30,10 @@ logger = logging.getLogger("create_match_plots")
 
 print(f"Using DB URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
+def safe_plotly_json(fig):
+    return pio.to_json(fig, pretty=True, engine="json", validate=False)
+
+
 
 
 def create_all_match_plots():
@@ -82,20 +86,21 @@ def create_all_match_plots():
                 }
 
                 plot_dict = {
-                    "xg_graph": pio.to_json(xg_plot, pretty=True),
-                    "momentum_graph": pio.to_json(momentum_plot, pretty=True),
-                    "match_summary": json.dumps(match_summary, indent=2),
-                    "dominance_heatmap": pio.to_json(generate_dominance_heatmap_json(match_df, home_team, away_team)),
-                    "dominance_heatmap_first": pio.to_json(
+                    "xg_graph": safe_plotly_json(xg_plot),
+                    "momentum_graph": safe_plotly_json(momentum_plot),
+                    "dominance_heatmap": safe_plotly_json(
+                        generate_dominance_heatmap_json(match_df, home_team, away_team)),
+                    "dominance_heatmap_first": safe_plotly_json(
                         generate_dominance_heatmap_json(match_df[match_df['period'] == 1], home_team, away_team)),
-                    "dominance_heatmap_second": pio.to_json(
+                    "dominance_heatmap_second": safe_plotly_json(
                         generate_dominance_heatmap_json(match_df[match_df['period'] == 2], home_team, away_team)),
-                    "home_team_heatmap": json.dumps(generate_team_match_heatmap(home_team_data)),
-                    "home_team_heatmap_first": json.dumps(generate_team_match_heatmap(home_team_data, "first")),
-                    "home_team_heatmap_second": json.dumps(generate_team_match_heatmap(home_team_data, "second")),
-                    "away_team_heatmap": json.dumps(generate_team_match_heatmap(away_team_data)),
-                    "away_team_heatmap_first": json.dumps(generate_team_match_heatmap(away_team_data, "first")),
-                    "away_team_heatmap_second": json.dumps(generate_team_match_heatmap(away_team_data, "second"))
+                    "home_team_heatmap": safe_plotly_json(generate_team_match_heatmap(home_team_data)),
+                    "home_team_heatmap_first": safe_plotly_json(generate_team_match_heatmap(home_team_data, "first")),
+                    "home_team_heatmap_second": safe_plotly_json(generate_team_match_heatmap(home_team_data, "second")),
+                    "away_team_heatmap": safe_plotly_json(generate_team_match_heatmap(away_team_data)),
+                    "away_team_heatmap_first": safe_plotly_json(generate_team_match_heatmap(away_team_data, "first")),
+                    "away_team_heatmap_second": safe_plotly_json(generate_team_match_heatmap(away_team_data, "second")),
+                    "match_summary": json.dumps(match_summary, indent=2)  # leave this as-is
                 }
 
                 for plot_type, plot_json in plot_dict.items():
