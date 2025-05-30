@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
-from scipy.ndimage import gaussian_filter
 import plotly.graph_objects as go
+from scipy.ndimage import gaussian_filter
+
 
 def _generate_pitch_shapes_vertical():
     return [
@@ -16,74 +17,74 @@ def _generate_pitch_shapes_vertical():
         dict(type="circle", x0=39.7, y0=108.7, x1=40.3, y1=109.3, fillcolor="black", line=dict(color="black"))
     ]
 
-def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, away_team: str, half: str = "full") -> dict:
-    bins = (24, 16)
-    sigma = 2.5
 
-    activity_events = match_data[match_data['type'].isin(['Pass', 'Carry', 'Dribble', 'Shot'])].copy()
-    location_data = activity_events[['location', 'team', 'period']].dropna()
+def generate_dominance_heatmap_json(match_df, home_team, away_team):
+    # Extract and bin locations
+    location_data = match_df[['location', 'team']].copy()
     location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list))]
-    location_data[['y', 'x']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
 
-    if half == "full":
-        first_half = location_data[location_data['period'] == 1].copy()
-        second_half = location_data[location_data['period'] == 2].copy()
-        second_half['y'] = 120 - second_half['y']
-        location_data = pd.concat([first_half, second_half])
-    elif half == "first":
-        location_data = location_data[location_data['period'] == 1].copy()
-    elif half == "second":
-        location_data = location_data[location_data['period'] == 2].copy()
+    location_data[['x', 'y']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
+    home_data = location_data[location_data['team'] == home_team]
+    away_data = location_data[location_data['team'] == away_team]
 
-    team_a_data = location_data[location_data['team'] == home_team]
-    team_b_data = location_data[location_data['team'] == away_team]
+    # Create 2D histograms
+    bins = (24, 16)
+    pitch_length = 120
+    pitch_width = 80
 
-    x_bins = np.linspace(0, 80, bins[1] + 1)
-    y_bins = np.linspace(0, 120, bins[0] + 1)
+    def make_grid(data):
+        heatmap, xedges, yedges = np.histogram2d(
+            data['y'], data['x'], bins=bins, range=[[0, pitch_length], [0, pitch_width]]
+        )
+        return gaussian_filter(heatmap, sigma=1)
 
-    a_hist, _, _ = np.histogram2d(team_a_data['y'], team_a_data['x'], bins=[y_bins, x_bins])
-    b_hist, _, _ = np.histogram2d(team_b_data['y'], team_b_data['x'], bins=[y_bins, x_bins])
-    dominance = a_hist - b_hist
-    dominance = gaussian_filter(dominance, sigma=sigma)
+    home_grid = make_grid(home_data)
+    away_grid = make_grid(away_data)
 
-    # ✅ Sanitize the result to avoid NaNs or Infs
-    dominance = np.nan_to_num(dominance, nan=0.0, posinf=0.0, neginf=0.0)
+    # Normalize and subtract
+    max_val = max(home_grid.max(), away_grid.max(), 1)
+    combined_grid = (home_grid - away_grid) / max_val
 
-    # Debug logs (optional)
-    print("Dominance shape:", dominance.shape)
-    print("Dominance min/max:", np.min(dominance), np.max(dominance))
-    print("Any NaNs?:", np.isnan(dominance).any())
-
-    y_centers = 0.5 * (y_bins[:-1] + y_bins[1:])
-    x_centers = 0.5 * (x_bins[:-1] + x_bins[1:])
-    abs_max = np.max(np.abs(dominance))
+    # Build heatmap
+    x = np.linspace(2.5, pitch_width - 2.5, bins[1])
+    y = np.linspace(2.5, pitch_length - 2.5, bins[0])
 
     fig = go.Figure(data=go.Heatmap(
-        type='heatmap',  # ✅ explicitly set
-        z=dominance.tolist(),
-        x=x_centers.tolist(),
-        y=y_centers.tolist(),
-        zmin=-abs_max,
-        zmax=abs_max,
+        z=combined_grid,
+        x=x,
+        y=y,
+        colorscale=[[0, 'rgb(5,48,97)'], [0.5, 'rgb(247,247,247)'], [1, 'rgb(103,0,31)']],
+        zmin=-1,
+        zmax=1,
         zmid=0,
-        colorscale=[
-            [0.0, "rgb(5,48,97)"],
-            [0.5, "rgb(247,247,247)"],
-            [1.0, "rgb(103,0,31)"]
-        ],
         showscale=True,
-        colorbar=dict(title="Activity Edge", tickformat=".0f")
+        colorbar=dict(
+            title='Activity Edge',
+            tickformat=".0f"
+        )
     ))
 
+    # Add pitch lines or shapes here if needed
     fig.update_layout(
         autosize=True,
-        xaxis=dict(visible=False),
-        yaxis=dict(visible=False),
+        paper_bgcolor="rgba(0, 0, 0, 0)",
+        plot_bgcolor="rgba(0, 0, 0, 0)",
+        title=dict(text="Full Half Activity Map", x=0.5, font=dict(size=16)),
         margin=dict(t=30, l=0, r=0, b=0),
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        title=dict(text=f"{half.capitalize()} Half Activity Map", x=0.5, font=dict(color='white', size=14)),
+        xaxis=dict(
+            visible=False,
+            type='linear',
+            range=[0, pitch_width],
+            autorange=False  # Force it to respect the range
+        ),
+        yaxis=dict(
+            visible=False,
+            type='linear',
+            range=[0, pitch_length],
+            autorange=False
+        ),
         shapes=_generate_pitch_shapes_vertical()
     )
 
-    return fig.to_plotly_json()
+    return fig
+

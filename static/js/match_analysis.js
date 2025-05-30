@@ -22,8 +22,7 @@ function renderPlot(containerId, plot) {
             console.log(`[PLOT] Successfully rendered: ${containerId}`);
         } catch (err) {
             console.error(`[PLOT] ❌ Failed to render in: ${containerId}`, err);
-            console.log('[PLOT] Plot data preview:', plot.data);
-            console.log('[PLOT] Plot layout preview:', plot.layout);
+
         }
     } else {
         console.warn(`[PLOT] Missing data/layout for: ${containerId}`);
