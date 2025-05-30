@@ -4,18 +4,32 @@ const cachedPlots = {};
 
 function renderPlot(containerId, plot) {
     const el = document.getElementById(containerId);
+
+    console.log(`[PLOT] Preparing to render in: ${containerId}`);
     if (!el || el.offsetWidth === 0 || el.offsetHeight === 0 || el.classList.contains('hidden')) {
-        console.warn(`[PLOT] Skipped rendering in: ${containerId} (not visible)`);
+        console.warn(`[PLOT] Skipped rendering: ${containerId} (container not visible or missing)`);
         return;
     }
 
     if (plot?.data && plot?.layout) {
-        Plotly.newPlot(containerId, plot.data, plot.layout);
-        console.log(`[PLOT] Rendered in: ${containerId}`);
+        try {
+            console.log(`[PLOT] Rendering plot:`, {
+                containerId,
+                dataLength: plot.data.length,
+                layoutKeys: Object.keys(plot.layout)
+            });
+            Plotly.newPlot(containerId, plot.data, plot.layout);
+            console.log(`[PLOT] Successfully rendered: ${containerId}`);
+        } catch (err) {
+            console.error(`[PLOT] ❌ Failed to render in: ${containerId}`, err);
+            console.log('[PLOT] Plot data preview:', plot.data);
+            console.log('[PLOT] Plot layout preview:', plot.layout);
+        }
     } else {
-        console.warn(`[PLOT] Missing data for: ${containerId}`);
+        console.warn(`[PLOT] Missing data/layout for: ${containerId}`);
     }
 }
+
 
 function togglePlotView(viewKey, containerId) {
     const plot = cachedPlots[viewKey];
