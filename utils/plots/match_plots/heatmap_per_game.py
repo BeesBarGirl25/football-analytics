@@ -51,9 +51,9 @@ def generate_dominance_heatmap_json(match_df, home_team, away_team):
     y = np.linspace(2.5, pitch_length - 2.5, bins[0])
 
     fig = go.Figure(data=go.Heatmap(
-        z=combined_grid,
-        x=x,
-        y=y,
+        z=combined_grid.tolist(),
+        x=x.tolist(),
+        y=y.tolist(),
         colorscale=[[0, 'rgb(5,48,97)'], [0.5, 'rgb(247,247,247)'], [1, 'rgb(103,0,31)']],
         zmin=-1,
         zmax=1,

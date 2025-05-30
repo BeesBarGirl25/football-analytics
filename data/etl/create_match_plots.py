@@ -36,6 +36,7 @@ def safe_plotly_json(fig):
 
 
 
+
 def create_all_match_plots():
     with app.app_context():
         matches = Match.query.all()
