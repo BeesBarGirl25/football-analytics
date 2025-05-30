@@ -90,7 +90,7 @@ def create_all_match_plots():
                     "xg_graph": safe_plotly_json(xg_plot),
                     "momentum_graph": safe_plotly_json(momentum_plot),
                     "dominance_heatmap": json.dumps(
-                        generate_dominance_heatmap_json(match_df, home_team, away_team)),
+                        generate_dominance_heatmap_json(match_df)),
                     "dominance_heatmap_first": json.dumps(
                         generate_dominance_heatmap_json(match_df[match_df['period'] == 1])),
                     "dominance_heatmap_second": json.dumps(
