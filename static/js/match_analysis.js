@@ -38,12 +38,18 @@ document.querySelectorAll('.tab-btn').forEach(button => {
 
         // ✅ Re-render plot now that container is visible
         setTimeout(() => {
-            if (tabId === 'home') {
-                togglePlotView('heatmap_heatmap_full', 'heatmap_home', 'heatmap-home-plot-container');
-            } else if (tabId === 'away') {
-                togglePlotView('heatmap_heatmap_full', 'heatmap_away', 'heatmap-away-plot-container');
+            const containerId = tabId === 'home' ? 'heatmap-home-plot-container' : 'heatmap-away-plot-container';
+            const groupKey = tabId === 'home' ? 'heatmap_home' : 'heatmap_away';
+            const viewKey = 'heatmap_heatmap_full';
+
+            const el = document.getElementById(containerId);
+            if (el.offsetWidth > 0 && el.offsetHeight > 0) {
+                togglePlotView(viewKey, groupKey, containerId);
+            } else {
+                // Retry in 100ms if not ready
+                setTimeout(() => togglePlotView(viewKey, groupKey, containerId), 100);
             }
-        }, 100);
+        }, 150);
     });
 });
 
