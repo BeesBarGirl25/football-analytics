@@ -85,10 +85,10 @@ def create_all_match_plots():
                     "xg_graph": pio.to_json(xg_plot, pretty=True),
                     "momentum_graph": pio.to_json(momentum_plot, pretty=True),
                     "match_summary": json.dumps(match_summary, indent=2),
-                    "dominance_heatmap": json.dumps(generate_dominance_heatmap_json(match_df, home_team, away_team)),
-                    "dominance_heatmap_first": json.dumps(
+                    "dominance_heatmap": pio.to_json(generate_dominance_heatmap_json(match_df, home_team, away_team)),
+                    "dominance_heatmap_first": pio.to_json(
                         generate_dominance_heatmap_json(match_df[match_df['period'] == 1], home_team, away_team)),
-                    "dominance_heatmap_second": json.dumps(
+                    "dominance_heatmap_second": pio.to_json(
                         generate_dominance_heatmap_json(match_df[match_df['period'] == 2], home_team, away_team)),
                     "home_team_heatmap": json.dumps(generate_team_match_heatmap(home_team_data)),
                     "home_team_heatmap_first": json.dumps(generate_team_match_heatmap(home_team_data, "first")),
