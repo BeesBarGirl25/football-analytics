@@ -35,9 +35,8 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, aw
     elif half == "second":
         location_data = location_data[location_data['period'] == 2].copy()
 
-    team_a, team_b = home_team, away_team
-    team_a_data = location_data[location_data['team'] == team_a]
-    team_b_data = location_data[location_data['team'] == team_b]
+    team_a_data = location_data[location_data['team'] == home_team]
+    team_b_data = location_data[location_data['team'] == away_team]
 
     x_bins = np.linspace(0, 80, bins[1] + 1)
     y_bins = np.linspace(0, 120, bins[0] + 1)
@@ -47,12 +46,20 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, home_team: str, aw
     dominance = a_hist - b_hist
     dominance = gaussian_filter(dominance, sigma=sigma)
 
+    # ✅ Sanitize the result to avoid NaNs or Infs
+    dominance = np.nan_to_num(dominance, nan=0.0, posinf=0.0, neginf=0.0)
+
+    # Debug logs (optional)
+    print("Dominance shape:", dominance.shape)
+    print("Dominance min/max:", np.min(dominance), np.max(dominance))
+    print("Any NaNs?:", np.isnan(dominance).any())
+
     y_centers = 0.5 * (y_bins[:-1] + y_bins[1:])
     x_centers = 0.5 * (x_bins[:-1] + x_bins[1:])
-
     abs_max = np.max(np.abs(dominance))
 
     fig = go.Figure(data=go.Heatmap(
+        type='heatmap',  # ✅ explicitly set
         z=dominance.tolist(),
         x=x_centers.tolist(),
         y=y_centers.tolist(),
