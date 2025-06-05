@@ -299,5 +299,4 @@ body {
 /* === Utility === */
 .hidden {
   display: none;
-  visibility: hidden;
 }
