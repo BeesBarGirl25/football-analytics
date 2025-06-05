@@ -88,5 +88,5 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, half: str = "full"
         shapes=_generate_pitch_shapes_vertical()
     )
 
-    return fig
+    return fig.to_plotly_json()
 
