@@ -1,10 +1,9 @@
-// match_analysis.js — Final version with tab-safe rendering and dropdown support
+// match_analysis.js — Updated for reusable tab and toggle plot logic
 
 const cachedPlots = {};
 
 function renderPlot(containerId, plot) {
     const el = document.getElementById(containerId);
-
     console.log(`[PLOT] Preparing to render in: ${containerId}`);
     if (!el || el.offsetWidth === 0 || el.offsetHeight === 0 || el.classList.contains('hidden')) {
         console.warn(`[PLOT] Skipped rendering: ${containerId} (container not visible or missing)`);
@@ -13,11 +12,6 @@ function renderPlot(containerId, plot) {
 
     if (plot?.data && plot?.layout) {
         try {
-            console.log(`[PLOT] Rendering plot:`, {
-                containerId,
-                dataLength: plot.data.length,
-                layoutKeys: Object.keys(plot.layout)
-            });
             Plotly.newPlot(containerId, plot.data, plot.layout);
             console.log(`[PLOT] Successfully rendered: ${containerId}`);
         } catch (err) {
@@ -33,33 +27,40 @@ function togglePlotView(viewKey, containerId) {
     renderPlot(containerId, plot);
 }
 
-// Tab switching handler
+function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
+
+    const selectedTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+    selectedTab?.classList.add('active');
+    document.getElementById(tabId)?.classList.remove('hidden');
+    document.getElementById(graphContainerId)?.classList.remove('hidden');
+
+    requestAnimationFrame(() => {
+        togglePlotView(viewKey, containerId);
+        const el = document.getElementById(containerId);
+        if (el) Plotly.Plots.resize(el);
+    });
+}
+
 document.querySelectorAll('.tab-btn').forEach(button => {
     button.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
-
-        button.classList.add('active');
         const tabId = button.getAttribute('data-tab');
-        const targetTab = document.getElementById(tabId);
-        targetTab.classList.remove('hidden');
-
         if (tabId === 'home') {
-            document.getElementById('graph-container-home-team-4')?.classList.remove('hidden');
+            showTabAndRenderPlot(tabId, 'home_team_heatmap', 'heatmap-home-plot-container', 'graph-container-home-team-4');
         } else if (tabId === 'away') {
-            document.getElementById('graph-container-away-team-4')?.classList.remove('hidden');
+            showTabAndRenderPlot(tabId, 'away_team_heatmap', 'heatmap-away-plot-container', 'graph-container-away-team-4');
+        } else if (tabId === 'overview') {
+            showTabAndRenderPlot(tabId, 'dominance_heatmap', 'dominance-plot-container', 'graph-container-4');
+        } else {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
+            button.classList.add('active');
+            document.getElementById(tabId)?.classList.remove('hidden');
         }
-
-        // Render only when visible
-        requestAnimationFrame(() => {
-            const containerId = tabId === 'home' ? 'heatmap-home-plot-container' : 'heatmap-away-plot-container';
-            const viewKey = tabId === 'home' ? 'home_team_heatmap' : 'away_team_heatmap';
-            togglePlotView(viewKey, containerId);
-        });
     });
 });
 
-// Toggle button handler (e.g. Full / 1st / 2nd Half)
 document.querySelectorAll('.toggle-btn').forEach(button => {
     button.addEventListener('click', () => {
         const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
@@ -69,7 +70,7 @@ document.querySelectorAll('.toggle-btn').forEach(button => {
         button.classList.add('active');
 
         const viewKey = button.getAttribute('data-view');
-        const containerId = button.closest('.graph-container').querySelector('.plotly-wrapper').id;
+        const containerId = button.closest('.graph-container')?.querySelector('.plotly-wrapper')?.id;
 
         requestAnimationFrame(() => {
             togglePlotView(viewKey, containerId);
@@ -77,7 +78,6 @@ document.querySelectorAll('.toggle-btn').forEach(button => {
     });
 });
 
-// Match selection: load plots & data
 $('#match-select').on('change', async function () {
     const matchId = $(this).val();
     if (!matchId || matchId === "Select match") {
@@ -96,17 +96,14 @@ $('#match-select').on('change', async function () {
             dominance_heatmap: result.dominance_heatmap,
             dominance_heatmap_first: result.dominance_heatmap_first,
             dominance_heatmap_second: result.dominance_heatmap_second,
-
             home_team_heatmap: result.home_team_heatmap,
             home_team_heatmap_first: result.home_team_heatmap_first,
             home_team_heatmap_second: result.home_team_heatmap_second,
-
             away_team_heatmap: result.away_team_heatmap,
             away_team_heatmap_first: result.away_team_heatmap_first,
             away_team_heatmap_second: result.away_team_heatmap_second
         });
 
-        // Show plot containers
         [1, 2, 3, 4].forEach(i => {
             const el = document.getElementById(`graph-container-${i}`);
             if (el) el.classList.remove('hidden');
@@ -120,10 +117,8 @@ $('#match-select').on('change', async function () {
             Plotly.newPlot('graph-container-3', result.momentum_graph.data, result.momentum_graph.layout);
         }
 
-        // Only render dominance heatmap on load (others wait for tab click)
-        togglePlotView('dominance_heatmap', 'dominance-plot-container');
+        showTabAndRenderPlot('overview', 'dominance_heatmap', 'dominance-plot-container', 'graph-container-4');
 
-        // Match summary
         const summary = result.match_summary;
         document.getElementById('home-team-name').textContent = summary.homeTeam ?? '–';
         document.getElementById('away-team-name').textContent = summary.awayTeam ?? '–';
