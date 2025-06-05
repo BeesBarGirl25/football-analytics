@@ -1,4 +1,4 @@
-// match_analysis.js — Refactored with flat plot cache and simplified logic
+// match_analysis.js — Refactored with requestAnimationFrame and flat cache
 
 const cachedPlots = {};
 
@@ -22,19 +22,18 @@ function renderPlot(containerId, plot) {
             console.log(`[PLOT] Successfully rendered: ${containerId}`);
         } catch (err) {
             console.error(`[PLOT] ❌ Failed to render in: ${containerId}`, err);
-
         }
     } else {
         console.warn(`[PLOT] Missing data/layout for: ${containerId}`);
     }
 }
 
-
 function togglePlotView(viewKey, containerId) {
     const plot = cachedPlots[viewKey];
     renderPlot(containerId, plot);
 }
 
+// Handle tab switching and deferred plot rendering
 document.querySelectorAll('.tab-btn').forEach(button => {
     button.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -51,20 +50,16 @@ document.querySelectorAll('.tab-btn').forEach(button => {
             document.getElementById('graph-container-away-team-4')?.classList.remove('hidden');
         }
 
-        setTimeout(() => {
+        // Defer rendering until DOM is updated
+        requestAnimationFrame(() => {
             const containerId = tabId === 'home' ? 'heatmap-home-plot-container' : 'heatmap-away-plot-container';
             const viewKey = tabId === 'home' ? 'home_team_heatmap' : 'away_team_heatmap';
-
-            const el = document.getElementById(containerId);
-            if (el.offsetWidth > 0 && el.offsetHeight > 0) {
-                togglePlotView(viewKey, containerId);
-            } else {
-                setTimeout(() => togglePlotView(viewKey, containerId), 100);
-            }
-        }, 150);
+            togglePlotView(viewKey, containerId);
+        });
     });
 });
 
+// Handle toggle buttons (e.g. full match / 1st half / 2nd half)
 document.querySelectorAll('.toggle-btn').forEach(button => {
     button.addEventListener('click', () => {
         const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
@@ -76,10 +71,13 @@ document.querySelectorAll('.toggle-btn').forEach(button => {
         const viewKey = button.getAttribute('data-view');
         const containerId = button.closest('.graph-container').querySelector('.plotly-wrapper').id;
 
-        togglePlotView(viewKey, containerId);
+        requestAnimationFrame(() => {
+            togglePlotView(viewKey, containerId);
+        });
     });
 });
 
+// Fetch plots when match is selected
 $('#match-select').on('change', async function () {
     const matchId = $(this).val();
     console.log("Match selected, ID:", matchId);
@@ -91,6 +89,7 @@ $('#match-select').on('change', async function () {
         const result = await response.json();
         console.log("[DEBUG] Results: ", result);
 
+        // Cache all views
         Object.assign(cachedPlots, {
             dominance_heatmap: result.dominance_heatmap,
             dominance_heatmap_first: result.dominance_heatmap_first,
@@ -105,11 +104,13 @@ $('#match-select').on('change', async function () {
             away_team_heatmap_second: result.away_team_heatmap_second
         });
 
+        // Show main graph containers
         [1, 2, 3, 4].forEach(i => {
             const el = document.getElementById(`graph-container-${i}`);
             if (el) el.classList.remove('hidden');
         });
 
+        // Render default plots
         if (result.xg_graph?.data && result.xg_graph?.layout) {
             Plotly.newPlot('graph-container-1', result.xg_graph.data, result.xg_graph.layout);
         }
@@ -122,6 +123,7 @@ $('#match-select').on('change', async function () {
         togglePlotView('home_team_heatmap', 'heatmap-home-plot-container');
         togglePlotView('away_team_heatmap', 'heatmap-away-plot-container');
 
+        // Match summary
         const summary = result.match_summary;
         document.getElementById('home-team-name').textContent = summary.homeTeam ?? '–';
         document.getElementById('away-team-name').textContent = summary.awayTeam ?? '–';
