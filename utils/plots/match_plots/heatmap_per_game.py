@@ -18,7 +18,7 @@ def _generate_pitch_shapes_vertical():
     ]
 
 
-def generate_dominant_team_map_json(match_data: pd.DataFrame, half: str = "full") -> dict:
+def generate_dominance_heatmap_json(match_data: pd.DataFrame, half: str = "full") -> dict:
     bins = (24, 16)  # (y, x)
 
     location_data = match_data[['location', 'team', 'period']].dropna()
