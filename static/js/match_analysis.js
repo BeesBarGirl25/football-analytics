@@ -1,4 +1,4 @@
-// match_analysis.js — Refactored with requestAnimationFrame and flat cache
+// match_analysis.js — Final version with tab-safe rendering and dropdown support
 
 const cachedPlots = {};
 
@@ -33,7 +33,7 @@ function togglePlotView(viewKey, containerId) {
     renderPlot(containerId, plot);
 }
 
-// Handle tab switching and deferred plot rendering
+// Tab switching handler
 document.querySelectorAll('.tab-btn').forEach(button => {
     button.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -50,7 +50,7 @@ document.querySelectorAll('.tab-btn').forEach(button => {
             document.getElementById('graph-container-away-team-4')?.classList.remove('hidden');
         }
 
-        // Defer rendering until DOM is updated
+        // Render only when visible
         requestAnimationFrame(() => {
             const containerId = tabId === 'home' ? 'heatmap-home-plot-container' : 'heatmap-away-plot-container';
             const viewKey = tabId === 'home' ? 'home_team_heatmap' : 'away_team_heatmap';
@@ -59,7 +59,7 @@ document.querySelectorAll('.tab-btn').forEach(button => {
     });
 });
 
-// Handle toggle buttons (e.g. full match / 1st half / 2nd half)
+// Toggle button handler (e.g. Full / 1st / 2nd Half)
 document.querySelectorAll('.toggle-btn').forEach(button => {
     button.addEventListener('click', () => {
         const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
@@ -77,14 +77,13 @@ document.querySelectorAll('.toggle-btn').forEach(button => {
     });
 });
 
-// Fetch plots when match is selected
+// Match selection: load plots & data
 $('#match-select').on('change', async function () {
     const matchId = $(this).val();
     if (!matchId || matchId === "Select match") {
         console.warn("Skipping fetch: no valid match selected.");
         return;
     }
-
 
     try {
         const response = await fetch(`/api/plots/${matchId}`);
@@ -93,7 +92,6 @@ $('#match-select').on('change', async function () {
         const result = await response.json();
         console.log("[DEBUG] Results: ", result);
 
-        // Cache all views
         Object.assign(cachedPlots, {
             dominance_heatmap: result.dominance_heatmap,
             dominance_heatmap_first: result.dominance_heatmap_first,
@@ -108,13 +106,12 @@ $('#match-select').on('change', async function () {
             away_team_heatmap_second: result.away_team_heatmap_second
         });
 
-        // Show main graph containers
+        // Show plot containers
         [1, 2, 3, 4].forEach(i => {
             const el = document.getElementById(`graph-container-${i}`);
             if (el) el.classList.remove('hidden');
         });
 
-        // Render default plots
         if (result.xg_graph?.data && result.xg_graph?.layout) {
             Plotly.newPlot('graph-container-1', result.xg_graph.data, result.xg_graph.layout);
         }
@@ -123,9 +120,8 @@ $('#match-select').on('change', async function () {
             Plotly.newPlot('graph-container-3', result.momentum_graph.data, result.momentum_graph.layout);
         }
 
+        // Only render dominance heatmap on load (others wait for tab click)
         togglePlotView('dominance_heatmap', 'dominance-plot-container');
-        togglePlotView('home_team_heatmap', 'heatmap-home-plot-container');
-        togglePlotView('away_team_heatmap', 'heatmap-away-plot-container');
 
         // Match summary
         const summary = result.match_summary;
