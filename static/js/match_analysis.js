@@ -80,7 +80,11 @@ document.querySelectorAll('.toggle-btn').forEach(button => {
 // Fetch plots when match is selected
 $('#match-select').on('change', async function () {
     const matchId = $(this).val();
-    console.log("Match selected, ID:", matchId);
+    if (!matchId || matchId === "Select match") {
+        console.warn("Skipping fetch: no valid match selected.");
+        return;
+    }
+
 
     try {
         const response = await fetch(`/api/plots/${matchId}`);
