@@ -17,14 +17,13 @@ def _generate_pitch_shapes_vertical():
         dict(type="circle", x0=39.7, y0=108.7, x1=40.3, y1=109.3, fillcolor="black", line=dict(color="black"))
     ]
 
-def generate_dominance_heatmap_json(match_data: pd.DataFrame, half: str = "full") -> dict:
-    bins = (24, 16)
-    sigma = 2.5
+
+def generate_dominant_team_map_json(match_data: pd.DataFrame, half: str = "full") -> dict:
+    bins = (24, 16)  # (y, x)
 
     location_data = match_data[['location', 'team', 'period']].dropna()
     location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list))]
     location_data[['y', 'x']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
-
 
     if half == "first":
         location_data = location_data[location_data['period'] == 1]
@@ -44,31 +43,38 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, half: str = "full"
 
     a_hist, _, _ = np.histogram2d(team_a_data['y'], team_a_data['x'], bins=[y_bins, x_bins])
     b_hist, _, _ = np.histogram2d(team_b_data['y'], team_b_data['x'], bins=[y_bins, x_bins])
-    total = a_hist + b_hist
 
+    total_actions = a_hist + b_hist
     with np.errstate(divide='ignore', invalid='ignore'):
-        dominance = np.divide(a_hist, total, out=np.full_like(total, 0.5), where=total != 0)
-    dominance = gaussian_filter(dominance, sigma=sigma)
+        dominance_ratio = np.divide(a_hist, total_actions, where=total_actions != 0)
+        dominance_ratio = np.nan_to_num(dominance_ratio, nan=0.5)  # Default to neutral if zero actions
+
+    smoothed_map = gaussian_filter(dominance_ratio, sigma=1.5)
+    smoothed_map = np.clip(smoothed_map, 0.0, 1.0)
 
     y_centers = 0.5 * (y_bins[:-1] + y_bins[1:])
     x_centers = 0.5 * (x_bins[:-1] + x_bins[1:])
 
     fig = go.Figure(data=go.Heatmap(
-        z=dominance.tolist(),
+        z=smoothed_map.tolist(),
         x=x_centers.tolist(),
         y=y_centers.tolist(),
         zmin=0,
         zmax=1,
-        colorscale=[
-            [0.0, "rgb(5,48,97)"],        # Team A = blue
-            [0.35, "rgb(67,147,195)"],
-            [0.49, "rgb(247,247,247)"],
-            [0.51, "rgb(253,219,199)"],
-            [0.65, "rgb(214,96,77)"],
-            [1.0, "rgb(103,0,31)"]         # Team B = red
-        ],
-        reversescale=False,
-        showscale=False
+        colorscale = [
+                        [0.0, "rgb(103,0,31)"],      # Deep red
+                        [0.1, "rgb(165,15,21)"],
+                        [0.2, "rgb(203,24,29)"],
+                        [0.3, "rgb(239,59,44)"],
+                        [0.4, "rgb(251,106,74)"],
+                        [0.5, "rgb(255,255,255)"],   # Neutral
+                        [0.6, "rgb(158,202,225)"],
+                        [0.7, "rgb(107,174,214)"],
+                        [0.8, "rgb(66,146,198)"],
+                        [0.9, "rgb(33,113,181)"],
+                        [1.0, "rgb(5,48,97)"]        # Deep blue
+                    ],
+        showscale=True
     ))
 
     fig.update_layout(
@@ -78,9 +84,9 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, half: str = "full"
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         autosize=True,
-        title=dict(text=f"{half.capitalize()} Half Dominance", x=0.5, font=dict(color='white', size=14)),
+        title=dict(text=f"{half.capitalize()} Half Dominant Team Map", x=0.5, font=dict(color='white', size=14)),
         shapes=_generate_pitch_shapes_vertical()
     )
 
-    return fig.to_plotly_json()
+    return fig
 
