@@ -167,26 +167,27 @@ html, body {
 /* === Graph Layout === */
 .graphs-container.wide-mode {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: 1fr 1fr 2fr 3fr;
   grid-template-rows: 1fr 1fr;
-  width: 100%;
   gap: 1rem;
+  width: 100%;
+  height: 100%;
   grid-template-areas:
-    "momentum momentum summary summary summary summary heatmap heatmap heatmap heatmap heatmap heatmap"
-    "xg       xg       summary summary summary summary heatmap heatmap heatmap heatmap heatmap heatmap";
+    "momentum summary summary heatmap"
+    "xg       summary summary heatmap";
 }
 
 .graphs-container.compact-mode {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(4, auto);
-  width: 100%;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto auto;
   gap: 1rem;
+  width: 100%;
   grid-template-areas:
-    "momentum momentum momentum momentum momentum momentum"
-    "xg xg xg xg xg xg"
-    "summary summary summary summary summary summary"
-    "heatmap heatmap heatmap heatmap heatmap heatmap";
+    "momentum"
+    "xg"
+    "summary"
+    "heatmap";
 }
 
 /* === Graph Components === */
@@ -200,7 +201,6 @@ html, body {
   overflow: hidden;
   color: #e0e0e0;
   text-align: center;
-  min-height: 100px;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -214,6 +214,9 @@ html, body {
 }
 .graph-container.summary {
   grid-area: summary;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
 }
 .graph-container.heatmap {
   grid-area: heatmap;
