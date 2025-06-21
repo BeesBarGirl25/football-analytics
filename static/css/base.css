@@ -300,3 +300,19 @@ body {
 .hidden {
   display: none;
 }
+
+.layout-toggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.graphs-container.compact-mode {
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: 160px;
+}
+
+.graphs-container.wide-mode {
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 220px;
+}
