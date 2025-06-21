@@ -166,30 +166,22 @@ html, body {
 }
 
 /* === Graph Layout === */
-.graphs-container {
-  display: grid;
-  grid-template-areas:
-    "xg summary heatmap"
-    "momentum summary heatmap";
-  grid-template-columns: 1fr 1.6fr 1.4fr;
-  grid-template-rows: 50% 50%;
-  height: 100%;
-  width: 100%;
-  gap: 1rem;
-  box-sizing: border-box;
-  flex-grow: 1;
-}
-
-/* === Compact & Wide Modes */
-.graphs-container.compact-mode {
-  grid-template-columns: repeat(6, 1fr);
-  grid-auto-rows: 160px;
-  width: 100%;
-}
 .graphs-container.wide-mode {
+  display: grid;
   grid-template-columns: repeat(12, 1fr);
   grid-auto-rows: 220px;
   width: 100%;
+  gap: 1rem;
+  grid-template-areas: none;
+}
+
+.graphs-container.compact-mode {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: 160px;
+  width: 100%;
+  gap: 1rem;
+  grid-template-areas: none;
 }
 
 /* === Graph Components === */
@@ -209,10 +201,22 @@ html, body {
   box-sizing: border-box;
 }
 
-.graph-container.xg { grid-area: xg; }
-.graph-container.momentum { grid-area: momentum; }
-.graph-container.summary { grid-area: summary; }
-.graph-container.heatmap { grid-area: heatmap; }
+.graph-container.xg {
+  grid-column: span 3;
+  grid-row: span 1;
+}
+.graph-container.momentum {
+  grid-column: span 3;
+  grid-row: span 1;
+}
+.graph-container.summary {
+  grid-column: span 6;
+  grid-row: span 2;
+}
+.graph-container.heatmap {
+  grid-column: span 6;
+  grid-row: span 2;
+}
 
 .graph-inner {
   display: flex;
@@ -241,13 +245,8 @@ html, body {
 /* === Responsive Graph Layout === */
 @media (max-width: 1024px) {
   .graphs-container {
-    grid-template-areas:
-      "xg"
-      "momentum"
-      "summary"
-      "heatmap";
     grid-template-columns: 1fr;
-    grid-template-rows: auto;
+    grid-auto-rows: auto;
   }
 }
 
