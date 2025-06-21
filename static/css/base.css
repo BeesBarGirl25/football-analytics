@@ -130,9 +130,10 @@ html, body {
   grid-template-areas:
     "xg summary heatmap"
     "momentum summary heatmap";
-  grid-template-columns: 1fr 1.2fr 1fr;
+  grid-template-columns: 1fr 1.6fr 1.2fr;
   grid-template-rows: 50% 50%;
   height: 100%;
+  width: 100%;
   gap: 1rem;
 }
 
@@ -197,8 +198,17 @@ html, body {
   font-size: 1.6rem;
   font-weight: 600;
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   color: #fff;
+  text-align: center;
+  justify-content: center;
+}
+
+.home-team-name,
+.away-team-name {
+  min-width: 80px;
+  overflow-wrap: break-word;
 }
 
 .team-score {
@@ -232,6 +242,7 @@ html, body {
   padding: 0.5rem;
   border-radius: 10px;
   max-width: 48%;
+  min-width: 140px;
   overflow-x: auto;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
 }
