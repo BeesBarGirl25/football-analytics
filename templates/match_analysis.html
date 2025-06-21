@@ -17,81 +17,73 @@
 
     <!-- OVERVIEW TAB -->
     <div class="analysis-content" id="overview">
-        <!-- Layout toggle button -->
-        <div class="layout-toggle">
+          <div class="layout-toggle">
             <button id="toggle-layout-btn" class="toggle-btn">Switch to Compact Layout</button>
-        </div>
+          </div>
 
-        <div class="graphs-container wide-mode">
-            <div id="graph-container-1" class="graph-container block-6x1 hidden"></div>
-
-            <div id="graph-container-2" class="graph-container block-12x2 hidden">
-                <div class="graph-inner">
-                    <div id="match-summary">
-                        <div class="score-header">
-                            <h3 id="combined-score-header">
-                                <span id="home-team-name" class="home-team-name"></span>
-                                <span id="home-team-score" class="team-score"></span>
-                                <span id="score-seperator" class="score-seperator"></span>
-                                <span id="away-team-score" class="team-score"></span>
-                                <span id="away-team-name" class="away-team-name"></span>
-                            </h3>
-                            <p id="extra-details"></p>
-                        </div>
-                    </div>
-
-                    <div class="team-tables">
-                        <div class="team-table">
-                            <table id="home-team-table"><tbody></tbody></table>
-                        </div>
-                        <div class="team-table">
-                            <table id="away-team-table"><tbody></tbody></table>
-                        </div>
-                    </div>
-                </div>
+          <div class="graphs-container wide-mode">
+            <!-- Top left: xG -->
+            <div id="graph-container-xg" class="graph-container xg">
+              <div id="xg-plot-container" class="plotly-wrapper"></div>
             </div>
 
-            <div id="graph-container-3" class="graph-container block-6x1 hidden"></div>
-
-            <div id="graph-container-4" class="graph-container block-6x2 hidden" data-plot-group="dominance">
-                <div class="graph-inner vertical">
-                    <div class="dominance-toggle-buttons">
-                        <button class="toggle-btn active" data-view="dominance_heatmap">Full Match</button>
-                        <button class="toggle-btn" data-view="dominance_heatmap_first">1st Half</button>
-                        <button class="toggle-btn" data-view="dominance_heatmap_second">2nd Half</button>
-                    </div>
-                    <div id="dominance-plot-container" class="plotly-wrapper"></div>
-                </div>
+            <!-- Bottom left: Momentum -->
+            <div id="graph-container-momentum" class="graph-container momentum">
+              <div id="momentum-plot-container" class="plotly-wrapper"></div>
             </div>
+
+            <!-- Center: Summary & Lineups -->
+            <div id="graph-container-summary" class="graph-container summary">
+              <div class="graph-inner">
+                <div id="match-summary">
+                  <div class="score-header">
+                    <h3 id="combined-score-header">
+                      <span id="home-team-name" class="home-team-name"></span>
+                      <span id="home-team-score" class="team-score"></span>
+                      <span id="score-seperator" class="score-seperator"></span>
+                      <span id="away-team-score" class="team-score"></span>
+                      <span id="away-team-name" class="away-team-name"></span>
+                    </h3>
+                    <p id="extra-details"></p>
+                  </div>
+                </div>
+
+                <div class="team-tables">
+                  <div class="team-table">
+                    <table id="home-team-table"><tbody></tbody></table>
+                  </div>
+                  <div class="team-table">
+                    <table id="away-team-table"><tbody></tbody></table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Heatmap -->
+            <div id="graph-container-heatmap" class="graph-container heatmap" data-plot-group="dominance">
+              <div class="graph-inner vertical">
+                <div class="dominance-toggle-buttons">
+                  <button class="toggle-btn active" data-view="dominance_heatmap">Full Match</button>
+                  <button class="toggle-btn" data-view="dominance_heatmap_first">1st Half</button>
+                  <button class="toggle-btn" data-view="dominance_heatmap_second">2nd Half</button>
+                </div>
+                <div id="dominance-plot-container" class="plotly-wrapper"></div>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
+
 
     <!-- HOME TEAM TAB -->
     <div class="analysis-content hidden" id="home">
-        <div class="layout-toggle">
-            <button id="toggle-layout-btn-home" class="toggle-btn">Switch to Compact Layout</button>
-        </div>
-        <div class="graphs-container wide-mode">
-            <div id="graph-container-home-team-4" class="graph-container block-12x2 hidden">
-                {% set prefix = 'home_team_heatmap' %}
-                {% set plot_container_id = 'heatmap-home-plot-container' %}
-                {% include 'partials/match_team_analysis.html' with context %}
-            </div>
-        </div>
+      <div class="graphs-container wide-mode">
+      </div>
     </div>
 
     <!-- AWAY TEAM TAB -->
     <div class="analysis-content hidden" id="away">
-        <div class="layout-toggle">
-            <button id="toggle-layout-btn-away" class="toggle-btn">Switch to Compact Layout</button>
-        </div>
-        <div class="graphs-container wide-mode">
-            <div id="graph-container-away-team-4" class="graph-container block-12x2 hidden">
-                {% set prefix = 'away_team_heatmap' %}
-                {% set plot_container_id = 'heatmap-away-plot-container' %}
-                {% include 'partials/match_team_analysis.html' with context %}
-            </div>
-        </div>
+      <div class="graphs-container wide-mode">
+      </div>
     </div>
 
     <!-- PLAYER TAB -->
@@ -132,4 +124,19 @@
   });
 </script>
 <script src="{{ url_for('static', filename='js/match_analysis.js') }}"></script>
+<script>
+  $(document).ready(function () {
+    $('.searchable-dropdown').select2();
+
+    $('#layout-toggle-checkbox').on('change', function () {
+      const compact = $(this).is(':checked');
+      $('.graphs-container').each(function () {
+        $(this).toggleClass('compact-mode', compact);
+        $(this).toggleClass('wide-mode', !compact);
+      });
+
+      $('.toggle-label').text(compact ? 'Wide Layout' : 'Compact Layout');
+    });
+  });
+</script>
 {% endblock %}
