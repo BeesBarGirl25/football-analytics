@@ -11,7 +11,9 @@ html, body {
 
 .wrapper {
   display: grid;
-  grid-template-areas: "sidebar top-navbar" "sidebar content";
+  grid-template-areas:
+    "sidebar top-navbar"
+    "sidebar content";
   grid-template-columns: 60px 1fr;
   grid-template-rows: auto 1fr;
   height: 100vh;
@@ -156,6 +158,7 @@ html, body {
   flex-direction: column;
   overflow: hidden;
   width: 100%;
+  height: 100%;
   box-sizing: border-box;
 }
 .analysis-content.hidden {
@@ -174,6 +177,7 @@ html, body {
   width: 100%;
   gap: 1rem;
   box-sizing: border-box;
+  flex-grow: 1;
 }
 
 /* === Compact & Wide Modes */
@@ -200,6 +204,9 @@ html, body {
   color: #e0e0e0;
   text-align: center;
   min-height: 100px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .graph-container.xg { grid-area: xg; }
