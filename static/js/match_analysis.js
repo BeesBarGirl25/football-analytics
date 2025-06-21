@@ -104,18 +104,19 @@ $('#match-select').on('change', async function () {
             away_team_heatmap_second: result.away_team_heatmap_second
         });
 
-        [1, 2, 3, 4].forEach(i => {
-            const el = document.getElementById(`graph-container-${i}`);
-            if (el) el.classList.remove('hidden');
-        });
+        document.getElementById('graph-container-xg')?.classList.remove('hidden');
+        document.getElementById('graph-container-momentum')?.classList.remove('hidden');
+        document.getElementById('graph-container-summary')?.classList.remove('hidden');
+        document.getElementById('graph-container-heatmap')?.classList.remove('hidden');
 
         if (result.xg_graph?.data && result.xg_graph?.layout) {
-            Plotly.newPlot('graph-container-1', result.xg_graph.data, result.xg_graph.layout);
+            Plotly.newPlot('xg-plot-container', result.xg_graph.data, result.xg_graph.layout);
         }
 
         if (result.momentum_graph?.data && result.momentum_graph?.layout) {
-            Plotly.newPlot('graph-container-3', result.momentum_graph.data, result.momentum_graph.layout);
+            Plotly.newPlot('momentum-plot-container', result.momentum_graph.data, result.momentum_graph.layout);
         }
+
 
         showTabAndRenderPlot('overview', 'dominance_heatmap', 'dominance-plot-container', 'graph-container-4');
 

@@ -1,11 +1,12 @@
 /* === Base Layout === */
-body {
+html, body {
+  height: 100%;
   margin: 0;
+  padding: 0;
+  overflow: hidden;
   font-family: 'Segoe UI', sans-serif;
   background-color: #121212;
   color: #e0e0e0;
-  overflow-x: hidden;
-  position: relative;
 }
 
 .wrapper {
@@ -72,16 +73,19 @@ body {
   color: #e0e0e0;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
+  height: 100%;
 }
 
 .analysis-container {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   background-color: #1e1e1e;
   padding: 0.5rem;
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  height: 100%;
 }
 
 .analysis-nav {
@@ -111,14 +115,16 @@ body {
 }
 
 .analysis-content {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 .analysis-content.hidden {
   display: none;
 }
 
-/* === Graph Layouts === */
+/* === Graph Layout === */
 .graphs-container {
   display: grid;
   grid-template-areas:
@@ -126,7 +132,7 @@ body {
     "momentum summary heatmap";
   grid-template-columns: 1fr 1.2fr 1fr;
   grid-template-rows: 50% 50%;
-  height: calc(100vh - 200px); /* adjusts to fit below nav/dropdowns */
+  height: 100%;
   gap: 1rem;
 }
 
@@ -143,8 +149,6 @@ body {
   grid-area: heatmap;
 }
 
-
-
 .graph-container {
   background-color: #1f1f1f;
   border: 1px solid #333;
@@ -155,6 +159,7 @@ body {
   overflow: hidden;
   color: #e0e0e0;
   text-align: center;
+  min-height: 100px;
 }
 
 .graph-inner {
@@ -172,6 +177,7 @@ body {
   flex-grow: 1;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 .plotly-wrapper .js-plotly-plot,
 .plotly-wrapper .plot-container,
@@ -313,27 +319,17 @@ body {
   color: #90caf9;
 }
 
-/* === Utility === */
-.hidden {
-  display: none;
-}
-
-.layout-toggle {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.5rem;
-}
-
+/* === Layout Modes === */
 .graphs-container.compact-mode {
   grid-template-columns: repeat(6, 1fr);
   grid-auto-rows: 160px;
 }
-
 .graphs-container.wide-mode {
   grid-template-columns: repeat(12, 1fr);
   grid-auto-rows: 220px;
 }
 
+/* === Toggle Switch in Navbar === */
 .layout-toggle-switch {
   display: flex;
   align-items: center;
@@ -389,4 +385,9 @@ input:checked + .slider:before {
 .toggle-label {
   font-size: 0.85rem;
   user-select: none;
+}
+
+/* === Utility === */
+.hidden {
+  display: none;
 }
