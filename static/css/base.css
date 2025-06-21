@@ -74,6 +74,7 @@ html, body {
   color: #ccc;
   padding-left: 0;
   padding-right: 0;
+  margin-left: auto;
 }
 
 /* === Responsive Navbar */
@@ -161,7 +162,7 @@ html, body {
   grid-template-areas:
     "xg summary heatmap"
     "momentum summary heatmap";
-  grid-template-columns: 1fr 1.6fr 1.2fr;
+  grid-template-columns: 1fr 1.6fr 1.4fr;
   grid-template-rows: 50% 50%;
   height: 100%;
   width: 100%;
