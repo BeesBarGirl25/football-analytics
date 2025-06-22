@@ -249,8 +249,12 @@ html, body {
   justify-content: flex-start;
   gap: 0.5rem;
   overflow: hidden;
-  display: none;
 }
+
+.graph-container.summary.hidden {
+  display: none !important;
+}
+
 .graph-container.summary .scoreline {
   font-size: 2rem;
   font-weight: bold;
