@@ -31,12 +31,13 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
   selectedTab?.classList.add('active');
   tabEl?.classList.remove('hidden');
 
-  const graphEl = tabEl?.querySelector(`#${graphContainerId}`);
-  const plotWrapper = tabEl?.querySelector(`#${containerId}`);
+  const graphEl = document.getElementById(graphContainerId);
+  const plotWrapper = document.getElementById(containerId);
   graphEl?.classList.remove('hidden');
   plotWrapper?.classList.remove('hidden');
 
   requestAnimationFrame(() => {
+    console.log(`[SHOW] Rendering plot for ${containerId}`);
     lazyRenderPlot(containerId, viewKey);
     const el = document.getElementById(containerId);
     if (el) Plotly.Plots.resize(el);
@@ -49,9 +50,9 @@ document.querySelectorAll('.tab-btn').forEach(button => {
   button.addEventListener('click', () => {
     const tabId = button.getAttribute('data-tab');
     if (tabId === 'home') {
-      showTabAndRenderPlot(tabId, 'home_team_heatmap', 'heatmap-home-plot-container', 'graph-container-home-team-4');
+      showTabAndRenderPlot(tabId, 'home_team_heatmap', 'heatmap-home-plot-container', 'graph-container-home_team_heatmap');
     } else if (tabId === 'away') {
-      showTabAndRenderPlot(tabId, 'away_team_heatmap', 'heatmap-away-plot-container', 'graph-container-away-team-4');
+      showTabAndRenderPlot(tabId, 'away_team_heatmap', 'heatmap-away-plot-container', 'graph-container-away_team_heatmap');
     } else if (tabId === 'overview') {
       showTabAndRenderPlot(tabId, 'dominance_heatmap', 'dominance-plot-container', 'graph-container-4');
     } else {
