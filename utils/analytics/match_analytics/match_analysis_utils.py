@@ -107,12 +107,12 @@ def goal_assist_stats(match_data: pd.DataFrame, home_team:str, away_team:str ):
         sub_off_emoji = '🔻'  # Red triangle pointed down
 
         player_matrix['contributions'] = (
-            player_matrix['goals'].apply(lambda x: goal_emoji * x) +
-            player_matrix['assists'].apply(lambda x: assist_emoji * x) +
-            player_matrix['yellow cards'].apply(lambda x: yellow_card_emoji * x) +
-            player_matrix['red cards'].apply(lambda x: red_card_emoji * x) +
-            player_matrix['subbed on'].apply(lambda x: sub_on_emoji * x) +
-            player_matrix['subbed off'].apply(lambda x: sub_off_emoji * x)
+            player_matrix['goals'].apply(lambda x: goal_emoji * int(x)) +
+            player_matrix['assists'].apply(lambda x: assist_emoji * int(x)) +
+            player_matrix['yellow cards'].apply(lambda x: yellow_card_emoji * int(x)) +
+            player_matrix['red cards'].apply(lambda x: red_card_emoji * int(x)) +
+            player_matrix['subbed on'].apply(lambda x: sub_on_emoji * int(x)) +
+            player_matrix['subbed off'].apply(lambda x: sub_off_emoji * int(x))
         )
 
         if team == home_team:
