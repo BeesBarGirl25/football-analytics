@@ -15,69 +15,87 @@ def extract_player_names(row):
     return [player['player']['name'] for player in row['lineup']]
 
 def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
-    logging.info("Starting goal_assist_stats")
+    # Initialize summary stats
+    home_norm = away_norm = home_et = away_et = home_pen = away_pen = 0
+    home_team_data = away_team_data = None
 
-    # initialize team summary containers
-    summaries = {}
+    for team in (home_team, away_team):
+        team_df = match_data[match_data["team"] == team]
 
-    for team in [home_team, away_team]:
-        team_df = match_data[match_data['team'] == team]
-        players = []
-        # collect starter + substitutes
-        try:
-            starters = extract_player_names(team_df[team_df['type'] == 'Starting XI']['tactics'].iloc[0])
-        except IndexError:
-            starters = []
-        subs = team_df[team_df['type'] == 'Substitution']['substitution_replacement'].tolist()
-        players = list(set(starters + subs))
+        # Build player roster DataFrame
+        starters = extract_player_names(team_df[team_df["type"] == "Starting XI"]["tactics"].iloc[0])
+        subs_out = team_df[team_df["type"] == "Substitution"]["player"]
+        subs_in = team_df[team_df["type"] == "Substitution"]["substitution_replacement"]
+        players = list(starters) + list(subs_in)
+        pm = pd.DataFrame({"player": pd.unique(players)})
 
-        # table to fill
-        pm = pd.DataFrame({'player': players})
-        pm[['goals','assists','yellow cards','red cards','subbed on','subbed off']] = 0
+        # Count contributions
+        shots = team_df[team_df["type"] == "Shot"]
+        goals = shots[shots["shot_outcome"] == "Goal"]["player"].value_counts()
+        assists = team_df[team_df.get("pass_goal_assist", False) == True]["player"].value_counts()
+        yellow = team_df[team_df.get("bad_behaviour_card", "") == "Yellow Card"]["player"].value_counts()
+        red = team_df[team_df.get("bad_behaviour_card", "") == "Red Card"]["player"].value_counts()
+        off = subs_out.value_counts()
+        on = subs_in.value_counts()
 
-        # count each event type
-        goal_counts = team_df.query("type=='Shot' and shot_outcome=='Goal'")['player'].value_counts()
-        assist_counts = team_df.query("pass_goal_assist==True")['player'].value_counts()
-        yellow_counts = team_df.query("bad_behaviour_card=='Yellow Card'")['player'].value_counts()
-        red_counts = team_df.query("bad_behaviour_card=='Red Card'")['player'].value_counts()
-        sub_on_counts = team_df.query("type=='Substitution'")['substitution_replacement'].value_counts()
-        sub_off_counts = team_df.query("type=='Substitution'")['player'].value_counts()
+        # Map counts to DataFrame
+        pm["goals"] = pm["player"].map(goals).fillna(0).astype(int)
+        pm["assists"] = pm["player"].map(assists).fillna(0).astype(int)
+        pm["yellow cards"] = pm["player"].map(yellow).fillna(0).astype(int)
+        pm["red cards"] = pm["player"].map(red).fillna(0).astype(int)
+        pm["subbed off"] = pm["player"].map(off).fillna(0).astype(int)
+        pm["subbed on"] = pm["player"].map(on).fillna(0).astype(int)
 
-        # apply counts
-        for col, vc in [('goals', goal_counts), ('assists', assist_counts),
-                        ('yellow cards', yellow_counts), ('red cards', red_counts),
-                        ('subbed on', sub_on_counts), ('subbed off', sub_off_counts)]:
-            pm[col] = pm['player'].map(vc).fillna(0).astype(int)
-
-        # build emoji string
-        pm['contributions'] = (
-            pm['goals'].apply(lambda x: '⚽' * x) +
-            pm['assists'].apply(lambda x: '🅰️' * x) +
-            pm['yellow cards'].apply(lambda x: '🟨' * x) +
-            pm['red cards'].apply(lambda x: '🟥' * x) +
-            pm['subbed on'].apply(lambda x: '🔺' * x) +
-            pm['subbed off'].apply(lambda x: '🔻' * x)
+        # Build contributions string with repeated emojis
+        pm["contributions"] = (
+            pm["goals"].apply(lambda x: "⚽" * x) +
+            pm["assists"].apply(lambda x: "🅰️" * x) +
+            pm["yellow cards"].apply(lambda x: "🟨" * x) +
+            pm["red cards"].apply(lambda x: "🟥" * x) +
+            pm["subbed on"].apply(lambda x: "🔺" * x) +
+            pm["subbed off"].apply(lambda x: "🔻" * x)
         )
 
-        summaries[team] = pm[['player','contributions']]
+        # Update match stats based on periods
+        goal_periods = shots[shots["shot_outcome"] == "Goal"][["period", "player"]]
+        for _, row in goal_periods.iterrows():
+            period = row["period"]
+            if period in (1, 2):
+                if team == home_team:
+                    home_norm += 1
+                else:
+                    away_norm += 1
+            elif period in (3, 4):
+                if team == home_team:
+                    home_et += 1
+                else:
+                    away_et += 1
+            elif period == 5:
+                if team == home_team:
+                    home_pen += 1
+                else:
+                    away_pen += 1
 
-    # extract team summaries
-    home_df = summaries[home_team]
-    away_df = summaries[away_team]
+        # Assign DataFrame to correct team
+        team_data = pm[["player", "contributions"]]
+        if team == home_team:
+            home_team_data = team_data
+        else:
+            away_team_data = team_data
 
-    logging.info(f"{home_team} contributions:\n{home_df}")
-    logging.info(f"{away_team} contributions:\n{away_df}")
-
+    # Return all ten values in the original signature
     return (
         home_team_data,
         away_team_data,
         home_team,
         away_team,
-        home_team_score_normal_time,
-        away_team_score_normal_time,
-        home_team_extra_time_score,
-        away_team_extra_time_score,
-        home_team_penalty_score,
-        away_team_penalty_score
+        home_norm,
+        away_norm,
+        home_et,
+        away_et,
+        home_pen,
+        away_pen,
     )
+
+
 
