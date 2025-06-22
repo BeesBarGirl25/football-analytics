@@ -153,7 +153,7 @@ function populateTable(tableId, players) {
         const contribCell = document.createElement('td');
 
         playerCell.textContent = player.player;
-        contribCell.textContent = player.contributions?.join('') ?? '';
+        contribCell.textContent = player.contributions ?? '';
 
         row.appendChild(playerCell);
         row.appendChild(contribCell);
