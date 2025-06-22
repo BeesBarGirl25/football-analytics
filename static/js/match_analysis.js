@@ -5,8 +5,17 @@ const cachedPlots = {};
 function renderPlot(containerId, plot) {
     const el = document.getElementById(containerId);
     console.log(`[PLOT] Preparing to render in: ${containerId}`);
-    if (!el || el.offsetWidth === 0 || el.offsetHeight === 0 || el.classList.contains('hidden')) {
-        console.warn(`[PLOT] Skipped rendering: ${containerId} (container not visible or missing)`);
+
+    if (!el) {
+        console.warn(`[PLOT] Skipped rendering: ${containerId} (element not found)`);
+        return;
+    }
+
+    const isVisible = el.offsetWidth > 0 && el.offsetHeight > 0 && !el.classList.contains('hidden');
+    console.log(`[DEBUG] ${containerId} visibility check — width: ${el.offsetWidth}, height: ${el.offsetHeight}, hidden class: ${el.classList.contains('hidden')}, isVisible: ${isVisible}`);
+
+    if (!isVisible) {
+        console.warn(`[PLOT] Skipped rendering: ${containerId} (not visible)`);
         return;
     }
 
@@ -21,6 +30,7 @@ function renderPlot(containerId, plot) {
         console.warn(`[PLOT] Missing data/layout for: ${containerId}`);
     }
 }
+
 
 function togglePlotView(viewKey, containerId) {
     const plot = cachedPlots[viewKey];
