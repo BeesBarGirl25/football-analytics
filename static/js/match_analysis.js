@@ -1,87 +1,50 @@
 const cachedPlots = {};
+const renderedPlots = new Set();
 
-function printVisibility(el, label) {
-  console.log(`[VISIBILITY] ${label} — exists: ${!!el}, width: ${el?.offsetWidth}, height: ${el?.offsetHeight}, hiddenClass: ${el?.classList.contains('hidden')}`);
-}
-
-function renderPlot(containerId, plot, attempts = 0) {
+function lazyRenderPlot(containerId, plotKey) {
   const el = document.getElementById(containerId);
-  console.log(`[RENDER ATTEMPT] ${containerId}, attempt ${attempts}`);
-  printVisibility(el, containerId);
+  const plot = cachedPlots[plotKey];
 
-  if (!el || el.offsetWidth === 0 || el.offsetHeight === 0 || el.classList.contains('hidden')) {
-    if (attempts < 10) {
-      console.log(`[WAIT] renderPlot retry (${attempts + 1})…`);
-      setTimeout(() => renderPlot(containerId, plot, attempts + 1), 100);
-    } else {
-      console.warn(`[PLOT] Skipped rendering: ${containerId} after ${attempts} attempts`);
+  if (!el || renderedPlots.has(containerId)) return;
+
+  setTimeout(() => {
+    if (el.offsetWidth === 0 || el.offsetHeight === 0) {
+      console.warn(`[DELAY] ${containerId} not visible yet. Skipping render.`);
+      return;
     }
-    return;
-  }
-
-  if (plot?.data && plot?.layout) {
     try {
       Plotly.newPlot(containerId, plot.data, plot.layout);
-      console.log(`[PLOT] ✅ Rendered successfully: ${containerId}`);
+      renderedPlots.add(containerId);
+      console.log(`[LAZY PLOT] ✅ ${containerId}`);
     } catch (err) {
-      console.error(`[PLOT] ❌ Failed to render in: ${containerId}`, err);
+      console.error(`[LAZY PLOT] ❌ Failed for ${containerId}`, err);
     }
-  } else {
-    console.warn(`[PLOT] Missing data/layout for: ${containerId}`);
-  }
-}
-
-function togglePlotView(viewKey, containerId, attempts = 0) {
-  const plot = cachedPlots[viewKey];
-  const el = document.getElementById(containerId);
-  printVisibility(el, containerId);
-
-  if (!el || el.offsetWidth === 0 || el.offsetHeight === 0 || el.classList.contains('hidden')) {
-    if (attempts < 10) {
-      console.log(`[WAIT] togglePlotView retry (${attempts + 1})…`);
-      setTimeout(() => togglePlotView(viewKey, containerId, attempts + 1), 100);
-    } else {
-      console.warn(`[SKIP] togglePlotView aborted after ${attempts} attempts`);
-    }
-    return;
-  }
-
-  renderPlot(containerId, plot);
+  }, 100);
 }
 
 function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
-  // 1. Hide all tabs
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
   document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
 
-  // 2. Activate the selected tab
   const selectedTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
   const tabEl = document.getElementById(tabId);
   selectedTab?.classList.add('active');
-
-  // ✅ 3. Unhide .analysis-content FIRST so children can compute their dimensions
   tabEl?.classList.remove('hidden');
 
-  // 4. Unhide graph + plot containers inside that tab
   const graphEl = tabEl?.querySelector(`#${graphContainerId}`);
   const plotWrapper = tabEl?.querySelector(`#${containerId}`);
   graphEl?.classList.remove('hidden');
   plotWrapper?.classList.remove('hidden');
 
-  // 5. Now run the plot logic AFTER frame paint
   requestAnimationFrame(() => {
-    console.log(`[SHOW] Rendering plot for ${containerId}`);
-    togglePlotView(viewKey, containerId);
+    lazyRenderPlot(containerId, viewKey);
     const el = document.getElementById(containerId);
     if (el) Plotly.Plots.resize(el);
   });
 }
 
-
-
-
-
 // Tabs
+
 document.querySelectorAll('.tab-btn').forEach(button => {
   button.addEventListener('click', () => {
     const tabId = button.getAttribute('data-tab');
@@ -101,6 +64,7 @@ document.querySelectorAll('.tab-btn').forEach(button => {
 });
 
 // Toggle buttons
+
 document.querySelectorAll('.toggle-btn').forEach(button => {
   button.addEventListener('click', () => {
     const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
@@ -118,11 +82,12 @@ document.querySelectorAll('.toggle-btn').forEach(button => {
       return;
     }
 
-    setTimeout(() => togglePlotView(viewKey, containerId), 50);
+    setTimeout(() => lazyRenderPlot(containerId, viewKey), 50);
   });
 });
 
 // Match select
+
 $('#match-select').on('change', async function () {
   const matchId = $(this).val();
   if (!matchId || matchId === "Select match") {
@@ -148,6 +113,8 @@ $('#match-select').on('change', async function () {
       away_team_heatmap_first: result.away_team_heatmap_first,
       away_team_heatmap_second: result.away_team_heatmap_second
     });
+
+    renderedPlots.clear();
 
     ['graph-container-xg', 'graph-container-momentum', 'graph-container-summary', 'graph-container-heatmap']
       .forEach(id => document.getElementById(id)?.classList.remove('hidden'));
