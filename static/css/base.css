@@ -61,18 +61,9 @@ html, body {
   white-space: nowrap;
 }
 
-.top-navbar .dropdowns {
-  display: flex;
-  gap: 10px;
-  flex-wrap: nowrap;
-  align-items: center;
-  margin-left: auto;
-  color: grey;
-}
-
 .top-navbar .dropdowns select {
   background-color: #2a2a2a;
-  color: #000000;
+  color: #e0e0e0;
   border: 1px solid #777;
   border-radius: 6px;
   padding: 6px 10px;
@@ -84,12 +75,20 @@ html, body {
   border-color: #90caf9;
   box-shadow: 0 0 5px #90caf9;
   background-color: #3a3a3a;
-  color: #000000;
+  color: #ffffff;
 }
 
 .top-navbar .dropdowns option {
   background-color: #2a2a2a;
-  color: #000000;
+  color: #ffffff;
+}
+
+.top-navbar .dropdowns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+  align-items: center;
+  color: grey;
 }
 
 .top-navbar .layout-toggle-switch {
@@ -99,6 +98,7 @@ html, body {
   color: #ccc;
   padding-left: 0;
   padding-right: 0;
+  margin-left: auto;
 }
 
 @media (max-width: 768px) {
@@ -111,7 +111,6 @@ html, body {
   .top-navbar .dropdowns {
     flex-wrap: wrap;
     width: 100%;
-    margin-left: 0;
   }
   .top-navbar .layout-toggle-switch {
     justify-content: flex-end;
@@ -190,7 +189,7 @@ html, body {
 /* === Graph Layout === */
 .graphs-container.wide-mode {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 2fr 2fr;
   grid-template-rows: 1fr 1fr;
   gap: 1rem;
   width: 100%;
@@ -254,10 +253,10 @@ html, body {
   flex-wrap: wrap;
   justify-content: center;
 }
-.graph-container.summary .scoreline .home-team-name {
+.graph-container.summary .scoreline .home {
   color: #2196f3;
 }
-.graph-container.summary .scoreline .away-team-name {
+.graph-container.summary .scoreline .away {
   color: #f44336;
 }
 .graph-container.summary .team-tables {
@@ -275,7 +274,7 @@ html, body {
   border-radius: 10px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   overflow-x: auto;
-  font-size: calc(0.65rem + 0.5vh);
+  font-size: calc(0.65rem + 0.2vh);
   display: flex;
   flex-direction: column;
   justify-content: center;
