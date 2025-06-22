@@ -34,7 +34,20 @@ function renderPlot(containerId, plot, attempts = 0) {
 }
 
 function togglePlotView(viewKey, containerId) {
+    // Diagnostic trace
+    if (viewKey === 'home_team_heatmap') {
+        console.trace(`[TRACE] togglePlotView called for ${viewKey}`);
+    }
+
     const plot = cachedPlots[viewKey];
+    const el = document.getElementById(containerId);
+
+    const isVisible = el?.offsetHeight > 0 && el?.offsetWidth > 0 && !el.classList.contains('hidden');
+    if (!isVisible) {
+        console.log(`[SKIP] togglePlotView skipped for ${containerId} — not visible`);
+        return;
+    }
+
     renderPlot(containerId, plot);
 }
 
@@ -59,7 +72,7 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
     });
 }
 
-// Render plots only when tabs are clicked
+// Tabs
 document.querySelectorAll('.tab-btn').forEach(button => {
     button.addEventListener('click', () => {
         const tabId = button.getAttribute('data-tab');
@@ -78,7 +91,7 @@ document.querySelectorAll('.tab-btn').forEach(button => {
     });
 });
 
-// Toggle buttons (safe)
+// Toggle buttons
 document.querySelectorAll('.toggle-btn').forEach(button => {
     button.addEventListener('click', () => {
         const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
@@ -91,18 +104,17 @@ document.querySelectorAll('.toggle-btn').forEach(button => {
         const container = button.closest('.graph-container');
         const containerId = container?.querySelector('.plotly-wrapper')?.id;
 
-        // ✅ Only render if container is visible
         if (container?.offsetHeight > 0 && container?.offsetWidth > 0 && !container.classList.contains('hidden')) {
             requestAnimationFrame(() => {
                 togglePlotView(viewKey, containerId);
             });
         } else {
-            console.log(`[SKIP] Not rendering ${viewKey} — container not visible yet`);
+            console.log(`[SKIP] Toggle for ${viewKey} skipped — container not visible`);
         }
     });
 });
 
-// Match select → fetch and display data
+// Match select
 $('#match-select').on('change', async function () {
     const matchId = $(this).val();
     if (!matchId || matchId === "Select match") {
@@ -129,7 +141,6 @@ $('#match-select').on('change', async function () {
             away_team_heatmap_second: result.away_team_heatmap_second
         });
 
-        // Show overview tab and plots only
         document.getElementById('graph-container-xg')?.classList.remove('hidden');
         document.getElementById('graph-container-momentum')?.classList.remove('hidden');
         document.getElementById('graph-container-summary')?.classList.remove('hidden');
