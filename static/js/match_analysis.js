@@ -64,11 +64,14 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
   plotWrapper?.classList.remove('hidden');
 
   setTimeout(() => {
-    togglePlotView(viewKey, containerId);
-    const el = document.getElementById(containerId);
-    if (el) Plotly.Plots.resize(el);
+    requestAnimationFrame(() => {
+      togglePlotView(viewKey, containerId);
+      const el = document.getElementById(containerId);
+      if (el) Plotly.Plots.resize(el);
+    });
   }, 100);
 }
+
 
 // Tabs
 document.querySelectorAll('.tab-btn').forEach(button => {
