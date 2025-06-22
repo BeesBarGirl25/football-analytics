@@ -37,10 +37,13 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
     document.getElementById(graphContainerId)?.classList.remove('hidden');
 
     requestAnimationFrame(() => {
-        togglePlotView(viewKey, containerId);
-        const el = document.getElementById(containerId);
-        if (el) Plotly.Plots.resize(el);
+        setTimeout(() => {
+            togglePlotView(viewKey, containerId);
+            const el = document.getElementById(containerId);
+            if (el) Plotly.Plots.resize(el);
+        }, 0);
     });
+
 }
 
 document.querySelectorAll('.tab-btn').forEach(button => {
