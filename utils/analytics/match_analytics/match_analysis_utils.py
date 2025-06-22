@@ -15,72 +15,63 @@ def extract_player_names(row):
     return [player['player']['name'] for player in row['lineup']]
 
 def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
-    # Counters
-    home_score_norm = away_score_norm = 0
-    home_score_et = away_score_et = 0
-    home_score_pen = away_score_pen = 0
+    # Initialize scoring counters
+    home_norm = away_norm = home_et = away_et = home_pen = away_pen = 0
 
-    home_team_data = away_team_data = None
+    def process_team(team):
+        df = match_data[match_data["team"] == team]
 
-    for team in (home_team, away_team):
-        team_df = match_data[match_data["team"] == team]
+        # Starting + subs list
+        starting = df.loc[df["type"] == "Starting XI", "tactics"].iloc[0]
+        starters = extract_player_names(starting)
+        replacements = df.loc[df["type"] == "Substitution", "substitution_replacement"].tolist()
+        players = starters + replacements
+        pm = pd.DataFrame({"player": players})
 
-        # Build player list
-        starting = extract_player_names(team_df[team_df["type"] == "Starting XI"]["tactics"].iloc[0])
-        subbed = team_df[team_df["type"] == "Substitution"]["substitution_replacement"].tolist()
-        players = starting + subbed
+        # Ensure count columns exist and are integer
+        for col in ("goals", "assists", "yellow cards", "red cards", "subbed on", "subbed off"):
+            pm[col] = 0
 
-        # Init player count matrix
-        pm = pd.DataFrame(players, columns=["player"]).drop_duplicates()
-        stats = ["goals", "assists", "yellow cards", "red cards", "subbed on", "subbed off"]
-        pm[stats] = 0
+        # Shots → goals
+        goals = df.loc[(df["type"] == "Shot") & (df["shot_outcome"] == "Goal"), "player"]
+        assists = df.loc[df.get("pass_goal_assist", False) == True, "player"]
+        yellows = df.loc[df.get("bad_behaviour_card", "") == "Yellow Card", "player"]
+        reds = df.loc[df.get("bad_behaviour_card", "") == "Red Card", "player"]
 
-        # Count goal & assist events
-        goal_events = team_df[(team_df["type"] == "Shot") & (team_df["shot_outcome"] == "Goal")]
-        pm.loc[pm["player"].isin(goal_events["player"]), "goals"] = (
-            goal_events["player"].value_counts()
-        )
-
-        if "pass_goal_assist" in team_df.columns:
-            assist_events = team_df[team_df["pass_goal_assist"] == True]
-            pm.loc[pm["player"].isin(assist_events["player"]), "assists"] = (
-                assist_events["player"].value_counts()
-            )
-
-        # Cards
-        if "bad_behaviour_card" in team_df.columns:
-            yc = team_df[team_df["bad_behaviour_card"] == "Yellow Card"]
-            rc = team_df[team_df["bad_behaviour_card"] == "Red Card"]
-            pm.loc[pm["player"].isin(yc["player"]), "yellow cards"] = yc["player"].value_counts()
-            pm.loc[pm["player"].isin(rc["player"]), "red cards"] = rc["player"].value_counts()
-
-        # Substitutions
-        subs = team_df[team_df["type"] == "Substitution"]
-        pm.loc[pm["player"].isin(subs["player"]), "subbed off"] = subs["player"].value_counts()
-        pm.loc[pm["player"].isin(subs["substitution_replacement"]), "subbed on"] = (
-            subs["substitution_replacement"].value_counts()
-        )
-
-        # Score breakdown by period
-        for _, shot in goal_events.iterrows():
-            period = shot.get("period", None)
-            if period in (1, 2):
-                if team == home_team:
-                    home_score_norm += 1
+        # Compute type of goal
+        for period in df.loc[(df["type"] == "Shot") & (df["shot_outcome"] == "Goal"), "period"]:
+            nonlocal home_norm, away_norm, home_et, away_et, home_pen, away_pen
+            if period in [1, 2]:
+                if df["period"].max() < 3:
+                    home_norm += (team == home_team)
+                    away_norm += (team == away_team)
                 else:
-                    away_score_norm += 1
-            elif period in (3, 4):
-                if team == home_team:
-                    home_score_et += 1
-                else:
-                    away_score_et += 1
+                    home_norm += (team == home_team)
+                    away_norm += (team == away_team)
+                    home_et += (team == home_team)
+                    away_et += (team == away_team)
+            elif period in [3, 4]:
+                home_et += (team == home_team)
+                away_et += (team == away_team)
             elif period == 5:
-                if team == home_team:
-                    home_score_pen += 1
-                else:
-                    away_score_pen += 1
+                home_pen += (team == home_team)
+                away_pen += (team == away_team)
 
-        # Build emoji string
+        # Substitution counts
+        subs = df.loc[df["type"] == "Substitution", :]
+        pm.loc[pm["player"].isin(subs["substitution_replacement"]), "subbed on"] += 1
+        pm.loc[pm["player"].isin(subs["player"]), "subbed off"] += 1
+
+        # Aggregate stats
+        pm.loc[pm["player"].isin(goals), "goals"] += 1
+        pm.loc[pm["player"].isin(assists), "assists"] += 1
+        pm.loc[pm["player"].isin(yellows), "yellow cards"] += 1
+        pm.loc[pm["player"].isin(reds), "red cards"] += 1
+
+        # Convert to nullable int before emoji
+        pm = pm.fillna(0).astype({col: "Int64" for col in pm.columns if col != "player"})
+
+        # Emoji build
         pm["contributions"] = (
             pm["goals"].apply(lambda x: "⚽" * int(x)) +
             pm["assists"].apply(lambda x: "🅰️" * int(x)) +
@@ -90,24 +81,19 @@ def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
             pm["subbed off"].apply(lambda x: "🔻" * int(x))
         )
 
-        # Assign to correct side
-        if team == home_team:
-            home_team_data = pm[["player", "contributions"]]
-        else:
-            away_team_data = pm[["player", "contributions"]]
+        return pm[["player", "contributions"]]
+
+    home_df = process_team(home_team)
+    away_df = process_team(away_team)
 
     return (
-        home_team_data,
-        away_team_data,
-        home_team,
-        away_team,
-        home_score_norm,
-        away_score_norm,
-        home_score_et,
-        away_score_et,
-        home_score_pen,
-        away_score_pen,
+        home_df, away_df,
+        home_team, away_team,
+        home_norm, away_norm,
+        home_et, away_et,
+        home_pen, away_pen
     )
+
 
 
 
