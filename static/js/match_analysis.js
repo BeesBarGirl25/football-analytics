@@ -144,19 +144,22 @@ $('#match-select').on('change', async function () {
 });
 
 function populateTable(tableId, players) {
-    const tableBody = document.querySelector(`#${tableId} tbody`);
-    tableBody.innerHTML = '';
+    console.log(`[DEBUG] populateTable for ${tableId}`, players);
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    tbody.innerHTML = '';
 
-    players.forEach(player => {
+    players.forEach(p => {
         const row = document.createElement('tr');
         const playerCell = document.createElement('td');
         const contribCell = document.createElement('td');
 
-        playerCell.textContent = player.player;
-        contribCell.textContent = player.contributions ?? '';
+        playerCell.textContent = p.player || '';
+        contribCell.textContent = p.contributions || '';
 
-        row.appendChild(playerCell);
-        row.appendChild(contribCell);
-        tableBody.appendChild(row);
+        console.log(`Row: ${p.player} -> ${p.contributions}`);
+
+        row.append(playerCell, contribCell);
+        tbody.appendChild(row);
     });
 }
+
