@@ -2,122 +2,101 @@ import pandas as pd
 import logging
 
 def cumulative_stats(team_data: pd.DataFrame):
-    team_data['goals']=team_data['shot_outcome'].apply(lambda x: 1 if x == 'Goal' else 0)
+    team_data['goals'] = team_data['shot_outcome'].apply(lambda x: 1 if x == 'Goal' else 0)
     team_data.replace(-999, 0, inplace=True)
-    team_data=team_data.sort_values('minute')
-    team_data['cum_goals']=0
-    team_data['cum_xg']=0
-    team_data['cum_goals']=team_data['goals'].cumsum()
-    team_data['cum_xg']=team_data['shot_statsbomb_xg'].cumsum()
+    team_data = team_data.sort_values('minute')
+    team_data['cum_goals'] = team_data['goals'].cumsum()
+    team_data['cum_xg'] = team_data['shot_statsbomb_xg'].cumsum()
     return team_data
+
 
 def extract_player_names(row):
     return [player['player']['name'] for player in row['lineup']]
 
-def goal_assist_stats(match_data: pd.DataFrame, home_team:str, away_team:str ):
 
-    home_team_score_normal_time = 0
-    away_team_score_normal_time = 0
-    home_team_extra_time_score = 0
-    away_team_extra_time_score = 0
-    home_team_penalty_score = 0
-    away_team_penalty_score = 0
+def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
+    # Initialize scoring counters
+    home_norm = away_norm = home_et = away_et = home_pen = away_pen = 0
 
-    for team in home_team, away_team:
-        team_data = match_data[match_data['team'] == team]
-        starting_list = team_data[team_data['type'] == 'Starting XI']['tactics'].iloc[0]
-        starting_players = extract_player_names(starting_list)
-        subbed_players = team_data[team_data['type'] == 'Substitution']['substitution_replacement'].tolist()
-        player_list = starting_players + subbed_players
+    def process_team(team):
+        nonlocal home_norm, away_norm, home_et, away_et, home_pen, away_pen
+        df = match_data[match_data["team"] == team]
 
-        player_matrix = pd.DataFrame(player_list, columns=['player'])
-        player_matrix[['goals', 'assists', 'red cards', 'yellow cards', 'subbed on', 'subbed off']] = 0
+        # Starting XI
+        starters = []
+        start_rows = df[df["type"] == "Starting XI"]["tactics"]
+        if not start_rows.empty:
+            starters = extract_player_names(start_rows.iloc[0])
 
-        # Initialize empty DataFrames
-        assist_rows = pd.DataFrame(columns=['player'])
-        yellow_rows = pd.DataFrame(columns=['player'])
-        red_rows = pd.DataFrame(columns=['player'])
+        # Substitutes
+        subs = df[df["type"] == "Substitution"]
+        replacements = subs["substitution_replacement"].dropna().tolist()
+        players = starters + replacements
 
-        if 'pass_goal_assist' in team_data.columns:
-            assist_rows = team_data[team_data['pass_goal_assist'] == True][['player']]
+        pm = pd.DataFrame({"player": players})
+        for col in ("goals","assists","yellow cards","red cards","subbed on","subbed off"):
+            pm[col] = 0
 
-        goal_rows = team_data[(team_data['type'] == 'Shot') & (team_data['shot_outcome'] == 'Goal')][['player']]
-
-        for period in team_data[(team_data['type'] == 'Shot') & (team_data['shot_outcome'] == 'Goal')][
-            'period'].tolist():
-
-
-            # Ensure 'period' is treated as a string or integer as appropriate
-            if period in [1, 2] and team_data['period'].max() < 3:
-                # Normal time score
-
-                if team == home_team:
-                    home_team_score_normal_time += 1
+        # Goals (shots with outcome == Goal)
+        goal_shots = df[(df["type"] == "Shot") & (df["shot_outcome"] == "Goal")]
+        for _, shot in goal_shots.iterrows():
+            player = shot["player"]
+            pm.loc[pm["player"] == player, "goals"] += 1
+            period = shot.get("period", None)
+            is_home = team == home_team
+            if period in (1, 2):
+                if df["period"].max() < 3:
+                    home_norm += is_home
+                    away_norm += not is_home
                 else:
-                    away_team_score_normal_time += 1
-
-            elif period in [1, 2] and team_data['period'].max() > 2:
-                # Normal and extra time combined
-                if team == home_team:
-                    home_team_score_normal_time += 1
-                    home_team_extra_time_score += 1
-                else:
-                    away_team_score_normal_time += 1
-                    away_team_extra_time_score += 1
-
-            elif period in [3, 4]:
-                # Extra time score
-                if team == home_team:
-                    home_team_extra_time_score += 1
-                else:
-                    away_team_extra_time_score += 1
-
+                    home_norm += is_home
+                    away_norm += not is_home
+                    home_et += is_home
+                    away_et += not is_home
+            elif period in (3, 4):
+                home_et += is_home
+                away_et += not is_home
             elif period == 5:
-                # Penalty shootout score
-                if team == home_team:
-                    home_team_penalty_score += 1
-                else:
-                    away_team_penalty_score += 1
+                home_pen += is_home
+                away_pen += not is_home
 
+        # Assists
+        if "pass_goal_assist" in df.columns:
+            for player in df[df["pass_goal_assist"] == True]["player"]:
+                pm.loc[pm["player"] == player, "assists"] += 1
 
+        # Cards
+        if "bad_behaviour_card" in df.columns:
+            for card_type, colname in [("Yellow Card", "yellow cards"), ("Red Card", "red cards")]:
+                for player in df[df["bad_behaviour_card"] == card_type]["player"]:
+                    pm.loc[pm["player"] == player, colname] += 1
 
+        # Substitution counts
+        for player in replacements:
+            pm.loc[pm["player"] == player, "subbed on"] += 1
+        for player in subs["player"].dropna():
+            pm.loc[pm["player"] == player, "subbed off"] += 1
 
-        if 'bad_behaviour_card' in team_data.columns:
-            yellow_rows = team_data[team_data['bad_behaviour_card'] == 'Yellow Card'][['player']]
-            red_rows = team_data[team_data['bad_behaviour_card'] == 'Red Card'][['player']]
-
-        subs_rows = team_data[team_data['type'] == 'Substitution']
-        off = subs_rows[['player']]
-        on = subs_rows[['substitution_replacement']]
-
-        # Update stats
-        player_matrix.loc[player_matrix['player'].isin(assist_rows['player']), 'assists'] += 1
-        player_matrix.loc[player_matrix['player'].isin(goal_rows['player']), 'goals'] += 1
-        player_matrix.loc[player_matrix['player'].isin(yellow_rows['player']), 'yellow cards'] += 1
-        player_matrix.loc[player_matrix['player'].isin(red_rows['player']), 'red cards'] += 1
-        player_matrix.loc[player_matrix['player'].isin(off['player']), 'subbed off'] += 1
-        player_matrix.loc[player_matrix['player'].isin(on['substitution_replacement']), 'subbed on'] += 1
-
-        # Emoji mapping
-        goal_emoji = '⚽'
-        assist_emoji = '🅰️'
-        yellow_card_emoji = '🟨'
-        red_card_emoji = '🟥'
-        sub_on_emoji = '🔺'  # Red triangle pointed up
-        sub_off_emoji = '🔻'  # Red triangle pointed down
-
-        player_matrix['contributions'] = (
-            player_matrix['goals'].apply(lambda x: goal_emoji * x) +
-            player_matrix['assists'].apply(lambda x: assist_emoji * x) +
-            player_matrix['yellow cards'].apply(lambda x: yellow_card_emoji * x) +
-            player_matrix['red cards'].apply(lambda x: red_card_emoji * x) +
-            player_matrix['subbed on'].apply(lambda x: sub_on_emoji * x) +
-            player_matrix['subbed off'].apply(lambda x: sub_off_emoji * x)
+        # Ensure ints and build contributions without commas
+        pm = pm.fillna(0).astype({c: "Int64" for c in pm.columns if c != "player"})
+        pm["contributions"] = (
+            pm["goals"].apply(lambda x: "⚽" * int(x)) +
+            pm["assists"].apply(lambda x: "🅰️" * int(x)) +
+            pm["yellow cards"].apply(lambda x: "🟨" * int(x)) +
+            pm["red cards"].apply(lambda x: "🟥" * int(x)) +
+            pm["subbed on"].apply(lambda x: "🔺" * int(x)) +
+            pm["subbed off"].apply(lambda x: "🔻" * int(x))
         )
 
-        if team == home_team:
-            home_team_data = player_matrix[['player', 'contributions']]
-        else:
-            away_team_data = player_matrix[['player', 'contributions']]
+        return pm[["player", "contributions"]]
 
-    return home_team_data, away_team_data, home_team, away_team, home_team_score_normal_time, away_team_score_normal_time, home_team_extra_time_score, away_team_extra_time_score, home_team_penalty_score, away_team_penalty_score
+    home_df = process_team(home_team)
+    away_df = process_team(away_team)
+
+    return (
+        home_df, away_df,
+        home_team, away_team,
+        home_norm, away_norm,
+        home_et, away_et,
+        home_pen, away_pen
+    )
