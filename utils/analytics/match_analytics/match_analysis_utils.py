@@ -68,4 +68,16 @@ def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
     logging.info(f"{home_team} contributions:\n{home_df}")
     logging.info(f"{away_team} contributions:\n{away_df}")
 
-    return home_df, away_df
+    return (
+        home_team_data,
+        away_team_data,
+        home_team,
+        away_team,
+        home_team_score_normal_time,
+        away_team_score_normal_time,
+        home_team_extra_time_score,
+        away_team_extra_time_score,
+        home_team_penalty_score,
+        away_team_penalty_score
+    )
+
