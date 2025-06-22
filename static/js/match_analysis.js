@@ -33,18 +33,22 @@ function renderPlot(containerId, plot, attempts = 0) {
     }
 }
 
-function togglePlotView(viewKey, containerId) {
-    // Diagnostic trace
+function togglePlotView(viewKey, containerId, attempts = 0) {
     if (viewKey === 'home_team_heatmap') {
         console.trace(`[TRACE] togglePlotView called for ${viewKey}`);
     }
 
     const plot = cachedPlots[viewKey];
     const el = document.getElementById(containerId);
-
     const isVisible = el?.offsetHeight > 0 && el?.offsetWidth > 0 && !el.classList.contains('hidden');
+
     if (!isVisible) {
-        console.log(`[SKIP] togglePlotView skipped for ${containerId} — not visible`);
+        if (attempts < 10) {
+            console.log(`[WAIT] togglePlotView for ${containerId} not yet visible, retrying... (${attempts})`);
+            setTimeout(() => togglePlotView(viewKey, containerId, attempts + 1), 100);
+        } else {
+            console.warn(`[SKIP] togglePlotView for ${containerId} skipped after ${attempts} attempts`);
+        }
         return;
     }
 
@@ -93,37 +97,26 @@ document.querySelectorAll('.tab-btn').forEach(button => {
 
 // Toggle buttons
 document.querySelectorAll('.toggle-btn').forEach(button => {
-  button.addEventListener('click', () => {
-    const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
-    if (allButtons) {
-        allButtons.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-    }
-    button.classList.add('active');
+    button.addEventListener('click', () => {
+        const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
+        if (allButtons) {
+            allButtons.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+        }
+        button.classList.add('active');
 
-    const viewKey = button.getAttribute('data-view');
-    const container = button.closest('.graph-container');
-    const containerId = container?.querySelector('.plotly-wrapper')?.id;
+        const viewKey = button.getAttribute('data-view');
+        const container = button.closest('.graph-container');
+        const containerId = container?.querySelector('.plotly-wrapper')?.id;
 
-    // ❗ NEW: check that the container *and* its tab are visible
-    const tabContent = button.closest('.analysis-content');
-    const isVisible = (
-        tabContent &&
-        !tabContent.classList.contains('hidden') &&
-        container?.offsetHeight > 0 &&
-        container?.offsetWidth > 0 &&
-        !container.classList.contains('hidden')
-    );
-
-    if (isVisible) {
-        requestAnimationFrame(() => {
-            togglePlotView(viewKey, containerId);
-        });
-    } else {
-        console.log(`[SKIP] Toggle for ${viewKey} skipped — container or tab not visible`);
-    }
-  });
+        if (container?.offsetHeight > 0 && container?.offsetWidth > 0 && !container.classList.contains('hidden')) {
+            requestAnimationFrame(() => {
+                togglePlotView(viewKey, containerId);
+            });
+        } else {
+            console.log(`[SKIP] Toggle for ${viewKey} skipped — container not visible`);
+        }
+    });
 });
-
 
 // Match select
 $('#match-select').on('change', async function () {
