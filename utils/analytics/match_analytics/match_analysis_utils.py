@@ -13,6 +13,7 @@ def cumulative_stats(team_data: pd.DataFrame):
 def extract_player_names(row):
     return [player['player']['name'] for player in row['lineup']]
 
+
 def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
     # Initialize scoring counters
     home_norm = away_norm = home_et = away_et = home_pen = away_pen = 0
