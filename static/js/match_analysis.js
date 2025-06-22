@@ -4,6 +4,7 @@ const cachedPlots = {};
 
 function renderPlot(containerId, plot, attempts = 0) {
     const el = document.getElementById(containerId);
+    console.log(`[RENDER ATTEMPT] ${containerId}, attempt ${attempts}`);
     if (!el) {
         console.warn(`[PLOT] Skipped rendering: ${containerId} (element not found)`);
         return;
@@ -58,7 +59,7 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
     });
 }
 
-// ⏱ Render plots only when tabs are clicked
+// Render plots only when tabs are clicked
 document.querySelectorAll('.tab-btn').forEach(button => {
     button.addEventListener('click', () => {
         const tabId = button.getAttribute('data-tab');
@@ -77,7 +78,7 @@ document.querySelectorAll('.tab-btn').forEach(button => {
     });
 });
 
-// 🧠 Heatmap view toggle buttons
+// Toggle buttons (safe)
 document.querySelectorAll('.toggle-btn').forEach(button => {
     button.addEventListener('click', () => {
         const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
@@ -87,15 +88,21 @@ document.querySelectorAll('.toggle-btn').forEach(button => {
         button.classList.add('active');
 
         const viewKey = button.getAttribute('data-view');
-        const containerId = button.closest('.graph-container')?.querySelector('.plotly-wrapper')?.id;
+        const container = button.closest('.graph-container');
+        const containerId = container?.querySelector('.plotly-wrapper')?.id;
 
-        requestAnimationFrame(() => {
-            togglePlotView(viewKey, containerId);
-        });
+        // ✅ Only render if container is visible
+        if (container?.offsetHeight > 0 && container?.offsetWidth > 0 && !container.classList.contains('hidden')) {
+            requestAnimationFrame(() => {
+                togglePlotView(viewKey, containerId);
+            });
+        } else {
+            console.log(`[SKIP] Not rendering ${viewKey} — container not visible yet`);
+        }
     });
 });
 
-// 🧠 Match select → fetch and display data
+// Match select → fetch and display data
 $('#match-select').on('change', async function () {
     const matchId = $(this).val();
     if (!matchId || matchId === "Select match") {
@@ -122,7 +129,7 @@ $('#match-select').on('change', async function () {
             away_team_heatmap_second: result.away_team_heatmap_second
         });
 
-        // Show overview tab and plots
+        // Show overview tab and plots only
         document.getElementById('graph-container-xg')?.classList.remove('hidden');
         document.getElementById('graph-container-momentum')?.classList.remove('hidden');
         document.getElementById('graph-container-summary')?.classList.remove('hidden');
