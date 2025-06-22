@@ -248,7 +248,7 @@ html, body {
   align-items: center;
   justify-content: flex-start;
   gap: 0.5rem;
-  overflow-y: auto;
+  overflow: hidden;
 }
 .graph-container.summary .scoreline {
   font-size: 2rem;
@@ -272,6 +272,7 @@ html, body {
   gap: 1rem;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 .graph-container.summary .team-table {
   flex: 1;
@@ -279,7 +280,7 @@ html, body {
   padding: 0.5rem;
   border-radius: 10px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-  overflow-x: auto;
+  overflow-y: auto;
   font-size: calc(0.65rem + 0.5vh);
   display: flex;
   flex-direction: column;
