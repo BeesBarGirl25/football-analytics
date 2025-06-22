@@ -259,10 +259,10 @@ html, body {
   flex-wrap: wrap;
   justify-content: center;
 }
-.graph-container.summary .scoreline .home-team-name {
+.graph-container.summary .scoreline .home {
   color: #2196f3;
 }
-.graph-container.summary .scoreline .away-team-name {
+.graph-container.summary .scoreline .away {
   color: #f44336;
 }
 .graph-container.summary .team-tables {
