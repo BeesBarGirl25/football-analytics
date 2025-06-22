@@ -59,6 +59,9 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
   selectedTab?.classList.add('active');
   tabEl?.classList.remove('hidden'); // Must be unhidden *first* so children can become visible
 
+    console.log(`[TAB] Switched to ${tabId}, will render ${viewKey} in ${containerId}`);
+
+
   // Now access elements *within* tabEl
   const graphEl = tabEl?.querySelector(`#${graphContainerId}`);
   const plotWrapper = tabEl?.querySelector(`#${containerId}`);
