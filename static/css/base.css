@@ -52,7 +52,7 @@ html, body {
   height: 45px;
   z-index: 1000;
   gap: 1rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .top-navbar .logo {
   color: #90caf9;
@@ -61,28 +61,18 @@ html, body {
   white-space: nowrap;
 }
 
-.top-navbar .layout-toggle-switch {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  color: #ccc;
-  padding-left: 0;
-  padding-right: 0;
-  margin-left: auto;
-}
-
 .top-navbar .dropdowns {
   display: flex;
   gap: 10px;
   flex-wrap: nowrap;
   align-items: center;
   color: grey;
-  order: 1;
   margin-left: auto;
+  order: 0;
 }
 
 .top-navbar .dropdowns select {
-  background-color: #ffffff;
+  background-color: #ffffff !important;
   color: #000000 !important;
   border: 1px solid #777;
   border-radius: 6px;
@@ -95,12 +85,21 @@ html, body {
   border-color: #90caf9;
   box-shadow: 0 0 5px #90caf9;
   background-color: #ffffff;
-  color: #000000;
+  color: #000000 !important;
 }
 
 .top-navbar .dropdowns option {
   background-color: #ffffff;
   color: #000000;
+}
+
+.top-navbar .layout-toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #ccc;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 @media (max-width: 768px) {
