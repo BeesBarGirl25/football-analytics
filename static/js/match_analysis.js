@@ -41,23 +41,32 @@ function togglePlotView(viewKey, containerId) {
 }
 
 function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
+    // Reset all tab buttons and contents
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
 
+    // Activate the selected tab
     const selectedTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-    selectedTab?.classList.add('active');
-    document.getElementById(tabId)?.classList.remove('hidden');
-    document.getElementById(graphContainerId)?.classList.remove('hidden');
+    const tabEl = document.getElementById(tabId);
+    const graphEl = document.getElementById(graphContainerId);
 
+    selectedTab?.classList.add('active');
+    tabEl?.classList.remove('hidden');
+
+    // ✅ Wait for DOM to apply visibility changes
     requestAnimationFrame(() => {
+        // now remove the hidden class from the specific graph container
+        graphEl?.classList.remove('hidden');
+
+        // ✅ Then wait another tick before rendering (reflow-safe)
         setTimeout(() => {
             togglePlotView(viewKey, containerId);
             const el = document.getElementById(containerId);
             if (el) Plotly.Plots.resize(el);
         }, 0);
     });
-
 }
+
 
 document.querySelectorAll('.tab-btn').forEach(button => {
     button.addEventListener('click', () => {
