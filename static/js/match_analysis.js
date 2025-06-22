@@ -93,26 +93,37 @@ document.querySelectorAll('.tab-btn').forEach(button => {
 
 // Toggle buttons
 document.querySelectorAll('.toggle-btn').forEach(button => {
-    button.addEventListener('click', () => {
-        const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
-        if (allButtons) {
-            allButtons.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-        }
-        button.classList.add('active');
+  button.addEventListener('click', () => {
+    const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
+    if (allButtons) {
+        allButtons.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+    }
+    button.classList.add('active');
 
-        const viewKey = button.getAttribute('data-view');
-        const container = button.closest('.graph-container');
-        const containerId = container?.querySelector('.plotly-wrapper')?.id;
+    const viewKey = button.getAttribute('data-view');
+    const container = button.closest('.graph-container');
+    const containerId = container?.querySelector('.plotly-wrapper')?.id;
 
-        if (container?.offsetHeight > 0 && container?.offsetWidth > 0 && !container.classList.contains('hidden')) {
-            requestAnimationFrame(() => {
-                togglePlotView(viewKey, containerId);
-            });
-        } else {
-            console.log(`[SKIP] Toggle for ${viewKey} skipped — container not visible`);
-        }
-    });
+    // ❗ NEW: check that the container *and* its tab are visible
+    const tabContent = button.closest('.analysis-content');
+    const isVisible = (
+        tabContent &&
+        !tabContent.classList.contains('hidden') &&
+        container?.offsetHeight > 0 &&
+        container?.offsetWidth > 0 &&
+        !container.classList.contains('hidden')
+    );
+
+    if (isVisible) {
+        requestAnimationFrame(() => {
+            togglePlotView(viewKey, containerId);
+        });
+    } else {
+        console.log(`[SKIP] Toggle for ${viewKey} skipped — container or tab not visible`);
+    }
+  });
 });
+
 
 // Match select
 $('#match-select').on('change', async function () {
