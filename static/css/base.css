@@ -195,7 +195,7 @@ html, body {
 /* === Graph Layout === */
 .graphs-container.wide-mode {
   display: grid;
-  grid-template-columns: 1fr 2fr 2fr;
+  grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 1rem;
   width: 100%;
@@ -249,6 +249,7 @@ html, body {
   justify-content: flex-start;
   gap: 0.5rem;
   overflow: hidden;
+  display: none;
 }
 .graph-container.summary .scoreline {
   font-size: 2rem;
