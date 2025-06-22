@@ -55,22 +55,27 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
 
   const selectedTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
   const tabEl = document.getElementById(tabId);
-  const graphEl = document.getElementById(graphContainerId);
-  const plotWrapper = document.getElementById(containerId);
 
   selectedTab?.classList.add('active');
-  tabEl?.classList.remove('hidden');
+  tabEl?.classList.remove('hidden'); // Must be unhidden *first* so children can become visible
+
+  // Now access elements *within* tabEl
+  const graphEl = tabEl?.querySelector(`#${graphContainerId}`);
+  const plotWrapper = tabEl?.querySelector(`#${containerId}`);
+
   graphEl?.classList.remove('hidden');
   plotWrapper?.classList.remove('hidden');
 
   setTimeout(() => {
     requestAnimationFrame(() => {
+      console.log(`[SHOW] Rendering plot for ${containerId}`);
       togglePlotView(viewKey, containerId);
       const el = document.getElementById(containerId);
       if (el) Plotly.Plots.resize(el);
     });
   }, 100);
 }
+
 
 
 // Tabs
