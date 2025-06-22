@@ -98,22 +98,21 @@ def goal_assist_stats(match_data: pd.DataFrame, home_team:str, away_team:str ):
         player_matrix.loc[player_matrix['player'].isin(off['player']), 'subbed off'] += 1
         player_matrix.loc[player_matrix['player'].isin(on['substitution_replacement']), 'subbed on'] += 1
 
-        # Emoji mapping
-        goal_emoji = '⚽'
-        assist_emoji = '🅰️'
-        yellow_card_emoji = '🟨'
-        red_card_emoji = '🟥'
-        sub_on_emoji = '🔺'  # Red triangle pointed up
-        sub_off_emoji = '🔻'  # Red triangle pointed down
+        # After creating and updating numeric columns
+        player_matrix[['goals', 'assists', 'yellow cards', 'red cards', 'subbed on', 'subbed off']] = (
+            player_matrix[['goals', 'assists', 'yellow cards', 'red cards', 'subbed on', 'subbed off']]
+            .fillna(0).astype(int)
+        )
 
         player_matrix['contributions'] = (
-            player_matrix['goals'].apply(lambda x: goal_emoji * int(x)) +
-            player_matrix['assists'].apply(lambda x: assist_emoji * int(x)) +
-            player_matrix['yellow cards'].apply(lambda x: yellow_card_emoji * int(x)) +
-            player_matrix['red cards'].apply(lambda x: red_card_emoji * int(x)) +
-            player_matrix['subbed on'].apply(lambda x: sub_on_emoji * int(x)) +
-            player_matrix['subbed off'].apply(lambda x: sub_off_emoji * int(x))
+                player_matrix['goals'].apply(lambda x: '⚽' * int(x)) +
+                player_matrix['assists'].apply(lambda x: '🅰️' * int(x)) +
+                player_matrix['yellow cards'].apply(lambda x: '🟨' * int(x)) +
+                player_matrix['red cards'].apply(lambda x: '🟥' * int(x)) +
+                player_matrix['subbed on'].apply(lambda x: '🔺' * int(x)) +
+                player_matrix['subbed off'].apply(lambda x: '🔻' * int(x))
         )
+
 
         if team == home_team:
             home_team_data = player_matrix[['player', 'contributions']]
