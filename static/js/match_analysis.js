@@ -1,4 +1,4 @@
-// match_analysis.js — Updated for reusable tab and toggle plot logic
+// match_analysis.js — Render plots only when tabs are clicked
 
 const cachedPlots = {};
 
@@ -10,11 +10,10 @@ function renderPlot(containerId, plot, attempts = 0) {
     }
 
     const isVisible = el.offsetWidth > 0 && el.offsetHeight > 0 && !el.classList.contains('hidden');
-
     if (!isVisible) {
         if (attempts < 10) {
             console.log(`[WAIT] ${containerId} not yet visible, retrying... (${attempts})`);
-            setTimeout(() => renderPlot(containerId, plot, attempts + 1), 100); // retry after 100ms
+            setTimeout(() => renderPlot(containerId, plot, attempts + 1), 100);
         } else {
             console.warn(`[PLOT] Skipped rendering: ${containerId} after ${attempts} attempts`);
         }
@@ -33,19 +32,15 @@ function renderPlot(containerId, plot, attempts = 0) {
     }
 }
 
-
-
 function togglePlotView(viewKey, containerId) {
     const plot = cachedPlots[viewKey];
     renderPlot(containerId, plot);
 }
 
 function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
-    // Reset all tab buttons and contents
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
 
-    // Activate the selected tab
     const selectedTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
     const tabEl = document.getElementById(tabId);
     const graphEl = document.getElementById(graphContainerId);
@@ -53,12 +48,8 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
     selectedTab?.classList.add('active');
     tabEl?.classList.remove('hidden');
 
-    // ✅ Wait for DOM to apply visibility changes
     requestAnimationFrame(() => {
-        // now remove the hidden class from the specific graph container
         graphEl?.classList.remove('hidden');
-
-        // ✅ Then wait another tick before rendering (reflow-safe)
         setTimeout(() => {
             togglePlotView(viewKey, containerId);
             const el = document.getElementById(containerId);
@@ -67,7 +58,7 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
     });
 }
 
-
+// ⏱ Render plots only when tabs are clicked
 document.querySelectorAll('.tab-btn').forEach(button => {
     button.addEventListener('click', () => {
         const tabId = button.getAttribute('data-tab');
@@ -86,6 +77,7 @@ document.querySelectorAll('.tab-btn').forEach(button => {
     });
 });
 
+// 🧠 Heatmap view toggle buttons
 document.querySelectorAll('.toggle-btn').forEach(button => {
     button.addEventListener('click', () => {
         const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
@@ -103,6 +95,7 @@ document.querySelectorAll('.toggle-btn').forEach(button => {
     });
 });
 
+// 🧠 Match select → fetch and display data
 $('#match-select').on('change', async function () {
     const matchId = $(this).val();
     if (!matchId || matchId === "Select match") {
@@ -129,6 +122,7 @@ $('#match-select').on('change', async function () {
             away_team_heatmap_second: result.away_team_heatmap_second
         });
 
+        // Show overview tab and plots
         document.getElementById('graph-container-xg')?.classList.remove('hidden');
         document.getElementById('graph-container-momentum')?.classList.remove('hidden');
         document.getElementById('graph-container-summary')?.classList.remove('hidden');
@@ -141,7 +135,6 @@ $('#match-select').on('change', async function () {
         if (result.momentum_graph?.data && result.momentum_graph?.layout) {
             Plotly.newPlot('momentum-plot-container', result.momentum_graph.data, result.momentum_graph.layout);
         }
-
 
         showTabAndRenderPlot('overview', 'dominance_heatmap', 'dominance-plot-container', 'graph-container-4');
 
