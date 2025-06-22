@@ -2,27 +2,29 @@
 
 const cachedPlots = {};
 
-function renderPlot(containerId, plot) {
+function renderPlot(containerId, plot, attempts = 0) {
     const el = document.getElementById(containerId);
-    console.log(`[PLOT] Preparing to render in: ${containerId}`);
-
     if (!el) {
         console.warn(`[PLOT] Skipped rendering: ${containerId} (element not found)`);
         return;
     }
 
     const isVisible = el.offsetWidth > 0 && el.offsetHeight > 0 && !el.classList.contains('hidden');
-    console.log(`[DEBUG] ${containerId} visibility check — width: ${el.offsetWidth}, height: ${el.offsetHeight}, hidden class: ${el.classList.contains('hidden')}, isVisible: ${isVisible}`);
 
     if (!isVisible) {
-        console.warn(`[PLOT] Skipped rendering: ${containerId} (not visible)`);
+        if (attempts < 10) {
+            console.log(`[WAIT] ${containerId} not yet visible, retrying... (${attempts})`);
+            setTimeout(() => renderPlot(containerId, plot, attempts + 1), 100); // retry after 100ms
+        } else {
+            console.warn(`[PLOT] Skipped rendering: ${containerId} after ${attempts} attempts`);
+        }
         return;
     }
 
     if (plot?.data && plot?.layout) {
         try {
             Plotly.newPlot(containerId, plot.data, plot.layout);
-            console.log(`[PLOT] Successfully rendered: ${containerId}`);
+            console.log(`[PLOT] ✅ Rendered successfully: ${containerId}`);
         } catch (err) {
             console.error(`[PLOT] ❌ Failed to render in: ${containerId}`, err);
         }
@@ -30,6 +32,7 @@ function renderPlot(containerId, plot) {
         console.warn(`[PLOT] Missing data/layout for: ${containerId}`);
     }
 }
+
 
 
 function togglePlotView(viewKey, containerId) {
