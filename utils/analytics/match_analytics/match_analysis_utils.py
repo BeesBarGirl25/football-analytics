@@ -15,86 +15,98 @@ def extract_player_names(row):
     return [player['player']['name'] for player in row['lineup']]
 
 def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
-    # Initialize summary stats
-    home_norm = away_norm = home_et = away_et = home_pen = away_pen = 0
+    # Counters
+    home_score_norm = away_score_norm = 0
+    home_score_et = away_score_et = 0
+    home_score_pen = away_score_pen = 0
+
     home_team_data = away_team_data = None
 
     for team in (home_team, away_team):
         team_df = match_data[match_data["team"] == team]
 
-        # Build player roster DataFrame
-        starters = extract_player_names(team_df[team_df["type"] == "Starting XI"]["tactics"].iloc[0])
-        subs_out = team_df[team_df["type"] == "Substitution"]["player"]
-        subs_in = team_df[team_df["type"] == "Substitution"]["substitution_replacement"]
-        players = list(starters) + list(subs_in)
-        pm = pd.DataFrame({"player": pd.unique(players)})
+        # Build player list
+        starting = extract_player_names(team_df[team_df["type"] == "Starting XI"]["tactics"].iloc[0])
+        subbed = team_df[team_df["type"] == "Substitution"]["substitution_replacement"].tolist()
+        players = starting + subbed
 
-        # Count contributions
-        shots = team_df[team_df["type"] == "Shot"]
-        goals = shots[shots["shot_outcome"] == "Goal"]["player"].value_counts()
-        assists = team_df[team_df.get("pass_goal_assist", False) == True]["player"].value_counts()
-        yellow = team_df[team_df.get("bad_behaviour_card", "") == "Yellow Card"]["player"].value_counts()
-        red = team_df[team_df.get("bad_behaviour_card", "") == "Red Card"]["player"].value_counts()
-        off = subs_out.value_counts()
-        on = subs_in.value_counts()
+        # Init player count matrix
+        pm = pd.DataFrame(players, columns=["player"]).drop_duplicates()
+        stats = ["goals", "assists", "yellow cards", "red cards", "subbed on", "subbed off"]
+        pm[stats] = 0
 
-        # Map counts to DataFrame
-        pm["goals"] = pm["player"].map(goals).fillna(0).astype(int)
-        pm["assists"] = pm["player"].map(assists).fillna(0).astype(int)
-        pm["yellow cards"] = pm["player"].map(yellow).fillna(0).astype(int)
-        pm["red cards"] = pm["player"].map(red).fillna(0).astype(int)
-        pm["subbed off"] = pm["player"].map(off).fillna(0).astype(int)
-        pm["subbed on"] = pm["player"].map(on).fillna(0).astype(int)
-
-        # Build contributions string with repeated emojis
-        pm["contributions"] = (
-            pm["goals"].apply(lambda x: "⚽" * x) +
-            pm["assists"].apply(lambda x: "🅰️" * x) +
-            pm["yellow cards"].apply(lambda x: "🟨" * x) +
-            pm["red cards"].apply(lambda x: "🟥" * x) +
-            pm["subbed on"].apply(lambda x: "🔺" * x) +
-            pm["subbed off"].apply(lambda x: "🔻" * x)
+        # Count goal & assist events
+        goal_events = team_df[(team_df["type"] == "Shot") & (team_df["shot_outcome"] == "Goal")]
+        pm.loc[pm["player"].isin(goal_events["player"]), "goals"] = (
+            goal_events["player"].value_counts()
         )
 
-        # Update match stats based on periods
-        goal_periods = shots[shots["shot_outcome"] == "Goal"][["period", "player"]]
-        for _, row in goal_periods.iterrows():
-            period = row["period"]
+        if "pass_goal_assist" in team_df.columns:
+            assist_events = team_df[team_df["pass_goal_assist"] == True]
+            pm.loc[pm["player"].isin(assist_events["player"]), "assists"] = (
+                assist_events["player"].value_counts()
+            )
+
+        # Cards
+        if "bad_behaviour_card" in team_df.columns:
+            yc = team_df[team_df["bad_behaviour_card"] == "Yellow Card"]
+            rc = team_df[team_df["bad_behaviour_card"] == "Red Card"]
+            pm.loc[pm["player"].isin(yc["player"]), "yellow cards"] = yc["player"].value_counts()
+            pm.loc[pm["player"].isin(rc["player"]), "red cards"] = rc["player"].value_counts()
+
+        # Substitutions
+        subs = team_df[team_df["type"] == "Substitution"]
+        pm.loc[pm["player"].isin(subs["player"]), "subbed off"] = subs["player"].value_counts()
+        pm.loc[pm["player"].isin(subs["substitution_replacement"]), "subbed on"] = (
+            subs["substitution_replacement"].value_counts()
+        )
+
+        # Score breakdown by period
+        for _, shot in goal_events.iterrows():
+            period = shot.get("period", None)
             if period in (1, 2):
                 if team == home_team:
-                    home_norm += 1
+                    home_score_norm += 1
                 else:
-                    away_norm += 1
+                    away_score_norm += 1
             elif period in (3, 4):
                 if team == home_team:
-                    home_et += 1
+                    home_score_et += 1
                 else:
-                    away_et += 1
+                    away_score_et += 1
             elif period == 5:
                 if team == home_team:
-                    home_pen += 1
+                    home_score_pen += 1
                 else:
-                    away_pen += 1
+                    away_score_pen += 1
 
-        # Assign DataFrame to correct team
-        team_data = pm[["player", "contributions"]]
+        # Build emoji string
+        pm["contributions"] = (
+            pm["goals"].apply(lambda x: "⚽" * int(x)) +
+            pm["assists"].apply(lambda x: "🅰️" * int(x)) +
+            pm["yellow cards"].apply(lambda x: "🟨" * int(x)) +
+            pm["red cards"].apply(lambda x: "🟥" * int(x)) +
+            pm["subbed on"].apply(lambda x: "🔺" * int(x)) +
+            pm["subbed off"].apply(lambda x: "🔻" * int(x))
+        )
+
+        # Assign to correct side
         if team == home_team:
-            home_team_data = team_data
+            home_team_data = pm[["player", "contributions"]]
         else:
-            away_team_data = team_data
+            away_team_data = pm[["player", "contributions"]]
 
-    # Return all ten values in the original signature
     return (
         home_team_data,
         away_team_data,
         home_team,
         away_team,
-        home_norm,
-        away_norm,
-        home_et,
-        away_et,
-        home_pen,
-        away_pen,
+        home_score_norm,
+        away_score_norm,
+        home_score_et,
+        away_score_et,
+        home_score_pen,
+        away_score_pen,
     )
 
 
