@@ -66,31 +66,30 @@ html, body {
   display: flex;
   gap: 10px;
   align-items: center;
-  color: grey;
   margin-left: auto;
   order: 1;
 }
 
-.top-navbar .dropdowns select {
+.top-navbar .dropdowns .select2-container .select2-selection--single {
   background-color: #ffffff !important;
   color: #000000 !important;
   border: 1px solid #777;
   border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 0.9rem;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
 }
 
-.top-navbar .dropdowns select:focus {
-  outline: none;
-  border-color: #90caf9;
-  box-shadow: 0 0 5px #90caf9;
-  background-color: #ffffff;
-  color: #000000 !important;
-}
-
-.top-navbar .dropdowns option {
+.select2-dropdown,
+.select2-container--default .select2-results > .select2-results__options {
   background-color: #ffffff !important;
   color: #000000 !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: #90caf9 !important;
+  color: #121212 !important;
 }
 
 .top-navbar .layout-toggle-switch {
