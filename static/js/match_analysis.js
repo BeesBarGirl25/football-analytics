@@ -50,34 +50,34 @@ function togglePlotView(viewKey, containerId, attempts = 0) {
 }
 
 function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
+  // 1. Hide all tabs
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
   document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
 
+  // 2. Activate the selected tab
   const selectedTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
   const tabEl = document.getElementById(tabId);
-
   selectedTab?.classList.add('active');
-  tabEl?.classList.remove('hidden'); // Must be unhidden *first* so children can become visible
 
-    console.log(`[TAB] Switched to ${tabId}, will render ${viewKey} in ${containerId}`);
+  // ✅ 3. Unhide .analysis-content FIRST so children can compute their dimensions
+  tabEl?.classList.remove('hidden');
 
-
-  // Now access elements *within* tabEl
+  // 4. Unhide graph + plot containers inside that tab
   const graphEl = tabEl?.querySelector(`#${graphContainerId}`);
   const plotWrapper = tabEl?.querySelector(`#${containerId}`);
-
   graphEl?.classList.remove('hidden');
   plotWrapper?.classList.remove('hidden');
 
-  setTimeout(() => {
-    requestAnimationFrame(() => {
-      console.log(`[SHOW] Rendering plot for ${containerId}`);
-      togglePlotView(viewKey, containerId);
-      const el = document.getElementById(containerId);
-      if (el) Plotly.Plots.resize(el);
-    });
-  }, 100);
+  // 5. Now run the plot logic AFTER frame paint
+  requestAnimationFrame(() => {
+    console.log(`[SHOW] Rendering plot for ${containerId}`);
+    togglePlotView(viewKey, containerId);
+    const el = document.getElementById(containerId);
+    if (el) Plotly.Plots.resize(el);
+  });
 }
+
+
 
 
 
