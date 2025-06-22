@@ -64,8 +64,8 @@
     <!-- HOME TAB -->
     <div class="analysis-content hidden" id="home">
         <div class="graphs-container wide-mode">
-            <div class="graph-container xg">
-                {% set prefix = 'home_team_xg' %}
+            <div id="graph-container-home-team-4" class="graph-container heatmap">
+                {% set prefix = 'home_team_heatmap' %}
                 {% set plot_container_id = 'heatmap-home-plot-container' %}
                 {% include 'partials/match_team_analysis.html' with context %}
             </div>
@@ -75,8 +75,8 @@
     <!-- AWAY TAB -->
     <div class="analysis-content hidden" id="away">
         <div class="graphs-container wide-mode">
-            <div class="graph-container xg">
-                {% set prefix = 'away_team_xg' %}
+            <div id="graph-container-away-team-4" class="graph-container heatmap">
+                {% set prefix = 'away_team_heatmap' %}
                 {% set plot_container_id = 'heatmap-away-plot-container' %}
                 {% include 'partials/match_team_analysis.html' with context %}
             </div>
