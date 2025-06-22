@@ -56,25 +56,40 @@ function togglePlotView(viewKey, containerId, attempts = 0) {
 }
 
 function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
+    // Hide all tabs
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
 
+    // Activate selected tab
     const selectedTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
     const tabEl = document.getElementById(tabId);
-    const graphEl = document.getElementById(graphContainerId);
-
     selectedTab?.classList.add('active');
     tabEl?.classList.remove('hidden');
 
+    // Unhide any nested graph containers or wrappers that might still be hidden
+    const graphEl = document.getElementById(graphContainerId);
+    const plotWrapper = document.getElementById(containerId);
+
+    if (graphEl?.classList.contains('hidden')) {
+        console.log(`[SHOW] Unhiding graph container: ${graphContainerId}`);
+        graphEl.classList.remove('hidden');
+    }
+
+    if (plotWrapper?.classList.contains('hidden')) {
+        console.log(`[SHOW] Unhiding plot wrapper: ${containerId}`);
+        plotWrapper.classList.remove('hidden');
+    }
+
+    // Wait a tick for the DOM to repaint before rendering
     requestAnimationFrame(() => {
-        graphEl?.classList.remove('hidden');
         setTimeout(() => {
             togglePlotView(viewKey, containerId);
             const el = document.getElementById(containerId);
             if (el) Plotly.Plots.resize(el);
-        }, 0);
+        }, 100); // Adjust if needed
     });
 }
+
 
 // Tabs
 document.querySelectorAll('.tab-btn').forEach(button => {
