@@ -77,11 +77,13 @@ html, body {
   flex-wrap: nowrap;
   align-items: center;
   color: grey;
+  order: 1;
+  margin-left: auto;
 }
 
 .top-navbar .dropdowns select {
-  background-color: #2a2a2a;
-  color: #000000;
+  background-color: #ffffff;
+  color: #000000 !important;
   border: 1px solid #777;
   border-radius: 6px;
   padding: 6px 10px;
@@ -92,12 +94,12 @@ html, body {
   outline: none;
   border-color: #90caf9;
   box-shadow: 0 0 5px #90caf9;
-  background-color: #3a3a3a;
+  background-color: #ffffff;
   color: #000000;
 }
 
 .top-navbar .dropdowns option {
-  background-color: #2a2a2a;
+  background-color: #ffffff;
   color: #000000;
 }
 
