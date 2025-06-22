@@ -54,6 +54,7 @@ html, body {
   gap: 1rem;
   flex-wrap: nowrap;
 }
+
 .top-navbar .logo {
   color: #90caf9;
   font-size: 1.8rem;
@@ -64,11 +65,10 @@ html, body {
 .top-navbar .dropdowns {
   display: flex;
   gap: 10px;
-  flex-wrap: nowrap;
   align-items: center;
   color: grey;
   margin-left: auto;
-  order: 0;
+  order: 1;
 }
 
 .top-navbar .dropdowns select {
@@ -89,8 +89,8 @@ html, body {
 }
 
 .top-navbar .dropdowns option {
-  background-color: #ffffff;
-  color: #000000;
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
 .top-navbar .layout-toggle-switch {
@@ -100,6 +100,7 @@ html, body {
   color: #ccc;
   padding-left: 0;
   padding-right: 0;
+  order: 2;
 }
 
 @media (max-width: 768px) {
@@ -117,6 +118,7 @@ html, body {
   .top-navbar .dropdowns {
     flex-wrap: wrap;
     width: 100%;
+    order: 1;
   }
 }
 
