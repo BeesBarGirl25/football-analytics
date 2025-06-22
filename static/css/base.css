@@ -64,9 +64,23 @@ html, body {
 .top-navbar .dropdowns select {
   background-color: #2a2a2a;
   color: #e0e0e0;
-  border: 1px solid #555;
+  border: 1px solid #777;
   border-radius: 6px;
-  padding: 4px 8px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+
+.top-navbar .dropdowns select:focus {
+  outline: none;
+  border-color: #90caf9;
+  box-shadow: 0 0 5px #90caf9;
+  background-color: #3a3a3a;
+  color: #ffffff;
+}
+
+.top-navbar .dropdowns option {
+  background-color: #2a2a2a;
+  color: #ffffff;
 }
 
 .top-navbar .dropdowns {
@@ -175,7 +189,7 @@ html, body {
 /* === Graph Layout === */
 .graphs-container.wide-mode {
   display: grid;
-  grid-template-columns: 1fr 2fr 2fr;
+  grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 1rem;
   width: 100%;
@@ -231,9 +245,13 @@ html, body {
   overflow-y: auto;
 }
 .graph-container.summary .scoreline {
-  font-size: 1.4rem;
+  font-size: 2rem;
   font-weight: bold;
-  margin: 0.25rem 0;
+  margin: 0.1rem 0;
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 .graph-container.summary .scoreline .home {
   color: #2196f3;
@@ -247,6 +265,7 @@ html, body {
   justify-content: center;
   gap: 1rem;
   width: 100%;
+  height: 100%;
 }
 .graph-container.summary .team-table {
   flex: 1;
@@ -255,7 +274,10 @@ html, body {
   border-radius: 10px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   overflow-x: auto;
-  font-size: 0.75rem;
+  font-size: calc(0.65rem + 0.2vh);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .graph-container.heatmap {
   grid-area: heatmap;
