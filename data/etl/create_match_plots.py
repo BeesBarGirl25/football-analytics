@@ -12,6 +12,7 @@ from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
 from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
 from utils.analytics.match_analytics.match_analysis_utils import goal_assist_stats
 from utils.plots.match_plots.heatmap_per_game import generate_dominance_heatmap_json
+from utils.plots.match_plots.team_possesion_heatmap import generate_team_match_heatmap
 
 # Suppress common warning spam
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -29,6 +30,11 @@ logger = logging.getLogger("create_match_plots")
 
 print(f"Using DB URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
+def safe_plotly_json(fig):
+    return pio.to_json(fig, pretty=True, engine="json", validate=False)
+
+
+
 
 
 def create_all_match_plots():
@@ -43,15 +49,19 @@ def create_all_match_plots():
 
                 events = sb.events(match.id).fillna(-999)
                 match_df = pd.DataFrame(events)
+                home_team, away_team = match_df['team'].unique()
 
-                xg_plot = generate_match_graph_plot(match_df)
-                momentum_plot = generate_momentum_graph_plot(match_df)
-                home_df, away_df, home_team, away_team, home_norm, away_norm, home_et, away_et, home_pen, away_pen = goal_assist_stats(match_df)
-                heatmap_plot = generate_dominance_heatmap_json(match_df)
+                xg_plot = generate_match_graph_plot(match_df, home_team, away_team)
+                momentum_plot = generate_momentum_graph_plot(match_df, home_team, away_team)
+                home_df, away_df, home_team, away_team, home_norm, away_norm, home_et, away_et, home_pen, away_pen = goal_assist_stats(match_df, home_team, away_team)
+
 
                 # Match summary JSON
                 home_data = [{"player": row["player"], "contributions": list(row["contributions"])} for _, row in home_df.iterrows()]
                 away_data = [{"player": row["player"], "contributions": list(row["contributions"])} for _, row in away_df.iterrows()]
+
+                home_team_data = match_df[match_df['team'] == home_team]
+                away_team_data = match_df[match_df['team'] == away_team]
 
                 scoreline = f"{home_team} {home_norm} - {away_norm} {away_team}"
                 extra = None
@@ -77,14 +87,21 @@ def create_all_match_plots():
                 }
 
                 plot_dict = {
-                    "xg_graph": pio.to_json(xg_plot, pretty=True),
-                    "momentum_graph": pio.to_json(momentum_plot, pretty=True),
-                    "match_summary": json.dumps(match_summary, indent=2),
-                    "dominance_heatmap": json.dumps(generate_dominance_heatmap_json(match_df)),
+                    "xg_graph": safe_plotly_json(xg_plot),
+                    "momentum_graph": safe_plotly_json(momentum_plot),
+                    "dominance_heatmap": json.dumps(
+                        generate_dominance_heatmap_json(match_df)),
                     "dominance_heatmap_first": json.dumps(
                         generate_dominance_heatmap_json(match_df[match_df['period'] == 1])),
                     "dominance_heatmap_second": json.dumps(
                         generate_dominance_heatmap_json(match_df[match_df['period'] == 2])),
+                    "home_team_heatmap": safe_plotly_json(generate_team_match_heatmap(home_team_data)),
+                    "home_team_heatmap_first": safe_plotly_json(generate_team_match_heatmap(home_team_data, "first")),
+                    "home_team_heatmap_second": safe_plotly_json(generate_team_match_heatmap(home_team_data, "second")),
+                    "away_team_heatmap": safe_plotly_json(generate_team_match_heatmap(away_team_data)),
+                    "away_team_heatmap_first": safe_plotly_json(generate_team_match_heatmap(away_team_data, "first")),
+                    "away_team_heatmap_second": safe_plotly_json(generate_team_match_heatmap(away_team_data, "second")),
+                    "match_summary": json.dumps(match_summary, indent=2)  # leave this as-is
                 }
 
                 for plot_type, plot_json in plot_dict.items():
