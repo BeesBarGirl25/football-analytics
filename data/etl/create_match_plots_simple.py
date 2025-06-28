@@ -1,6 +1,7 @@
 import json
 import logging
 import pandas as pd
+import numpy as np
 import time
 from typing import List, Dict, Any
 import warnings
@@ -10,6 +11,22 @@ from app import app
 from utils.db import db
 from models import Match, MatchPlot, Season
 from utils.plots.plot_factory import MatchDataProcessor, generate_all_plots_sync
+
+
+class NumpyEncoder(json.JSONEncoder):
+    """Custom JSON encoder that handles numpy data types"""
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, np.bool_):
+            return bool(obj)
+        elif pd.isna(obj):
+            return None
+        return super().default(obj)
 
 # Suppress common warning spam
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -47,7 +64,7 @@ def process_single_match(match: Match) -> Dict[str, Any]:
         plot_dict = {}
         for plot_type, plot_data in all_plots.items():
             try:
-                plot_dict[plot_type] = json.dumps(plot_data)
+                plot_dict[plot_type] = json.dumps(plot_data, cls=NumpyEncoder)
             except Exception as json_error:
                 logger.error(f"JSON serialization failed for {plot_type}: {json_error}")
                 raise
