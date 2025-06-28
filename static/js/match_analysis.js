@@ -50,11 +50,11 @@ document.querySelectorAll('.tab-btn').forEach(button => {
   button.addEventListener('click', () => {
     const tabId = button.getAttribute('data-tab');
     if (tabId === 'home') {
-      showTabAndRenderPlot(tabId, 'home_team_heatmap', 'heatmap-home-plot-container', 'graph-container-home_team_heatmap');
+      showTabAndRenderPlot(tabId, 'home_team_heatmap', 'heatmap-home-plot-container', 'graph-container-home-team-4');
     } else if (tabId === 'away') {
-      showTabAndRenderPlot(tabId, 'away_team_heatmap', 'heatmap-away-plot-container', 'graph-container-away_team_heatmap');
+      showTabAndRenderPlot(tabId, 'away_team_heatmap', 'heatmap-away-plot-container', 'graph-container-away-team-4');
     } else if (tabId === 'overview') {
-      showTabAndRenderPlot(tabId, 'dominance_heatmap', 'dominance-plot-container', 'graph-container-4');
+      showTabAndRenderPlot(tabId, 'dominance_heatmap', 'dominance-plot-container', 'graph-container-heatmap');
     } else {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
@@ -128,7 +128,7 @@ $('#match-select').on('change', async function () {
       Plotly.newPlot('momentum-plot-container', result.momentum_graph.data, result.momentum_graph.layout);
     }
 
-    showTabAndRenderPlot('overview', 'dominance_heatmap', 'dominance-plot-container', 'graph-container-4');
+    showTabAndRenderPlot('overview', 'dominance_heatmap', 'dominance-plot-container', 'graph-container-heatmap');
 
     const summary = result.match_summary;
     document.getElementById('home-team-name').textContent = summary.homeTeam ?? '–';
