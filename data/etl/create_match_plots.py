@@ -11,8 +11,7 @@ from models import Match, MatchPlot, Season
 from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
 from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
 from utils.analytics.match_analytics.match_analysis_utils import goal_assist_stats
-from utils.plots.match_plots.heatmap_per_game import generate_dominance_heatmap_json
-from utils.plots.match_plots.team_possesion_heatmap import generate_team_match_heatmap
+from utils.plots.match_plots.unified_heatmap import generate_dominance_heatmap_json, generate_team_match_heatmap
 
 # Suppress common warning spam
 warnings.filterwarnings("ignore", category=UserWarning)
