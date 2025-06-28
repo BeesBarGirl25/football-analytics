@@ -86,20 +86,20 @@ def create_all_match_plots():
                 }
 
                 plot_dict = {
-                    "xg_graph": safe_plotly_json(xg_plot),
-                    "momentum_graph": safe_plotly_json(momentum_plot),
-                    "dominance_heatmap": safe_plotly_json(
+                    "xg_graph": json.dumps(xg_plot),
+                    "momentum_graph": json.dumps(momentum_plot),
+                    "dominance_heatmap": json.dumps(
                         generate_dominance_heatmap_json(match_df, "full")),
-                    "dominance_heatmap_first": safe_plotly_json(
+                    "dominance_heatmap_first": json.dumps(
                         generate_dominance_heatmap_json(match_df, "first")),
-                    "dominance_heatmap_second": safe_plotly_json(
+                    "dominance_heatmap_second": json.dumps(
                         generate_dominance_heatmap_json(match_df, "second")),
-                    "home_team_heatmap": safe_plotly_json(generate_team_match_heatmap(home_team_data)),
-                    "home_team_heatmap_first": safe_plotly_json(generate_team_match_heatmap(home_team_data, "first")),
-                    "home_team_heatmap_second": safe_plotly_json(generate_team_match_heatmap(home_team_data, "second")),
-                    "away_team_heatmap": safe_plotly_json(generate_team_match_heatmap(away_team_data)),
-                    "away_team_heatmap_first": safe_plotly_json(generate_team_match_heatmap(away_team_data, "first")),
-                    "away_team_heatmap_second": safe_plotly_json(generate_team_match_heatmap(away_team_data, "second")),
+                    "home_team_heatmap": json.dumps(generate_team_match_heatmap(home_team_data)),
+                    "home_team_heatmap_first": json.dumps(generate_team_match_heatmap(home_team_data, "first")),
+                    "home_team_heatmap_second": json.dumps(generate_team_match_heatmap(home_team_data, "second")),
+                    "away_team_heatmap": json.dumps(generate_team_match_heatmap(away_team_data)),
+                    "away_team_heatmap_first": json.dumps(generate_team_match_heatmap(away_team_data, "first")),
+                    "away_team_heatmap_second": json.dumps(generate_team_match_heatmap(away_team_data, "second")),
                     "match_summary": json.dumps(match_summary, indent=2)  # leave this as-is
                 }
 

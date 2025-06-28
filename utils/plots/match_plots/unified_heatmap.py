@@ -133,13 +133,14 @@ def generate_heatmap(
         team_hist, _, _ = np.histogram2d(location_data['y'], location_data['x'], bins=[y_bins, x_bins])
         heatmap_data = gaussian_filter(team_hist, sigma=sigma)
     
-    # Create Plotly figure
+    # Create Plotly data - ensure all numpy arrays are converted to lists
     heatmap_kwargs = {
-        'z': heatmap_data.tolist() if heatmap_type == "dominance" else heatmap_data,
+        'z': heatmap_data.tolist(),  # Always convert to list
         'x': x_centers.tolist(),
         'y': y_centers.tolist(),
         'colorscale': colorscale,
-        'showscale': True
+        'showscale': True,
+        'type': 'heatmap'
     }
     
     # Add zmin/zmax for dominance heatmaps
@@ -152,21 +153,22 @@ def generate_heatmap(
     if heatmap_type == "possession":
         heatmap_kwargs['reversescale'] = True
     
-    fig = go.Figure(data=go.Heatmap(**heatmap_kwargs))
+    # Create data array
+    data = [heatmap_kwargs]
     
     # Configure layout
-    fig.update_layout(
-        xaxis=dict(range=[0, 80], visible=False),
-        yaxis=dict(range=[0, 120], visible=False, scaleanchor="x", scaleratio=1.5),
-        margin=dict(t=30, l=0, r=0, b=0),
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        autosize=True,
-        title=dict(text=f"{half.capitalize()} Half {title_prefix}", x=0.5, font=dict(color='white', size=14)),
-        shapes=_generate_pitch_shapes_vertical()
-    )
+    layout = {
+        'xaxis': {'range': [0, 80], 'visible': False},
+        'yaxis': {'range': [0, 120], 'visible': False, 'scaleanchor': "x", 'scaleratio': 1.5},
+        'margin': {'t': 30, 'l': 0, 'r': 0, 'b': 0},
+        'plot_bgcolor': 'rgba(0,0,0,0)',
+        'paper_bgcolor': 'rgba(0,0,0,0)',
+        'autosize': True,
+        'title': {'text': f"{half.capitalize()} Half {title_prefix}", 'x': 0.5, 'font': {'color': 'white', 'size': 14}},
+        'shapes': _generate_pitch_shapes_vertical()
+    }
     
-    return fig
+    return {"data": data, "layout": layout}
 
 
 # Backward compatibility wrapper functions
