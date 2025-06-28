@@ -302,7 +302,7 @@ if __name__ == "__main__":
     # Configuration - adjust these based on your system
     BATCH_SIZE = 10      # Number of matches to process in each batch
     MAX_WORKERS = 4      # Number of concurrent workers
-    USE_ASYNC = True     # Use async processing (recommended)
+    USE_ASYNC = False    # Use sync processing for Heroku compatibility
     
     create_all_match_plots_optimized(
         batch_size=BATCH_SIZE,
