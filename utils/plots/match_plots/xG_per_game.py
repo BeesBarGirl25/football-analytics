@@ -122,41 +122,41 @@ def generate_match_graph_plot(match_data: pd.DataFrame, home_team: str, away_tea
             font=dict(color="red", size=12)
         ))
 
-    # Define the layout of the graph
-    layout = go.Layout(
-        title=dict(
-            text='xG and Goals per Game',
-            font=dict(color='white', size=14),
-            x=0.5
-        ),
-        xaxis=dict(
-            color='white',
-            gridcolor='rgba(255, 255, 255, 0.1)',
-            showline=True,
-            linecolor='rgba(255, 255, 255, 0.2)'
-        ),
-        yaxis=dict(
-            color='white',
-            gridcolor='rgba(255, 255, 255, 0.1)',
-            showline=True,
-            linecolor='rgba(255, 255, 255, 0.2)',
-            range=[0, y_max + 1]
-        ),
-        legend=dict(
-            orientation='h',
-            x=0,
-            y=1,
-            xanchor='left',
-            yanchor='top',
-            font=dict(color='white', size=11),
-            bgcolor='rgba(0,0,0,0)'  # transparent background
-        ),
-        autosize=True,
-        plot_bgcolor="rgba(0, 0, 0, 0)",
-        paper_bgcolor="rgba(0, 0, 0, 0)",
-        margin=dict(l=10, r=10, t=30, b=30),
-        shapes=shapes,
-        annotations=annotations
-    )
+    # Define the layout of the graph - convert to dict for JSON serialization
+    layout = {
+        'title': {
+            'text': 'xG and Goals per Game',
+            'font': {'color': 'white', 'size': 14},
+            'x': 0.5
+        },
+        'xaxis': {
+            'color': 'white',
+            'gridcolor': 'rgba(255, 255, 255, 0.1)',
+            'showline': True,
+            'linecolor': 'rgba(255, 255, 255, 0.2)'
+        },
+        'yaxis': {
+            'color': 'white',
+            'gridcolor': 'rgba(255, 255, 255, 0.1)',
+            'showline': True,
+            'linecolor': 'rgba(255, 255, 255, 0.2)',
+            'range': [0, y_max + 1]
+        },
+        'legend': {
+            'orientation': 'h',
+            'x': 0,
+            'y': 1,
+            'xanchor': 'left',
+            'yanchor': 'top',
+            'font': {'color': 'white', 'size': 11},
+            'bgcolor': 'rgba(0,0,0,0)'  # transparent background
+        },
+        'autosize': True,
+        'plot_bgcolor': "rgba(0, 0, 0, 0)",
+        'paper_bgcolor': "rgba(0, 0, 0, 0)",
+        'margin': {'l': 10, 'r': 10, 't': 30, 'b': 30},
+        'shapes': shapes,
+        'annotations': annotations
+    }
 
     return {"data": data, "layout": layout}

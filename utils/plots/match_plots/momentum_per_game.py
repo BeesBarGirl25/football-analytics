@@ -106,39 +106,39 @@ def generate_momentum_graph_plot(match_data: pd.DataFrame, home_team: str, away_
         'width': 0.6,
     }
 
-    layout = go.Layout(
-        title=dict(
-            text='Momentum',
-            font=dict(color='white', size=14),
-            x=0.5
-        ),
-        xaxis=dict(
-            color='white',
-            gridcolor='rgba(255, 255, 255, 0.05)',
-            showline=False,
-            linecolor='rgba(255, 255, 255, 0.2)',
-            automargin=True,
-            autorange=True,
-            zeroline=False,
-            zerolinecolor='rgba(255,255,255,0.6)',
-            zerolinewidth=2,
-        ),
-        yaxis=dict(
-            range=[-max_range, max_range],  # Symmetrical around 0
-            showgrid=False,
-            zeroline=True,
-            zerolinecolor='rgba(255,255,255,0.6)',
-            zerolinewidth=2,
-            visible=False
-        ),
-        barmode='relative',  # overlay instead of relative
-        bargap=0.1,
-        autosize=True,
-        plot_bgcolor="rgba(0, 0, 0, 0)",
-        paper_bgcolor="rgba(0, 0, 0, 0)",
-        margin=dict(l=10, r=10, t=30, b=30),
-        showlegend=False
-    )
+    layout = {
+        'title': {
+            'text': 'Momentum',
+            'font': {'color': 'white', 'size': 14},
+            'x': 0.5
+        },
+        'xaxis': {
+            'color': 'white',
+            'gridcolor': 'rgba(255, 255, 255, 0.05)',
+            'showline': False,
+            'linecolor': 'rgba(255, 255, 255, 0.2)',
+            'automargin': True,
+            'autorange': True,
+            'zeroline': False,
+            'zerolinecolor': 'rgba(255,255,255,0.6)',
+            'zerolinewidth': 2,
+        },
+        'yaxis': {
+            'range': [-max_range, max_range],  # Symmetrical around 0
+            'showgrid': False,
+            'zeroline': True,
+            'zerolinecolor': 'rgba(255,255,255,0.6)',
+            'zerolinewidth': 2,
+            'visible': False
+        },
+        'barmode': 'relative',  # overlay instead of relative
+        'bargap': 0.1,
+        'autosize': True,
+        'plot_bgcolor': "rgba(0, 0, 0, 0)",
+        'paper_bgcolor': "rgba(0, 0, 0, 0)",
+        'margin': {'l': 10, 'r': 10, 't': 30, 'b': 30},
+        'showlegend': False
+    }
 
     # Return a dictionary to match the desired format
     data = [home_trace, away_trace]
