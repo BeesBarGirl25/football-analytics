@@ -166,7 +166,7 @@ def generate_heatmap(
         shapes=_generate_pitch_shapes_vertical()
     )
     
-    return fig.to_plotly_json()
+    return fig
 
 
 # Backward compatibility wrapper functions
