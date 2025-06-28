@@ -28,55 +28,63 @@ def generate_match_graph_plot(match_data: pd.DataFrame, home_team: str, away_tea
     y_cum_xg_team2 = team_2_stats['cum_xg'].tolist()
     y_cum_goals_team2 = team_2_stats['cum_goals'].tolist()
 
-    # Initialize Plotly traces (data)
+    # Initialize Plotly traces (data) - convert to dicts for JSON serialization
     data = [
         # Real data traces (hidden from legend)
-        go.Scatter(
-            x=x_team1_stats,
-            y=y_cum_xg_team1,
-            mode='lines',
-            name='',
-            line=dict(color='blue', dash='dash'),
-            showlegend=False
-        ),
-        go.Scatter(
-            x=x_team1_stats,
-            y=y_cum_goals_team1,
-            mode='lines',
-            name='',
-            line=dict(color='blue'),
-            showlegend=False
-        ),
-        go.Scatter(
-            x=x_team2_stats,
-            y=y_cum_xg_team2,
-            mode='lines',
-            name='',
-            line=dict(color='red', dash='dash'),
-            showlegend=False
-        ),
-        go.Scatter(
-            x=x_team2_stats,
-            y=y_cum_goals_team2,
-            mode='lines',
-            name='',
-            line=dict(color='red'),
-            showlegend=False
-        ),
+        {
+            'x': x_team1_stats,
+            'y': y_cum_xg_team1,
+            'mode': 'lines',
+            'name': '',
+            'line': {'color': 'blue', 'dash': 'dash'},
+            'showlegend': False,
+            'type': 'scatter'
+        },
+        {
+            'x': x_team1_stats,
+            'y': y_cum_goals_team1,
+            'mode': 'lines',
+            'name': '',
+            'line': {'color': 'blue'},
+            'showlegend': False,
+            'type': 'scatter'
+        },
+        {
+            'x': x_team2_stats,
+            'y': y_cum_xg_team2,
+            'mode': 'lines',
+            'name': '',
+            'line': {'color': 'red', 'dash': 'dash'},
+            'showlegend': False,
+            'type': 'scatter'
+        },
+        {
+            'x': x_team2_stats,
+            'y': y_cum_goals_team2,
+            'mode': 'lines',
+            'name': '',
+            'line': {'color': 'red'},
+            'showlegend': False,
+            'type': 'scatter'
+        },
         # Legend dummy for xG
-        go.Scatter(
-            x=[None], y=[None],
-            mode='lines',
-            line=dict(color='white', dash='dash'),
-            name='xG'
-        ),
+        {
+            'x': [None],
+            'y': [None],
+            'mode': 'lines',
+            'line': {'color': 'white', 'dash': 'dash'},
+            'name': 'xG',
+            'type': 'scatter'
+        },
         # Legend dummy for Goals
-        go.Scatter(
-            x=[None], y=[None],
-            mode='lines',
-            line=dict(color='white'),
-            name='Goals'
-        )
+        {
+            'x': [None],
+            'y': [None],
+            'mode': 'lines',
+            'line': {'color': 'white'},
+            'name': 'Goals',
+            'type': 'scatter'
+        }
     ]
 
     # Add annotations and shading for extra time and penalties if applicable
@@ -152,4 +160,3 @@ def generate_match_graph_plot(match_data: pd.DataFrame, home_team: str, away_tea
     )
 
     return {"data": data, "layout": layout}
-

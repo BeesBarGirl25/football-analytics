@@ -81,28 +81,30 @@ def generate_momentum_graph_plot(match_data: pd.DataFrame, home_team: str, away_
     buffer = max_value * 0.1
     max_range = max_value + buffer
 
-    # Create Bar traces
-    home_trace = go.Bar(
-        x=home_team_x,
-        y=home_team_y,
-        name=home_team,
-        marker=dict(
-            color='blue',
-            line=dict(color='rgba(0, 0, 255, 0.3)', width=3)
-        ),
-        width=0.6,
-    )
+    # Create Bar traces - convert to dicts for JSON serialization
+    home_trace = {
+        'x': home_team_x,
+        'y': home_team_y,
+        'name': home_team,
+        'type': 'bar',
+        'marker': {
+            'color': 'blue',
+            'line': {'color': 'rgba(0, 0, 255, 0.3)', 'width': 3}
+        },
+        'width': 0.6,
+    }
 
-    away_trace = go.Bar(
-        x=away_team_x,
-        y=away_team_y,
-        name=away_team,
-        marker=dict(
-            color='red',
-            line=dict(color='rgba(255, 0, 0, 0.3)', width=3)
-        ),
-        width=0.6,
-    )
+    away_trace = {
+        'x': away_team_x,
+        'y': away_team_y,
+        'name': away_team,
+        'type': 'bar',
+        'marker': {
+            'color': 'red',
+            'line': {'color': 'rgba(255, 0, 0, 0.3)', 'width': 3}
+        },
+        'width': 0.6,
+    }
 
     layout = go.Layout(
         title=dict(
@@ -141,4 +143,3 @@ def generate_momentum_graph_plot(match_data: pd.DataFrame, home_team: str, away_
     # Return a dictionary to match the desired format
     data = [home_trace, away_trace]
     return {"data": data, "layout": layout}
-
