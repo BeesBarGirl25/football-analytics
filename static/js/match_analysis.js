@@ -61,33 +61,37 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
 document.querySelectorAll('.tab-btn').forEach(button => {
   button.addEventListener('click', () => {
     const tabId = button.getAttribute('data-tab');
+    
+    // Always update tab states first
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
+    button.classList.add('active');
+    document.getElementById(tabId)?.classList.remove('hidden');
+    
     if (tabId === 'home') {
-      // Show tab and render current team heatmap based on state
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
-      button.classList.add('active');
-      document.getElementById(tabId)?.classList.remove('hidden');
-      document.getElementById('graph-container-home-team-4')?.classList.remove('hidden');
+      // Show home team container and render current heatmap
+      const homeContainer = document.getElementById('graph-container-home-team-4');
+      if (homeContainer) {
+        homeContainer.classList.remove('hidden');
+        console.log('[HOME TAB] Container shown, rendering heatmap');
+      }
       
       // Render with current state
-      setTimeout(() => renderCurrentTeamHeatmap('home_team'), 50);
+      setTimeout(() => renderCurrentTeamHeatmap('home_team'), 100);
+      
     } else if (tabId === 'away') {
-      // Show tab and render current team heatmap based on state
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
-      button.classList.add('active');
-      document.getElementById(tabId)?.classList.remove('hidden');
-      document.getElementById('graph-container-away-team-4')?.classList.remove('hidden');
+      // Show away team container and render current heatmap
+      const awayContainer = document.getElementById('graph-container-away-team-4');
+      if (awayContainer) {
+        awayContainer.classList.remove('hidden');
+        console.log('[AWAY TAB] Container shown, rendering heatmap');
+      }
       
       // Render with current state
-      setTimeout(() => renderCurrentTeamHeatmap('away_team'), 50);
+      setTimeout(() => renderCurrentTeamHeatmap('away_team'), 100);
+      
     } else if (tabId === 'overview') {
       showTabAndRenderPlot(tabId, 'dominance_heatmap', 'dominance-plot-container', 'graph-container-heatmap');
-    } else {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
-      button.classList.add('active');
-      document.getElementById(tabId)?.classList.remove('hidden');
     }
   });
 });
@@ -100,7 +104,23 @@ function renderCurrentTeamHeatmap(teamPrefix) {
   // Determine container ID based on team
   const containerId = teamPrefix === 'home_team' ? 'heatmap-home-plot-container' : 'heatmap-away-plot-container';
   
+  // Debug: Check if plot data exists
+  if (!cachedPlots[plotKey]) {
+    console.error(`[TEAM HEATMAP] Plot data missing for ${plotKey}`);
+    console.log('[TEAM HEATMAP] Available plots:', Object.keys(cachedPlots));
+    return;
+  }
+  
+  // Debug: Check if container exists and is visible
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.error(`[TEAM HEATMAP] Container ${containerId} not found`);
+    return;
+  }
+  
   console.log(`[TEAM HEATMAP] Rendering ${plotKey} in ${containerId}`);
+  console.log(`[TEAM HEATMAP] Container dimensions: ${container.offsetWidth}x${container.offsetHeight}`);
+  
   setTimeout(() => lazyRenderPlot(containerId, plotKey, true), 50);
 }
 

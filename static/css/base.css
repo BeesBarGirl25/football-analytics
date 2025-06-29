@@ -306,6 +306,11 @@ html, body {
   display: none;
 }
 
+.graph-container.tall {
+  height: 100%;
+  min-height: 400px;
+}
+
 .graph-inner {
   display: flex;
   flex-direction: column;

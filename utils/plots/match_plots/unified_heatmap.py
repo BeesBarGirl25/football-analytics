@@ -274,12 +274,14 @@ def generate_heatmap(
     
     # Configure layout
     layout = {
-        'xaxis': {'range': [0, 80], 'visible': False},
-        'yaxis': {'range': [0, 120], 'visible': False, 'scaleanchor': "x", 'scaleratio': 1.5},
+        'xaxis': {'range': [0, 80], 'visible': False, 'fixedrange': True},
+        'yaxis': {'range': [0, 120], 'visible': False, 'scaleanchor': "x", 'scaleratio': 1.5, 'fixedrange': True},
         'margin': {'t': 30, 'l': 0, 'r': 0, 'b': 0},
         'plot_bgcolor': 'rgba(0,0,0,0)',
         'paper_bgcolor': 'rgba(0,0,0,0)',
         'autosize': True,
+        'width': None,
+        'height': None,
         'title': {'text': f"{half.capitalize()} Half {title_prefix}", 'x': 0.5, 'font': {'color': 'white', 'size': 14}},
         'shapes': _generate_pitch_shapes_vertical()
     }
