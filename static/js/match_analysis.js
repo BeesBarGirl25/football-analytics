@@ -1,11 +1,11 @@
 const cachedPlots = {};
 const renderedPlots = new Set();
 
-function lazyRenderPlot(containerId, plotKey) {
+function lazyRenderPlot(containerId, plotKey, force = false) {
   const el = document.getElementById(containerId);
   const plot = cachedPlots[plotKey];
 
-  if (!el || renderedPlots.has(containerId)) return;
+  if (!el || (!force && renderedPlots.has(containerId))) return;
 
   setTimeout(() => {
     if (el.offsetWidth === 0 || el.offsetHeight === 0) {
@@ -15,12 +15,13 @@ function lazyRenderPlot(containerId, plotKey) {
     try {
       Plotly.newPlot(containerId, plot.data, plot.layout);
       renderedPlots.add(containerId);
-      console.log(`[LAZY PLOT] ✅ ${containerId}`);
+      console.log(`[LAZY PLOT] ✅ ${containerId} (${plotKey})`);
     } catch (err) {
       console.error(`[LAZY PLOT] ❌ Failed for ${containerId}`, err);
     }
   }, 100);
 }
+
 
 function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -37,11 +38,12 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
   plotWrapper?.classList.remove('hidden');
 
   requestAnimationFrame(() => {
-    console.log(`[SHOW] Rendering plot for ${containerId}`);
-    lazyRenderPlot(containerId, viewKey);
-    const el = document.getElementById(containerId);
-    if (el) Plotly.Plots.resize(el);
+    setTimeout(() => {
+      console.log(`[SHOW] Rendering plot for ${containerId}`);
+      lazyRenderPlot(containerId, viewKey);
+    }, 20);  // tiny delay to allow reflow
   });
+
 }
 
 // Tabs
@@ -83,7 +85,7 @@ document.querySelectorAll('.toggle-btn').forEach(button => {
       return;
     }
 
-    setTimeout(() => lazyRenderPlot(containerId, viewKey), 50);
+    setTimeout(() => lazyRenderPlot(containerId, viewKey, true), 50);
   });
 });
 
