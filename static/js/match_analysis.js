@@ -88,22 +88,34 @@ document.querySelectorAll('.tab-btn').forEach(button => {
     document.getElementById(tabId)?.classList.remove('hidden');
     
     if (tabId === 'home') {
-      // Show home team container and render current heatmap
+      // Show home team container - it has data-plot-group="home_team_heatmap"
       const homeContainer = document.getElementById('graph-container-home-team-4');
       if (homeContainer) {
         homeContainer.classList.remove('hidden');
-        console.log('[HOME TAB] Container shown, rendering heatmap');
+        console.log('[HOME TAB] Container shown');
+        
+        // Also unhide any elements with the home team plot group
+        document.querySelectorAll('[data-plot-group="home_team_heatmap"]').forEach(el => {
+          el.classList.remove('hidden');
+          console.log('[HOME TAB] Unhiding plot group element');
+        });
       }
       
       // Render with current state
       setTimeout(() => renderCurrentTeamHeatmap('home_team'), 100);
       
     } else if (tabId === 'away') {
-      // Show away team container and render current heatmap
+      // Show away team container - it has data-plot-group="away_team_heatmap"
       const awayContainer = document.getElementById('graph-container-away-team-4');
       if (awayContainer) {
         awayContainer.classList.remove('hidden');
-        console.log('[AWAY TAB] Container shown, rendering heatmap');
+        console.log('[AWAY TAB] Container shown');
+        
+        // Also unhide any elements with the away team plot group
+        document.querySelectorAll('[data-plot-group="away_team_heatmap"]').forEach(el => {
+          el.classList.remove('hidden');
+          console.log('[AWAY TAB] Unhiding plot group element');
+        });
       }
       
       // Render with current state

@@ -47,9 +47,11 @@ def _preprocess_location_data(match_data: pd.DataFrame, half: str = "full") -> p
     # Normalize based on half and team perspective
     def normalize(loc, team, period):
         x, y = loc
+        # Original coordinates: x=0-120 (length), y=0-80 (width)
+        # We want to flip when team switches sides
         if (team == team_name and period in [2, 4]) or (team != team_name and period in [1, 3]):
-            return [120 - y, 80 - x]  # Fixed: y should be transformed by 120, x by 80
-        return [y, x]  # Fixed: return [y, x] not [x, y]
+            return [120 - x, 80 - y]  # Flip both coordinates
+        return [x, y]  # Keep original coordinates
 
     location_data['normalized_location'] = location_data.apply(
         lambda row: normalize(row['location'], row['team'], row['period']),
