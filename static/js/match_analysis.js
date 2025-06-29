@@ -37,14 +37,18 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
   graphEl?.classList.remove('hidden');
   plotWrapper?.classList.remove('hidden');
 
+  // NEW: Unhide all containers with the matching data-plot-group
+  document.querySelectorAll(`[data-plot-group="${viewKey}"]`)
+    .forEach(el => el.classList.remove('hidden'));
+
   requestAnimationFrame(() => {
     setTimeout(() => {
       console.log(`[SHOW] Rendering plot for ${containerId}`);
       lazyRenderPlot(containerId, viewKey);
-    }, 20);  // tiny delay to allow reflow
+    }, 20);
   });
-
 }
+
 
 // Tabs
 
