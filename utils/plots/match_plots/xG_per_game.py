@@ -28,55 +28,63 @@ def generate_match_graph_plot(match_data: pd.DataFrame, home_team: str, away_tea
     y_cum_xg_team2 = team_2_stats['cum_xg'].tolist()
     y_cum_goals_team2 = team_2_stats['cum_goals'].tolist()
 
-    # Initialize Plotly traces (data)
+    # Initialize Plotly traces (data) - convert to dicts for JSON serialization
     data = [
         # Real data traces (hidden from legend)
-        go.Scatter(
-            x=x_team1_stats,
-            y=y_cum_xg_team1,
-            mode='lines',
-            name='',
-            line=dict(color='blue', dash='dash'),
-            showlegend=False
-        ),
-        go.Scatter(
-            x=x_team1_stats,
-            y=y_cum_goals_team1,
-            mode='lines',
-            name='',
-            line=dict(color='blue'),
-            showlegend=False
-        ),
-        go.Scatter(
-            x=x_team2_stats,
-            y=y_cum_xg_team2,
-            mode='lines',
-            name='',
-            line=dict(color='red', dash='dash'),
-            showlegend=False
-        ),
-        go.Scatter(
-            x=x_team2_stats,
-            y=y_cum_goals_team2,
-            mode='lines',
-            name='',
-            line=dict(color='red'),
-            showlegend=False
-        ),
+        {
+            'x': x_team1_stats,
+            'y': y_cum_xg_team1,
+            'mode': 'lines',
+            'name': '',
+            'line': {'color': 'blue', 'dash': 'dash'},
+            'showlegend': False,
+            'type': 'scatter'
+        },
+        {
+            'x': x_team1_stats,
+            'y': y_cum_goals_team1,
+            'mode': 'lines',
+            'name': '',
+            'line': {'color': 'blue'},
+            'showlegend': False,
+            'type': 'scatter'
+        },
+        {
+            'x': x_team2_stats,
+            'y': y_cum_xg_team2,
+            'mode': 'lines',
+            'name': '',
+            'line': {'color': 'red', 'dash': 'dash'},
+            'showlegend': False,
+            'type': 'scatter'
+        },
+        {
+            'x': x_team2_stats,
+            'y': y_cum_goals_team2,
+            'mode': 'lines',
+            'name': '',
+            'line': {'color': 'red'},
+            'showlegend': False,
+            'type': 'scatter'
+        },
         # Legend dummy for xG
-        go.Scatter(
-            x=[None], y=[None],
-            mode='lines',
-            line=dict(color='white', dash='dash'),
-            name='xG'
-        ),
+        {
+            'x': [None],
+            'y': [None],
+            'mode': 'lines',
+            'line': {'color': 'white', 'dash': 'dash'},
+            'name': 'xG',
+            'type': 'scatter'
+        },
         # Legend dummy for Goals
-        go.Scatter(
-            x=[None], y=[None],
-            mode='lines',
-            line=dict(color='white'),
-            name='Goals'
-        )
+        {
+            'x': [None],
+            'y': [None],
+            'mode': 'lines',
+            'line': {'color': 'white'},
+            'name': 'Goals',
+            'type': 'scatter'
+        }
     ]
 
     # Add annotations and shading for extra time and penalties if applicable
@@ -114,42 +122,41 @@ def generate_match_graph_plot(match_data: pd.DataFrame, home_team: str, away_tea
             font=dict(color="red", size=12)
         ))
 
-    # Define the layout of the graph
-    layout = go.Layout(
-        title=dict(
-            text='xG and Goals per Game',
-            font=dict(color='white', size=14),
-            x=0.5
-        ),
-        xaxis=dict(
-            color='white',
-            gridcolor='rgba(255, 255, 255, 0.1)',
-            showline=True,
-            linecolor='rgba(255, 255, 255, 0.2)'
-        ),
-        yaxis=dict(
-            color='white',
-            gridcolor='rgba(255, 255, 255, 0.1)',
-            showline=True,
-            linecolor='rgba(255, 255, 255, 0.2)',
-            range=[0, y_max + 1]
-        ),
-        legend=dict(
-            orientation='h',
-            x=0,
-            y=1,
-            xanchor='left',
-            yanchor='top',
-            font=dict(color='white', size=11),
-            bgcolor='rgba(0,0,0,0)'  # transparent background
-        ),
-        autosize=True,
-        plot_bgcolor="rgba(0, 0, 0, 0)",
-        paper_bgcolor="rgba(0, 0, 0, 0)",
-        margin=dict(l=10, r=10, t=30, b=30),
-        shapes=shapes,
-        annotations=annotations
-    )
+    # Define the layout of the graph - convert to dict for JSON serialization
+    layout = {
+        'title': {
+            'text': 'xG and Goals per Game',
+            'font': {'color': 'white', 'size': 14},
+            'x': 0.5
+        },
+        'xaxis': {
+            'color': 'white',
+            'gridcolor': 'rgba(255, 255, 255, 0.1)',
+            'showline': True,
+            'linecolor': 'rgba(255, 255, 255, 0.2)'
+        },
+        'yaxis': {
+            'color': 'white',
+            'gridcolor': 'rgba(255, 255, 255, 0.1)',
+            'showline': True,
+            'linecolor': 'rgba(255, 255, 255, 0.2)',
+            'range': [0, y_max + 1]
+        },
+        'legend': {
+            'orientation': 'h',
+            'x': 0,
+            'y': 1,
+            'xanchor': 'left',
+            'yanchor': 'top',
+            'font': {'color': 'white', 'size': 11},
+            'bgcolor': 'rgba(0,0,0,0)'  # transparent background
+        },
+        'autosize': True,
+        'plot_bgcolor': "rgba(0, 0, 0, 0)",
+        'paper_bgcolor': "rgba(0, 0, 0, 0)",
+        'margin': {'l': 10, 'r': 10, 't': 30, 'b': 30},
+        'shapes': shapes,
+        'annotations': annotations
+    }
 
     return {"data": data, "layout": layout}
-

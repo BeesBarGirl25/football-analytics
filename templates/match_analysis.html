@@ -64,22 +64,7 @@
     <!-- HOME TAB -->
     <div class="analysis-content hidden" id="home">
         <div class="graphs-container wide-mode">
-            <div class="graph-container xg">
-                {% set prefix = 'home_team_xg' %}
-                {% set plot_container_id = 'heatmap-home-xg' %}
-                {% include 'partials/match_team_analysis.html' with context %}
-            </div>
-            <div class="graph-container momentum">
-                {% set prefix = 'home_team_momentum' %}
-                {% set plot_container_id = 'heatmap-home-momentum' %}
-                {% include 'partials/match_team_analysis.html' with context %}
-            </div>
-            <div class="graph-container summary">
-                {% set prefix = 'home_team_summary' %}
-                {% set plot_container_id = 'heatmap-home-summary' %}
-                {% include 'partials/match_team_analysis.html' with context %}
-            </div>
-            <div class="graph-container heatmap">
+            <div id="graph-container-home-team-4" class="graph-container heatmap">
                 {% set prefix = 'home_team_heatmap' %}
                 {% set plot_container_id = 'heatmap-home-plot-container' %}
                 {% include 'partials/match_team_analysis.html' with context %}
@@ -90,22 +75,7 @@
     <!-- AWAY TAB -->
     <div class="analysis-content hidden" id="away">
         <div class="graphs-container wide-mode">
-            <div class="graph-container xg">
-                {% set prefix = 'away_team_xg' %}
-                {% set plot_container_id = 'heatmap-away-xg' %}
-                {% include 'partials/match_team_analysis.html' with context %}
-            </div>
-            <div class="graph-container momentum">
-                {% set prefix = 'away_team_momentum' %}
-                {% set plot_container_id = 'heatmap-away-momentum' %}
-                {% include 'partials/match_team_analysis.html' with context %}
-            </div>
-            <div class="graph-container summary">
-                {% set prefix = 'away_team_summary' %}
-                {% set plot_container_id = 'heatmap-away-summary' %}
-                {% include 'partials/match_team_analysis.html' with context %}
-            </div>
-            <div class="graph-container heatmap">
+            <div id="graph-container-away-team-4" class="graph-container heatmap">
                 {% set prefix = 'away_team_heatmap' %}
                 {% set plot_container_id = 'heatmap-away-plot-container' %}
                 {% include 'partials/match_team_analysis.html' with context %}

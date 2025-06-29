@@ -81,64 +81,65 @@ def generate_momentum_graph_plot(match_data: pd.DataFrame, home_team: str, away_
     buffer = max_value * 0.1
     max_range = max_value + buffer
 
-    # Create Bar traces
-    home_trace = go.Bar(
-        x=home_team_x,
-        y=home_team_y,
-        name=home_team,
-        marker=dict(
-            color='blue',
-            line=dict(color='rgba(0, 0, 255, 0.3)', width=3)
-        ),
-        width=0.6,
-    )
+    # Create Bar traces - convert to dicts for JSON serialization
+    home_trace = {
+        'x': home_team_x,
+        'y': home_team_y,
+        'name': home_team,
+        'type': 'bar',
+        'marker': {
+            'color': 'blue',
+            'line': {'color': 'rgba(0, 0, 255, 0.3)', 'width': 3}
+        },
+        'width': 0.6,
+    }
 
-    away_trace = go.Bar(
-        x=away_team_x,
-        y=away_team_y,
-        name=away_team,
-        marker=dict(
-            color='red',
-            line=dict(color='rgba(255, 0, 0, 0.3)', width=3)
-        ),
-        width=0.6,
-    )
+    away_trace = {
+        'x': away_team_x,
+        'y': away_team_y,
+        'name': away_team,
+        'type': 'bar',
+        'marker': {
+            'color': 'red',
+            'line': {'color': 'rgba(255, 0, 0, 0.3)', 'width': 3}
+        },
+        'width': 0.6,
+    }
 
-    layout = go.Layout(
-        title=dict(
-            text='Momentum',
-            font=dict(color='white', size=14),
-            x=0.5
-        ),
-        xaxis=dict(
-            color='white',
-            gridcolor='rgba(255, 255, 255, 0.05)',
-            showline=False,
-            linecolor='rgba(255, 255, 255, 0.2)',
-            automargin=True,
-            autorange=True,
-            zeroline=False,
-            zerolinecolor='rgba(255,255,255,0.6)',
-            zerolinewidth=2,
-        ),
-        yaxis=dict(
-            range=[-max_range, max_range],  # Symmetrical around 0
-            showgrid=False,
-            zeroline=True,
-            zerolinecolor='rgba(255,255,255,0.6)',
-            zerolinewidth=2,
-            visible=False
-        ),
-        barmode='relative',  # overlay instead of relative
-        bargap=0.1,
-        autosize=True,
-        plot_bgcolor="rgba(0, 0, 0, 0)",
-        paper_bgcolor="rgba(0, 0, 0, 0)",
-        margin=dict(l=10, r=10, t=30, b=30),
-        showlegend=False
-    )
+    layout = {
+        'title': {
+            'text': 'Momentum',
+            'font': {'color': 'white', 'size': 14},
+            'x': 0.5
+        },
+        'xaxis': {
+            'color': 'white',
+            'gridcolor': 'rgba(255, 255, 255, 0.05)',
+            'showline': False,
+            'linecolor': 'rgba(255, 255, 255, 0.2)',
+            'automargin': True,
+            'autorange': True,
+            'zeroline': False,
+            'zerolinecolor': 'rgba(255,255,255,0.6)',
+            'zerolinewidth': 2,
+        },
+        'yaxis': {
+            'range': [-max_range, max_range],  # Symmetrical around 0
+            'showgrid': False,
+            'zeroline': True,
+            'zerolinecolor': 'rgba(255,255,255,0.6)',
+            'zerolinewidth': 2,
+            'visible': False
+        },
+        'barmode': 'relative',  # overlay instead of relative
+        'bargap': 0.1,
+        'autosize': True,
+        'plot_bgcolor': "rgba(0, 0, 0, 0)",
+        'paper_bgcolor': "rgba(0, 0, 0, 0)",
+        'margin': {'l': 10, 'r': 10, 't': 30, 'b': 30},
+        'showlegend': False
+    }
 
     # Return a dictionary to match the desired format
     data = [home_trace, away_trace]
     return {"data": data, "layout": layout}
-

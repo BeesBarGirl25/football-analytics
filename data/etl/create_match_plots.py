@@ -11,8 +11,7 @@ from models import Match, MatchPlot, Season
 from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
 from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
 from utils.analytics.match_analytics.match_analysis_utils import goal_assist_stats
-from utils.plots.match_plots.heatmap_per_game import generate_dominance_heatmap_json
-from utils.plots.match_plots.team_possesion_heatmap import generate_team_match_heatmap
+from utils.plots.match_plots.unified_heatmap import generate_dominance_heatmap_json, generate_team_match_heatmap
 
 # Suppress common warning spam
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -87,20 +86,20 @@ def create_all_match_plots():
                 }
 
                 plot_dict = {
-                    "xg_graph": safe_plotly_json(xg_plot),
-                    "momentum_graph": safe_plotly_json(momentum_plot),
+                    "xg_graph": json.dumps(xg_plot),
+                    "momentum_graph": json.dumps(momentum_plot),
                     "dominance_heatmap": json.dumps(
-                        generate_dominance_heatmap_json(match_df)),
+                        generate_dominance_heatmap_json(match_df, "full")),
                     "dominance_heatmap_first": json.dumps(
-                        generate_dominance_heatmap_json(match_df[match_df['period'] == 1])),
+                        generate_dominance_heatmap_json(match_df, "first")),
                     "dominance_heatmap_second": json.dumps(
-                        generate_dominance_heatmap_json(match_df[match_df['period'] == 2])),
-                    "home_team_heatmap": safe_plotly_json(generate_team_match_heatmap(home_team_data)),
-                    "home_team_heatmap_first": safe_plotly_json(generate_team_match_heatmap(home_team_data, "first")),
-                    "home_team_heatmap_second": safe_plotly_json(generate_team_match_heatmap(home_team_data, "second")),
-                    "away_team_heatmap": safe_plotly_json(generate_team_match_heatmap(away_team_data)),
-                    "away_team_heatmap_first": safe_plotly_json(generate_team_match_heatmap(away_team_data, "first")),
-                    "away_team_heatmap_second": safe_plotly_json(generate_team_match_heatmap(away_team_data, "second")),
+                        generate_dominance_heatmap_json(match_df, "second")),
+                    "home_team_heatmap": json.dumps(generate_team_match_heatmap(home_team_data)),
+                    "home_team_heatmap_first": json.dumps(generate_team_match_heatmap(home_team_data, "first")),
+                    "home_team_heatmap_second": json.dumps(generate_team_match_heatmap(home_team_data, "second")),
+                    "away_team_heatmap": json.dumps(generate_team_match_heatmap(away_team_data)),
+                    "away_team_heatmap_first": json.dumps(generate_team_match_heatmap(away_team_data, "first")),
+                    "away_team_heatmap_second": json.dumps(generate_team_match_heatmap(away_team_data, "second")),
                     "match_summary": json.dumps(match_summary, indent=2)  # leave this as-is
                 }
 
