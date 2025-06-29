@@ -34,45 +34,42 @@ def _generate_phase_filters(phase: str):
     return event_types
 
 def _preprocess_location_data(match_data: pd.DataFrame, half: str = "full") -> pd.DataFrame:
-    """Preprocess and normalize location data so the team always attacks in the same direction."""
+    """Preprocess and normalize location data so the team always attacks bottom-to-top (120 → 0)"""
     location_data = match_data[['location', 'team', 'period']].dropna()
     location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list) and len(loc) == 2)]
 
-    # Infer the team to normalize for (assumes single-team context for possession/attack/defense maps)
     teams = location_data['team'].dropna().unique()
     if len(teams) != 1:
         raise ValueError(f"Expected 1 team in match_data, found: {teams}")
     team_name = teams[0]
 
-    # Normalize based on half and team perspective
+    # Normalize coordinates to match left-to-right attacking direction
     def normalize(loc, team, period):
-        x, y = loc
-        # Original coordinates: x=0-120 (length), y=0-80 (width)
-        # We want to flip when team switches sides
+        x_sb, y_sb = loc  # x = length (0-120), y = width (0-80)
+
+        # Flip direction for second half if needed
         if (team == team_name and period in [2, 4]) or (team != team_name and period in [1, 3]):
-            return [120 - x, 80 - y]  # Flip both coordinates
-        return [x, y]  # Keep original coordinates
+            x_sb = 120 - x_sb
+            y_sb = 80 - y_sb
+
+        return [y_sb, x_sb]  # Now: y (length) → vertical axis, x (width) → horizontal axis
 
     location_data['normalized_location'] = location_data.apply(
         lambda row: normalize(row['location'], row['team'], row['period']),
         axis=1
     )
 
+    # Assign vertical (length) to y, horizontal (width) to x
     location_data[['y', 'x']] = pd.DataFrame(location_data['normalized_location'].tolist(), index=location_data.index)
 
-    # Apply half filter - debug what periods we have
-    print(f"[DEBUG] Available periods: {location_data['period'].unique()}")
-    print(f"[DEBUG] Filtering for half: {half}")
-    
+    # Half filtering
     if half == "first":
         location_data = location_data[location_data['period'] == 1]
     elif half == "second":
         location_data = location_data[location_data['period'] == 2]
-    
-    print(f"[DEBUG] After filtering, data shape: {location_data.shape}")
-    print(f"[DEBUG] Remaining periods: {location_data['period'].unique()}")
 
     return location_data
+
 
 
 
