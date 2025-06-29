@@ -48,8 +48,8 @@ def _preprocess_location_data(match_data: pd.DataFrame, half: str = "full") -> p
     def normalize(loc, team, period):
         x, y = loc
         if (team == team_name and period in [2, 4]) or (team != team_name and period in [1, 3]):
-            return [120 - x, 80 - y]
-        return [x, y]
+            return [120 - y, 80 - x]  # Fixed: y should be transformed by 120, x by 80
+        return [y, x]  # Fixed: return [y, x] not [x, y]
 
     location_data['normalized_location'] = location_data.apply(
         lambda row: normalize(row['location'], row['team'], row['period']),
@@ -183,13 +183,13 @@ def generate_heatmap(
             if team == team_a:
                 # Team A attacks towards y=120 in periods 1,3 and towards y=0 in periods 2,4
                 if period in [2, 4]:
-                    return [120 - x, 80 - y]
-                return [x, y]
+                    return [120 - y, 80 - x]  # Fixed: y should be transformed by 120, x by 80
+                return [y, x]  # Fixed: return [y, x] not [x, y]
             else:  # team_b
                 # Team B attacks towards y=0 in periods 1,3 and towards y=120 in periods 2,4
                 if period in [1, 3]:
-                    return [120 - x, 80 - y]
-                return [x, y]
+                    return [120 - y, 80 - x]  # Fixed: y should be transformed by 120, x by 80
+                return [y, x]  # Fixed: return [y, x] not [x, y]
         
         location_data['normalized_location'] = location_data.apply(
             lambda row: normalize_dominance([row['x'], row['y']], row['team'], row['period']),
