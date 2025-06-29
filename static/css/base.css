@@ -390,14 +390,20 @@ input:checked + .slider:before {
 }
 
 .dominance-toggle-buttons,
-.heatmap-toggle-buttons {
+.heatmap-toggle-buttons,
+.phase-toggle-buttons {
   display: flex;
   justify-content: center;
   gap: 10px;
   padding-bottom: 10px;
 }
 
-.toggle-btn {
+.phase-toggle-buttons {
+  margin-bottom: 8px;
+}
+
+.toggle-btn,
+.phase-btn {
   background-color: #1f1f1f;
   color: #e0e0e0;
   border: 1px solid #444;
@@ -407,12 +413,22 @@ input:checked + .slider:before {
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
-.toggle-btn:hover {
+
+.toggle-btn:hover,
+.phase-btn:hover {
   background-color: #2a2a2a;
 }
+
 .toggle-btn.active {
   background-color: #90caf9;
   color: #121212;
   font-weight: bold;
   border-color: #90caf9;
+}
+
+.phase-btn.active {
+  background-color: #ff6b35;
+  color: #fff;
+  font-weight: bold;
+  border-color: #ff6b35;
 }

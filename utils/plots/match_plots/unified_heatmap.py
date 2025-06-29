@@ -19,18 +19,53 @@ def _generate_pitch_shapes_vertical():
     ]
 
 
-def _preprocess_location_data(match_data: pd.DataFrame, half: str = "full") -> pd.DataFrame:
-    """Common preprocessing for location data"""
-    location_data = match_data[['location', 'team', 'period']].dropna()
-    location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list))]
-    location_data[['y', 'x']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
+def _generate_phase_filters(phase: str):
+    "Generate phase filters for match data depending on the phase of play."
+    # Define event types by phase
+    attacking_types = ['Pass', 'Carry', 'Dribble', 'Shot', 'Foul Won']
+    defensive_types = ['Interception', 'Clearance', 'Block', 'Ball Recovery', 'Duel', 'Foul Committed']
+    
+    if phase == "attack":
+        event_types = attacking_types
+    elif phase == "defense":
+        event_types = defensive_types
+    else:
+        raise ValueError("phase must be 'attack' or 'defense'")
+    return event_types
 
+def _preprocess_location_data(match_data: pd.DataFrame, half: str = "full") -> pd.DataFrame:
+    """Preprocess and normalize location data so the team always attacks in the same direction."""
+    location_data = match_data[['location', 'team', 'period']].dropna()
+    location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list) and len(loc) == 2)]
+
+    # Infer the team to normalize for (assumes single-team context for possession/attack/defense maps)
+    teams = location_data['team'].dropna().unique()
+    if len(teams) != 1:
+        raise ValueError(f"Expected 1 team in match_data, found: {teams}")
+    team_name = teams[0]
+
+    # Normalize based on half and team perspective
+    def normalize(loc, team, period):
+        x, y = loc
+        if (team == team_name and period in [2, 4]) or (team != team_name and period in [1, 3]):
+            return [120 - x, 80 - y]
+        return [x, y]
+
+    location_data['normalized_location'] = location_data.apply(
+        lambda row: normalize(row['location'], row['team'], row['period']),
+        axis=1
+    )
+
+    location_data[['y', 'x']] = pd.DataFrame(location_data['normalized_location'].tolist(), index=location_data.index)
+
+    # Apply half filter
     if half == "first":
         location_data = location_data[location_data['period'] == 1]
     elif half == "second":
         location_data = location_data[location_data['period'] == 2]
-    
+
     return location_data
+
 
 
 def _create_bins_and_centers(bins: tuple, epsilon: float = 1e-6):
@@ -75,7 +110,7 @@ def generate_heatmap(
     
     Args:
         match_data: DataFrame containing match event data
-        heatmap_type: 'dominance' or 'possession'
+        heatmap_type: 'dominance', 'possession', 'attack', or 'defense'
         half: 'full', 'first', or 'second'
         bins: Custom bin size (y, x). Defaults: dominance=(24,16), possession=(48,32)
         sigma: Gaussian filter sigma. Defaults: dominance=1.5, possession=2.5
@@ -99,6 +134,20 @@ def generate_heatmap(
         colorscale = colorscale or 'Viridis'
         title_prefix = title_prefix or "Possesion"
         zmin, zmax = None, None
+    elif heatmap_type == "attack":
+        bins = bins or (48, 32)
+        sigma = sigma or 2.5
+        colorscale = colorscale or 'Viridis'
+        title_prefix = title_prefix or "Attack Map"
+        zmin, zmax = None, None
+        phase_filter = _generate_phase_filters("attack")
+    elif heatmap_type == "defense":
+        bins = bins or (48, 32)
+        sigma = sigma or 2.5
+        colorscale = colorscale or 'Viridis'
+        title_prefix = title_prefix or "Defense Map"
+        zmin, zmax = None, None
+        phase_filter = _generate_phase_filters("defense")
     else:
         raise ValueError(f"Unknown heatmap_type: {heatmap_type}. Must be 'dominance' or 'possession'")
     
@@ -132,6 +181,14 @@ def generate_heatmap(
     elif heatmap_type == "possession":
         team_hist, _, _ = np.histogram2d(location_data['y'], location_data['x'], bins=[y_bins, x_bins])
         heatmap_data = gaussian_filter(team_hist, sigma=sigma)
+    elif heatmap_type == "attack":
+        attack_data = location_data[location_data['event_type'].isin(phase_filter)]
+        attack_hist, _, _ = np.histogram2d(attack_data['y'], attack_data['x'], bins=[y_bins, x_bins])
+        heatmap_data = gaussian_filter(attack_hist, sigma=sigma)
+    elif heatmap_type == "defense":
+        defense_data = location_data[location_data['event_type'].isin(phase_filter)]
+        defense_hist, _, _ = np.histogram2d(defense_data['y'], defense_data['x'], bins=[y_bins, x_bins])
+        heatmap_data = gaussian_filter(defense_hist, sigma=sigma)
     
     # Create Plotly data - ensure all numpy arrays are converted to lists
     heatmap_kwargs = {
@@ -180,3 +237,11 @@ def generate_dominance_heatmap_json(match_data: pd.DataFrame, half: str = "full"
 def generate_team_match_heatmap(match_data: pd.DataFrame, half: str = "full") -> dict:
     """Backward compatibility wrapper for team possession heatmaps"""
     return generate_heatmap(match_data, 'possession', half)
+
+def generate_team_attack_heatmap(match_data: pd.DataFrame, half: str = "full") -> dict:
+    """Backward compatibility wrapper for team attack heatmaps"""
+    return generate_heatmap(match_data, 'attack', half)
+
+def generate_team_defense_heatmap(match_data: pd.DataFrame, half: str = "full") -> dict:
+    """Backward compatibility wrapper for team defense heatmaps"""
+    return generate_heatmap(match_data, 'defense', half)

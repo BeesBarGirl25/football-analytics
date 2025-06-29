@@ -100,7 +100,7 @@ utils/plots/plot_factory.py
 ### Modified Files
 - `utils/plots/match_plots/unified_heatmap.py` - Consolidated heatmap logic
 - `utils/plots/match_plots/heatmap_per_game.py` - Wrapper function
-- `utils/plots/match_plots/team_possesion_heatmap.py` - Wrapper function
+- `utils/plots/match_plots/team_heatmaps.py` - Wrapper function
 - `data/etl/create_match_plots.py` - Fixed serialization issues
 - `static/js/match_analysis.js` - Fixed button functionality
 

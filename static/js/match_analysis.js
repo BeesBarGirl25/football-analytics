@@ -1,6 +1,12 @@
 const cachedPlots = {};
 const renderedPlots = new Set();
 
+// Track current selections for team heatmaps
+const teamHeatmapState = {
+  home_team: { phase: 'possession', half: 'full' },
+  away_team: { phase: 'possession', half: 'full' }
+};
+
 function lazyRenderPlot(containerId, plotKey, force = false) {
   const el = document.getElementById(containerId);
   const plot = cachedPlots[plotKey];
@@ -56,9 +62,25 @@ document.querySelectorAll('.tab-btn').forEach(button => {
   button.addEventListener('click', () => {
     const tabId = button.getAttribute('data-tab');
     if (tabId === 'home') {
-      showTabAndRenderPlot(tabId, 'home_team_heatmap', 'heatmap-home-plot-container', 'graph-container-home-team-4');
+      // Show tab and render current team heatmap based on state
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
+      button.classList.add('active');
+      document.getElementById(tabId)?.classList.remove('hidden');
+      document.getElementById('graph-container-home-team-4')?.classList.remove('hidden');
+      
+      // Render with current state
+      setTimeout(() => renderCurrentTeamHeatmap('home_team'), 50);
     } else if (tabId === 'away') {
-      showTabAndRenderPlot(tabId, 'away_team_heatmap', 'heatmap-away-plot-container', 'graph-container-away-team-4');
+      // Show tab and render current team heatmap based on state
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.analysis-content').forEach(content => content.classList.add('hidden'));
+      button.classList.add('active');
+      document.getElementById(tabId)?.classList.remove('hidden');
+      document.getElementById('graph-container-away-team-4')?.classList.remove('hidden');
+      
+      // Render with current state
+      setTimeout(() => renderCurrentTeamHeatmap('away_team'), 50);
     } else if (tabId === 'overview') {
       showTabAndRenderPlot(tabId, 'dominance_heatmap', 'dominance-plot-container', 'graph-container-heatmap');
     } else {
@@ -70,27 +92,85 @@ document.querySelectorAll('.tab-btn').forEach(button => {
   });
 });
 
-// Toggle buttons
+// Helper function to render current team heatmap based on state
+function renderCurrentTeamHeatmap(teamPrefix) {
+  const state = teamHeatmapState[teamPrefix];
+  const plotKey = `${teamPrefix}_${state.phase}_${state.half}`;
+  
+  // Determine container ID based on team
+  const containerId = teamPrefix === 'home_team' ? 'heatmap-home-plot-container' : 'heatmap-away-plot-container';
+  
+  console.log(`[TEAM HEATMAP] Rendering ${plotKey} in ${containerId}`);
+  setTimeout(() => lazyRenderPlot(containerId, plotKey, true), 50);
+}
 
-document.querySelectorAll('.toggle-btn').forEach(button => {
-  button.addEventListener('click', () => {
-    const allButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
-    if (allButtons) {
-      allButtons.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-    }
+// Phase button handlers
+document.addEventListener('click', (event) => {
+  if (event.target.classList.contains('phase-btn')) {
+    const button = event.target;
+    const phaseButtons = button.closest('.phase-toggle-buttons');
+    const teamPrefix = phaseButtons.getAttribute('data-team');
+    
+    // Update active states
+    phaseButtons.querySelectorAll('.phase-btn').forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
-
-    const viewKey = button.getAttribute('data-view');
+    
+    // Update state
+    const newPhase = button.getAttribute('data-phase');
+    teamHeatmapState[teamPrefix].phase = newPhase;
+    
+    // Check if container is visible before rendering
     const container = button.closest('.graph-container');
-    const containerId = container?.querySelector('.plotly-wrapper')?.id;
-
     if (!container || container.offsetParent === null) {
-      console.log(`[SKIP] Toggle for ${viewKey} — container not visible`);
+      console.log(`[SKIP] Phase change for ${teamPrefix} — container not visible`);
       return;
     }
+    
+    // Re-render with new combination
+    renderCurrentTeamHeatmap(teamPrefix);
+  }
+});
 
-    setTimeout(() => lazyRenderPlot(containerId, viewKey, true), 50);
-  });
+// Half button handlers (updated to work with team heatmaps)
+document.addEventListener('click', (event) => {
+  if (event.target.classList.contains('toggle-btn')) {
+    const button = event.target;
+    const toggleButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
+    
+    // Update active states
+    toggleButtons.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+    
+    // Check if this is a team heatmap or dominance heatmap
+    const teamPrefix = toggleButtons.getAttribute('data-team');
+    
+    if (teamPrefix) {
+      // Team heatmap logic
+      const newHalf = button.getAttribute('data-half');
+      teamHeatmapState[teamPrefix].half = newHalf;
+      
+      // Check if container is visible before rendering
+      const container = button.closest('.graph-container');
+      if (!container || container.offsetParent === null) {
+        console.log(`[SKIP] Half change for ${teamPrefix} — container not visible`);
+        return;
+      }
+      
+      renderCurrentTeamHeatmap(teamPrefix);
+    } else {
+      // Original dominance heatmap logic
+      const viewKey = button.getAttribute('data-view');
+      const container = button.closest('.graph-container');
+      const containerId = container?.querySelector('.plotly-wrapper')?.id;
+
+      if (!container || container.offsetParent === null) {
+        console.log(`[SKIP] Toggle for ${viewKey} — container not visible`);
+        return;
+      }
+
+      setTimeout(() => lazyRenderPlot(containerId, viewKey, true), 50);
+    }
+  }
 });
 
 // Match select
@@ -109,6 +189,10 @@ $('#match-select').on('change', async function () {
     const result = await response.json();
     console.log("[DEBUG] Results: ", result);
 
+    // Cache all plot data including new phase combinations
+    Object.assign(cachedPlots, result);
+    
+    // Ensure backward compatibility keys are available
     Object.assign(cachedPlots, {
       dominance_heatmap: result.dominance_heatmap,
       dominance_heatmap_first: result.dominance_heatmap_first,
