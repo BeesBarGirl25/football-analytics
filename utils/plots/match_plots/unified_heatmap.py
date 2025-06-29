@@ -151,24 +151,59 @@ def generate_heatmap(
     else:
         raise ValueError(f"Unknown heatmap_type: {heatmap_type}. Must be 'dominance' or 'possession'")
     
-    # Preprocess location data
-    location_data = _preprocess_location_data(match_data, half)
-    
     # Create bins and centers
     x_bins, y_bins, x_centers, y_centers = _create_bins_and_centers(bins)
     
     # Generate heatmap data based on type
     if heatmap_type == "dominance":
+        # For dominance heatmaps, we need to process both teams' data separately with normalization
+        location_data = match_data[['location', 'team', 'period']].dropna()
+        location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list) and len(loc) == 2)]
+        
+        # Extract coordinates
+        location_data[['x', 'y']] = pd.DataFrame(location_data['location'].tolist(), index=location_data.index)
+        
+        # Apply half filter
+        if half == "first":
+            location_data = location_data[location_data['period'] == 1]
+        elif half == "second":
+            location_data = location_data[location_data['period'] == 2]
+        
         teams = location_data['team'].unique()
         if len(teams) != 2:
             raise ValueError(f"Expected 2 teams for dominance heatmap, found {teams}")
         
         team_a, team_b = teams
+        
+        # Normalize coordinates so teams attack in consistent direction
+        def normalize_dominance(loc, team, period):
+            x, y = loc
+            # For team_a: normalize so they always attack towards y=120
+            # For team_b: normalize so they always attack towards y=0
+            if team == team_a:
+                # Team A attacks towards y=120 in periods 1,3 and towards y=0 in periods 2,4
+                if period in [2, 4]:
+                    return [120 - x, 80 - y]
+                return [x, y]
+            else:  # team_b
+                # Team B attacks towards y=0 in periods 1,3 and towards y=120 in periods 2,4
+                if period in [1, 3]:
+                    return [120 - x, 80 - y]
+                return [x, y]
+        
+        location_data['normalized_location'] = location_data.apply(
+            lambda row: normalize_dominance([row['x'], row['y']], row['team'], row['period']),
+            axis=1
+        )
+        
+        location_data[['norm_x', 'norm_y']] = pd.DataFrame(location_data['normalized_location'].tolist(), index=location_data.index)
+        
         team_a_data = location_data[location_data['team'] == team_a]
         team_b_data = location_data[location_data['team'] == team_b]
         
-        a_hist, _, _ = np.histogram2d(team_a_data['y'], team_a_data['x'], bins=[y_bins, x_bins])
-        b_hist, _, _ = np.histogram2d(team_b_data['y'], team_b_data['x'], bins=[y_bins, x_bins])
+        # Use normalized coordinates for histogram
+        a_hist, _, _ = np.histogram2d(team_a_data['norm_y'], team_a_data['norm_x'], bins=[y_bins, x_bins])
+        b_hist, _, _ = np.histogram2d(team_b_data['norm_y'], team_b_data['norm_x'], bins=[y_bins, x_bins])
         
         total_actions = a_hist + b_hist
         with np.errstate(divide='ignore', invalid='ignore'):
@@ -178,17 +213,41 @@ def generate_heatmap(
         heatmap_data = gaussian_filter(dominance_ratio, sigma=sigma)
         heatmap_data = np.clip(heatmap_data, 0.0, 1.0)
         
-    elif heatmap_type == "possession":
-        team_hist, _, _ = np.histogram2d(location_data['y'], location_data['x'], bins=[y_bins, x_bins])
-        heatmap_data = gaussian_filter(team_hist, sigma=sigma)
-    elif heatmap_type == "attack":
-        attack_data = location_data[location_data['event_type'].isin(phase_filter)]
-        attack_hist, _, _ = np.histogram2d(attack_data['y'], attack_data['x'], bins=[y_bins, x_bins])
-        heatmap_data = gaussian_filter(attack_hist, sigma=sigma)
-    elif heatmap_type == "defense":
-        defense_data = location_data[location_data['event_type'].isin(phase_filter)]
-        defense_hist, _, _ = np.histogram2d(defense_data['y'], defense_data['x'], bins=[y_bins, x_bins])
-        heatmap_data = gaussian_filter(defense_hist, sigma=sigma)
+    else:
+        # For single-team heatmaps (possession, attack, defense), use the preprocessing function
+        location_data = _preprocess_location_data(match_data, half)
+        
+        if heatmap_type == "possession":
+            team_hist, _, _ = np.histogram2d(location_data['y'], location_data['x'], bins=[y_bins, x_bins])
+            heatmap_data = gaussian_filter(team_hist, sigma=sigma)
+        elif heatmap_type == "attack":
+            # Check if we have the required column for filtering
+            if 'type' in match_data.columns:
+                # Filter original match data by event type, then preprocess
+                attack_match_data = match_data[match_data['type'].isin(phase_filter)]
+                if not attack_match_data.empty:
+                    attack_location_data = _preprocess_location_data(attack_match_data, half)
+                    attack_hist, _, _ = np.histogram2d(attack_location_data['y'], attack_location_data['x'], bins=[y_bins, x_bins])
+                else:
+                    attack_hist = np.zeros((len(y_bins)-1, len(x_bins)-1))
+            else:
+                # Fallback to all location data if no type column
+                attack_hist, _, _ = np.histogram2d(location_data['y'], location_data['x'], bins=[y_bins, x_bins])
+            heatmap_data = gaussian_filter(attack_hist, sigma=sigma)
+        elif heatmap_type == "defense":
+            # Check if we have the required column for filtering
+            if 'type' in match_data.columns:
+                # Filter original match data by event type, then preprocess
+                defense_match_data = match_data[match_data['type'].isin(phase_filter)]
+                if not defense_match_data.empty:
+                    defense_location_data = _preprocess_location_data(defense_match_data, half)
+                    defense_hist, _, _ = np.histogram2d(defense_location_data['y'], defense_location_data['x'], bins=[y_bins, x_bins])
+                else:
+                    defense_hist = np.zeros((len(y_bins)-1, len(x_bins)-1))
+            else:
+                # Fallback to all location data if no type column
+                defense_hist, _, _ = np.histogram2d(location_data['y'], location_data['x'], bins=[y_bins, x_bins])
+            heatmap_data = gaussian_filter(defense_hist, sigma=sigma)
     
     # Create Plotly data - ensure all numpy arrays are converted to lists
     heatmap_kwargs = {
