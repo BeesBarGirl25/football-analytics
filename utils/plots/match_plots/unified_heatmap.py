@@ -58,11 +58,17 @@ def _preprocess_location_data(match_data: pd.DataFrame, half: str = "full") -> p
 
     location_data[['y', 'x']] = pd.DataFrame(location_data['normalized_location'].tolist(), index=location_data.index)
 
-    # Apply half filter
+    # Apply half filter - debug what periods we have
+    print(f"[DEBUG] Available periods: {location_data['period'].unique()}")
+    print(f"[DEBUG] Filtering for half: {half}")
+    
     if half == "first":
         location_data = location_data[location_data['period'] == 1]
     elif half == "second":
         location_data = location_data[location_data['period'] == 2]
+    
+    print(f"[DEBUG] After filtering, data shape: {location_data.shape}")
+    print(f"[DEBUG] Remaining periods: {location_data['period'].unique()}")
 
     return location_data
 

@@ -39,13 +39,32 @@ function showTabAndRenderPlot(tabId, viewKey, containerId, graphContainerId) {
   tabEl?.classList.remove('hidden');
 
   const graphEl = document.getElementById(graphContainerId);
-  const plotWrapper = document.getElementById(containerId);
-  graphEl?.classList.remove('hidden');
-  plotWrapper?.classList.remove('hidden');
+  if (graphEl) {
+    graphEl.classList.remove('hidden');
+    console.log(`[SHOW] Unhiding graph container: ${graphContainerId}`);
+  }
 
-  // NEW: Unhide all containers with the matching data-plot-group
-  document.querySelectorAll(`[data-plot-group="${viewKey}"]`)
-    .forEach(el => el.classList.remove('hidden'));
+  const plotWrapper = document.getElementById(containerId);
+  if (plotWrapper) {
+    plotWrapper.classList.remove('hidden');
+    console.log(`[SHOW] Unhiding plot wrapper: ${containerId}`);
+  }
+
+  // Unhide all containers with the matching data-plot-group
+  const plotGroupElements = document.querySelectorAll(`[data-plot-group="${viewKey}"]`);
+  plotGroupElements.forEach(el => {
+    el.classList.remove('hidden');
+    console.log(`[SHOW] Unhiding plot group element for: ${viewKey}`);
+  });
+
+  // Also ensure any nested elements are visible
+  if (graphEl) {
+    const nestedElements = graphEl.querySelectorAll('.hidden');
+    nestedElements.forEach(el => {
+      el.classList.remove('hidden');
+      console.log(`[SHOW] Unhiding nested element`);
+    });
+  }
 
   requestAnimationFrame(() => {
     setTimeout(() => {
