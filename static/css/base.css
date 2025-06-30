@@ -257,9 +257,7 @@ html, body {
   overflow: hidden;
 }
 
-.graph-container.summary.hidden {
-  display: none !important;
-}
+
 
 .graph-container.summary .scoreline {
   font-size: 2rem;
@@ -302,9 +300,6 @@ html, body {
   grid-area: heatmap;
 }
 
-.graph-container.hidden {
-  display: none;
-}
 
 .graph-container.tall {
   height: 100%;
@@ -390,9 +385,6 @@ input:checked + .slider:before {
   user-select: none;
 }
 
-.hidden {
-  display: none;
-}
 
 .dominance-toggle-buttons,
 .heatmap-toggle-buttons,
