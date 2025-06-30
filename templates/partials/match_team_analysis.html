@@ -1,7 +1,7 @@
-<div id="graph-container-{{ prefix }}" class="graph-container tall hidden" data-plot-group="{{ prefix }}">
-    <div class="team-analysis-layout">
-        <!-- Stats Table Sidebar -->
-        <div class="team-stats-sidebar">
+<div class="team-analysis-grid">
+    <!-- Stats Block -->
+    <div class="graph-container team-stats">
+        <div class="graph-inner">
             <div class="stats-header">
                 <h4>Team Stats</h4>
             </div>
@@ -9,28 +9,28 @@
                 <div class="stats-loading">Loading stats...</div>
             </div>
         </div>
-        
-        <!-- Heatmap Area -->
-        <div class="heatmap-area">
-            <div class="graph-inner vertical heatmap-layout">
-                <!-- Compact top bar with all controls -->
-                <div class="heatmap-controls-bar" data-team="{{ prefix }}">
-                    <div class="control-group half-controls">
-                        <button class="toggle-btn active" data-half="full">Full Match</button>
-                        <button class="toggle-btn" data-half="first">1st Half</button>
-                        <button class="toggle-btn" data-half="second">2nd Half</button>
-                    </div>
-                    <div class="control-separator"></div>
-                    <div class="control-group phase-controls">
-                        <button class="phase-btn active" data-phase="possession">Possession</button>
-                        <button class="phase-btn" data-phase="attack">Attack</button>
-                        <button class="phase-btn" data-phase="defense">Defense</button>
-                    </div>
+    </div>
+    
+    <!-- Heatmap Block -->
+    <div class="graph-container team-heatmap">
+        <div class="graph-inner vertical">
+            <!-- Controls -->
+            <div class="heatmap-controls-bar" data-team="{{ prefix }}">
+                <div class="control-group half-controls">
+                    <button class="toggle-btn active" data-half="full">Full Match</button>
+                    <button class="toggle-btn" data-half="first">1st Half</button>
+                    <button class="toggle-btn" data-half="second">2nd Half</button>
                 </div>
-
-                <!-- Plot area takes remaining space -->
-                <div id="{{ plot_container_id }}" class="plotly-wrapper heatmap-plot"></div>
+                <div class="control-separator"></div>
+                <div class="control-group phase-controls">
+                    <button class="phase-btn active" data-phase="possession">Possession</button>
+                    <button class="phase-btn" data-phase="attack">Attack</button>
+                    <button class="phase-btn" data-phase="defense">Defense</button>
+                </div>
             </div>
+
+            <!-- Plot area -->
+            <div id="{{ plot_container_id }}" class="plotly-wrapper heatmap-plot"></div>
         </div>
     </div>
 </div>

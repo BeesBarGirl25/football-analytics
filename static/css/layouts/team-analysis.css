@@ -1,29 +1,28 @@
-/* === Team Analysis Layout === */
-.team-analysis-layout {
-  display: flex;
+/* === Team Analysis Grid Layout === */
+.team-analysis-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: 1fr;
+  gap: 1rem;
   width: 100%;
   height: 100%;
-  gap: 1rem;
+  min-height: 600px;
 }
 
-.team-stats-sidebar {
-  width: 280px;
-  min-width: 280px;
-  background-color: var(--bg-tertiary);
-  border-radius: 8px;
-  padding: 1rem;
+.graph-container.team-stats {
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
+  min-height: 500px;
 }
 
-.heatmap-area {
-  flex: 1;
+.graph-container.team-heatmap {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  min-height: 600px; /* Ensure minimum height for heatmaps */
+  min-height: 500px;
 }
 
 /* === Stats Header === */
@@ -43,27 +42,27 @@
 
 /* === Team Analysis Responsive === */
 @media (max-width: 1200px) {
-  .team-stats-sidebar {
-    width: 240px;
-    min-width: 240px;
+  .team-analysis-grid {
+    grid-template-columns: 250px 1fr;
   }
 }
 
 @media (max-width: 768px) {
-  .team-analysis-layout {
-    flex-direction: column;
+  .team-analysis-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
     gap: 0.5rem;
   }
   
-  .team-stats-sidebar {
-    width: 100%;
-    min-width: unset;
+  .graph-container.team-stats {
+    grid-column: 1;
+    grid-row: 1;
     max-height: 300px;
-    order: 2;
   }
   
-  .heatmap-area {
-    order: 1;
+  .graph-container.team-heatmap {
+    grid-column: 1;
+    grid-row: 2;
     min-height: 400px;
   }
   
@@ -73,8 +72,11 @@
 }
 
 @media (max-width: 480px) {
-  .team-stats-sidebar {
-    padding: 0.5rem;
+  .graph-container.team-stats {
     max-height: 250px;
+  }
+  
+  .graph-container.team-stats .graph-inner {
+    padding: 0.5rem;
   }
 }

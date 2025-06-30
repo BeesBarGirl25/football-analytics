@@ -18,8 +18,32 @@ def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
     # Initialize scoring counters
     home_norm = away_norm = home_et = away_et = home_pen = away_pen = 0
 
+    # Count goals for both teams first
+    all_goals = match_data[(match_data["type"] == "Shot") & (match_data["shot_outcome"] == "Goal")]
+    for _, goal in all_goals.iterrows():
+        period = goal.get("period", None)
+        is_home = goal["team"] == home_team
+        
+        if period in (1, 2):
+            # Normal time goals
+            if is_home:
+                home_norm += 1
+            else:
+                away_norm += 1
+        elif period in (3, 4):
+            # Extra time goals
+            if is_home:
+                home_et += 1
+            else:
+                away_et += 1
+        elif period == 5:
+            # Penalty shootout goals
+            if is_home:
+                home_pen += 1
+            else:
+                away_pen += 1
+
     def process_team(team):
-        nonlocal home_norm, away_norm, home_et, away_et, home_pen, away_pen
         df = match_data[match_data["team"] == team]
 
         # Starting XI
@@ -42,26 +66,6 @@ def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
         for _, shot in goal_shots.iterrows():
             player = shot["player"]
             pm.loc[pm["player"] == player, "goals"] += 1
-            period = shot.get("period", None)
-            is_home = team == home_team
-            if period in (1, 2):
-                # Normal time goals
-                if is_home:
-                    home_norm += 1
-                else:
-                    away_norm += 1
-            elif period in (3, 4):
-                # Extra time goals
-                if is_home:
-                    home_et += 1
-                else:
-                    away_et += 1
-            elif period == 5:
-                # Penalty shootout goals
-                if is_home:
-                    home_pen += 1
-                else:
-                    away_pen += 1
 
         # Assists
         if "pass_goal_assist" in df.columns:

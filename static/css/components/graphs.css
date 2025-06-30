@@ -112,6 +112,14 @@
   min-height: 500px; /* Ensure minimum height for heatmaps */
 }
 
+.heatmap-plot .js-plotly-plot,
+.heatmap-plot .plot-container,
+.heatmap-plot .main-svg {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 400px !important;
+}
+
 /* === Responsive Graphs === */
 @media (max-width: 1024px) {
   .graphs-container {
