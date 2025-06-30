@@ -5,8 +5,8 @@ def cumulative_stats(team_data: pd.DataFrame):
     team_data['goals'] = team_data['shot_outcome'].apply(lambda x: 1 if x == 'Goal' else 0)
     team_data.replace(-999, 0, inplace=True)
     team_data = team_data.sort_values('minute')
-    team_data['cum_goals'] = team_data['goals'].cumsum()
-    team_data['cum_xg'] = team_data['shot_statsbomb_xg'].cumsum()
+    team_data['cum_goals'] = team_data['goals'].cumsum().astype(float)  # Convert to float for JSON serialization
+    team_data['cum_xg'] = team_data['shot_statsbomb_xg'].cumsum().astype(float)  # Convert to float for JSON serialization
     return team_data
 
 
@@ -77,8 +77,8 @@ def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
         for player in subs["player"].dropna():
             pm.loc[pm["player"] == player, "subbed off"] += 1
 
-        # Ensure ints and build contributions without commas
-        pm = pm.fillna(0).astype({c: "Int64" for c in pm.columns if c != "player"})
+        # Ensure ints and build contributions without commas - use regular int for JSON serialization
+        pm = pm.fillna(0).astype({c: int for c in pm.columns if c != "player"})
         pm["contributions"] = (
             pm["goals"].apply(lambda x: "⚽" * int(x)) +
             pm["assists"].apply(lambda x: "🅰️" * int(x)) +
