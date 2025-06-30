@@ -278,6 +278,17 @@ $('#match-select').on('change', async function () {
     document.getElementById('away-team-score').textContent = summary.awayTeamNormalTime ?? '–';
     document.getElementById('score-seperator').textContent = '-';
 
+    // Update tab button texts with actual team names
+    const homeTabBtn = document.querySelector('.tab-btn[data-tab="home"]');
+    const awayTabBtn = document.querySelector('.tab-btn[data-tab="away"]');
+    
+    if (homeTabBtn && summary.homeTeam) {
+      homeTabBtn.textContent = summary.homeTeam;
+    }
+    if (awayTabBtn && summary.awayTeam) {
+      awayTabBtn.textContent = summary.awayTeam;
+    }
+
     const extraDetails = document.getElementById('extra-details');
     if (summary.extraTimeDetails) {
       extraDetails.textContent = summary.extraTimeDetails;
