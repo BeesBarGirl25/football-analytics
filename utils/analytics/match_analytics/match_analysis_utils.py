@@ -65,13 +65,15 @@ def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
 
         # Assists
         if "pass_goal_assist" in df.columns:
-            for player in df[df["pass_goal_assist"] == True]["player"]:
+            assist_players = df[df["pass_goal_assist"] == True]["player"].dropna()
+            for player in assist_players:
                 pm.loc[pm["player"] == player, "assists"] += 1
 
         # Cards
         if "bad_behaviour_card" in df.columns:
             for card_type, colname in [("Yellow Card", "yellow cards"), ("Red Card", "red cards")]:
-                for player in df[df["bad_behaviour_card"] == card_type]["player"]:
+                card_players = df[df["bad_behaviour_card"] == card_type]["player"].dropna()
+                for player in card_players:
                     pm.loc[pm["player"] == player, colname] += 1
 
         # Substitution counts
@@ -146,13 +148,19 @@ def generate_team_stats(team_data: pd.DataFrame, team_name: str):
     stats.append({"stat_name": "Fouls", "value": fouls})
     
     # Yellow cards
-    yellow_cards = len(team_data[(team_data['type'] == 'Bad Behaviour') & 
-                                (team_data['bad_behaviour_card'] == 'Yellow Card')])
+    if 'bad_behaviour_card' in team_data.columns:
+        yellow_cards = len(team_data[(team_data['type'] == 'Bad Behaviour') & 
+                                    (team_data['bad_behaviour_card'] == 'Yellow Card')])
+    else:
+        yellow_cards = 0
     stats.append({"stat_name": "Yellow Cards", "value": yellow_cards})
     
     # Red cards
-    red_cards = len(team_data[(team_data['type'] == 'Bad Behaviour') & 
-                             (team_data['bad_behaviour_card'] == 'Red Card')])
+    if 'bad_behaviour_card' in team_data.columns:
+        red_cards = len(team_data[(team_data['type'] == 'Bad Behaviour') & 
+                                 (team_data['bad_behaviour_card'] == 'Red Card')])
+    else:
+        red_cards = 0
     stats.append({"stat_name": "Red Cards", "value": red_cards})
     
     # Corners
