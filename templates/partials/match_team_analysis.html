@@ -1,11 +1,21 @@
 <div id="graph-container-{{ prefix }}" class="graph-container tall hidden" data-plot-group="{{ prefix }}">
-    <div class="graph-inner vertical">
-        <div class="heatmap-toggle-buttons">
-           <button class="toggle-btn active" data-view="{{ prefix }}">Full Match</button>
-            <button class="toggle-btn" data-view="{{ prefix }}_first">1st Half</button>
-            <button class="toggle-btn" data-view="{{ prefix }}_second">2nd Half</button>
+    <div class="graph-inner vertical heatmap-layout">
+        <!-- Compact top bar with all controls -->
+        <div class="heatmap-controls-bar" data-team="{{ prefix }}">
+            <div class="control-group half-controls">
+                <button class="toggle-btn active" data-half="full">Full Match</button>
+                <button class="toggle-btn" data-half="first">1st Half</button>
+                <button class="toggle-btn" data-half="second">2nd Half</button>
+            </div>
+            <div class="control-separator"></div>
+            <div class="control-group phase-controls">
+                <button class="phase-btn active" data-phase="possession">Possession</button>
+                <button class="phase-btn" data-phase="attack">Attack</button>
+                <button class="phase-btn" data-phase="defense">Defense</button>
+            </div>
         </div>
-        <div id="{{ plot_container_id }}" class="plotly-wrapper"></div>
+
+        <!-- Plot area takes remaining space -->
+        <div id="{{ plot_container_id }}" class="plotly-wrapper heatmap-plot"></div>
     </div>
 </div>
-

@@ -67,15 +67,30 @@ class PlotFactory:
     
     @staticmethod
     def generate_team_heatmaps(processor: MatchDataProcessor) -> Dict[str, Any]:
-        """Generate all team possession heatmaps"""
-        return {
-            'home_team_heatmap': generate_heatmap(processor.home_team_data, 'possession', 'full'),
-            'home_team_heatmap_first': generate_heatmap(processor.home_team_data, 'possession', 'first'),
-            'home_team_heatmap_second': generate_heatmap(processor.home_team_data, 'possession', 'second'),
-            'away_team_heatmap': generate_heatmap(processor.away_team_data, 'possession', 'full'),
-            'away_team_heatmap_first': generate_heatmap(processor.away_team_data, 'possession', 'first'),
-            'away_team_heatmap_second': generate_heatmap(processor.away_team_data, 'possession', 'second')
-        }
+        """Generate all team heatmap combinations (phase × half)"""
+        phases = ['possession', 'attack', 'defense']
+        halves = ['full', 'first', 'second']
+        
+        heatmaps = {}
+        for team_prefix in ['home_team', 'away_team']:
+            team_data = processor.home_team_data if team_prefix == 'home_team' else processor.away_team_data
+            
+            for phase in phases:
+                for half in halves:
+                    key = f"{team_prefix}_{phase}_{half}"
+                    heatmaps[key] = generate_heatmap(team_data, phase, half)
+        
+        # Keep backward compatibility keys
+        heatmaps.update({
+            'home_team_heatmap': heatmaps['home_team_possession_full'],
+            'home_team_heatmap_first': heatmaps['home_team_possession_first'],
+            'home_team_heatmap_second': heatmaps['home_team_possession_second'],
+            'away_team_heatmap': heatmaps['away_team_possession_full'],
+            'away_team_heatmap_first': heatmaps['away_team_possession_first'],
+            'away_team_heatmap_second': heatmaps['away_team_possession_second']
+        })
+        
+        return heatmaps
     
     @staticmethod
     def generate_match_summary(processor: MatchDataProcessor) -> Dict[str, Any]:

@@ -97,9 +97,21 @@ def create_all_match_plots():
                     "home_team_heatmap": json.dumps(generate_team_match_heatmap(home_team_data)),
                     "home_team_heatmap_first": json.dumps(generate_team_match_heatmap(home_team_data, "first")),
                     "home_team_heatmap_second": json.dumps(generate_team_match_heatmap(home_team_data, "second")),
+                    "home_team_attack_heatmap": json.dumps(generate_team_match_heatmap(home_team_data, "attack")),
+                    "home_team_attack_heatmap_first": json.dumps(generate_team_match_heatmap(home_team_data, "attack", "first")),
+                    "home_team_attack_heatmap_second": json.dumps(generate_team_match_heatmap(home_team_data, "attack", "second")),
+                    "home_team_defense_heatmap": json.dumps(generate_team_match_heatmap(home_team_data, "defense")),
+                    "home_team_defense_heatmap_first": json.dumps(generate_team_match_heatmap(home_team_data, "defense", "first")),
+                    "home_team_defense_heatmap_second": json.dumps(generate_team_match_heatmap(home_team_data, "defense", "second")),
                     "away_team_heatmap": json.dumps(generate_team_match_heatmap(away_team_data)),
                     "away_team_heatmap_first": json.dumps(generate_team_match_heatmap(away_team_data, "first")),
                     "away_team_heatmap_second": json.dumps(generate_team_match_heatmap(away_team_data, "second")),
+                    "away_team_attack_heatmap": json.dumps(generate_team_match_heatmap(away_team_data, "attack")),
+                    "away_team_attack_heatmap_first": json.dumps(generate_team_match_heatmap(away_team_data, "attack", "first")),
+                    "away_team_attack_heatmap_second": json.dumps(generate_team_match_heatmap(away_team_data, "attack", "second")),
+                    "away_team_defense_heatmap": json.dumps(generate_team_match_heatmap(away_team_data, "defense")),
+                    "away_team_defense_heatmap_first": json.dumps(generate_team_match_heatmap(away_team_data, "defense", "first")),
+                    "away_team_defense_heatmap_second": json.dumps(generate_team_match_heatmap(away_team_data, "defense", "second")),
                     "match_summary": json.dumps(match_summary, indent=2)  # leave this as-is
                 }
 
