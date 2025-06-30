@@ -43,24 +43,26 @@ def _preprocess_location_data(match_data: pd.DataFrame, half: str = "full") -> p
         raise ValueError(f"Expected 1 team in match_data, found: {teams}")
     team_name = teams[0]
 
-    # Normalize coordinates to match left-to-right attacking direction
+    # Normalize coordinates to consistent attacking direction
     def normalize(loc, team, period):
-        x_sb, y_sb = loc  # x = length (0-120), y = width (0-80)
+        x_sb, y_sb = loc  # StatsBomb: x = length (0-120), y = width (0-80)
 
-        # Flip direction for second half if needed
-        if (team == team_name and period in [2, 4]) or (team != team_name and period in [1, 3]):
-            x_sb = 120 - x_sb
-            y_sb = 80 - y_sb
+        # For single team heatmaps, normalize so team always attacks towards y=120 (top of pitch)
+        # Only flip coordinates for second half (period 2)
+        if period == 2:
+            x_sb = 120 - x_sb  # Flip length coordinate
+            y_sb = 80 - y_sb   # Flip width coordinate
 
-        return [y_sb, x_sb]  # Now: y (length) → vertical axis, x (width) → horizontal axis
+        # Convert to plot coordinates: x = width (horizontal), y = length (vertical)
+        return [y_sb, x_sb]
 
     location_data['normalized_location'] = location_data.apply(
         lambda row: normalize(row['location'], row['team'], row['period']),
         axis=1
     )
 
-    # Assign vertical (length) to y, horizontal (width) to x
-    location_data[['y', 'x']] = pd.DataFrame(location_data['normalized_location'].tolist(), index=location_data.index)
+    # Assign plot coordinates: x = width (0-80), y = length (0-120)
+    location_data[['x', 'y']] = pd.DataFrame(location_data['normalized_location'].tolist(), index=location_data.index)
 
     # Half filtering
     if half == "first":
@@ -182,19 +184,23 @@ def generate_heatmap(
         
         # Normalize coordinates so teams attack in consistent direction
         def normalize_dominance(loc, team, period):
-            x, y = loc
-            # For team_a: normalize so they always attack towards y=120
-            # For team_b: normalize so they always attack towards y=0
+            x_sb, y_sb = loc  # StatsBomb: x = length (0-120), y = width (0-80)
+            
+            # For team_a: normalize so they always attack towards y=120 (top of pitch)
+            # For team_b: normalize so they always attack towards y=0 (bottom of pitch)
             if team == team_a:
-                # Team A attacks towards y=120 in periods 1,3 and towards y=0 in periods 2,4
-                if period in [2, 4]:
-                    return [120 - y, 80 - x]  # Fixed: y should be transformed by 120, x by 80
-                return [y, x]  # Fixed: return [y, x] not [x, y]
+                # Team A attacks towards top in period 1, bottom in period 2
+                if period == 2:
+                    x_sb = 120 - x_sb  # Flip length coordinate
+                    y_sb = 80 - y_sb   # Flip width coordinate
             else:  # team_b
-                # Team B attacks towards y=0 in periods 1,3 and towards y=120 in periods 2,4
-                if period in [1, 3]:
-                    return [120 - y, 80 - x]  # Fixed: y should be transformed by 120, x by 80
-                return [y, x]  # Fixed: return [y, x] not [x, y]
+                # Team B attacks towards bottom in period 1, top in period 2
+                if period == 1:
+                    x_sb = 120 - x_sb  # Flip length coordinate
+                    y_sb = 80 - y_sb   # Flip width coordinate
+            
+            # Convert to plot coordinates: x = width (horizontal), y = length (vertical)
+            return [y_sb, x_sb]
         
         location_data['normalized_location'] = location_data.apply(
             lambda row: normalize_dominance([row['x'], row['y']], row['team'], row['period']),
