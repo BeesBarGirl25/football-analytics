@@ -220,7 +220,7 @@ def generate_heatmap(
         Plotly figure as JSON dict
     """
     
-    # Set defaults based on heatmap type
+    # Set defaults based on heatmap type - ALL use dominance colorscale for consistency
     if heatmap_type == "dominance":
         bins = bins or (24, 16)
         sigma = sigma or 1.5
@@ -230,20 +230,20 @@ def generate_heatmap(
     elif heatmap_type == "possession":
         bins = bins or (48, 32)
         sigma = sigma or 2.5
-        colorscale = colorscale or _get_team_colorscale()
+        colorscale = colorscale or _get_dominance_colorscale()  # Use dominance colorscale
         title_prefix = title_prefix or "Possession Map"
         normalization_type = "percentile"
     elif heatmap_type == "attack":
         bins = bins or (48, 32)
         sigma = sigma or 2.5
-        colorscale = colorscale or _get_team_colorscale()
+        colorscale = colorscale or _get_dominance_colorscale()  # Use dominance colorscale
         title_prefix = title_prefix or "Attack Map"
         normalization_type = "percentile"
         phase_filter = _generate_phase_filters("attack")
     elif heatmap_type == "defense":
         bins = bins or (48, 32)
         sigma = sigma or 2.5
-        colorscale = colorscale or _get_team_colorscale()
+        colorscale = colorscale or _get_dominance_colorscale()  # Use dominance colorscale
         title_prefix = title_prefix or "Defense Map"
         normalization_type = "percentile"
         phase_filter = _generate_phase_filters("defense")
@@ -372,15 +372,13 @@ def generate_heatmap(
         'type': 'heatmap'
     }
     
-    # Add zmin/zmax for dominance heatmaps
+    # Add zmin/zmax for all heatmaps to ensure consistent scaling
     if zmin is not None:
         heatmap_kwargs['zmin'] = zmin
     if zmax is not None:
         heatmap_kwargs['zmax'] = zmax
     
-    # Add reversescale for possession heatmaps
-    if heatmap_type == "possession":
-        heatmap_kwargs['reversescale'] = True
+    # No reversescale needed since all heatmaps use the same color scheme
     
     # Create data array
     data = [heatmap_kwargs]
