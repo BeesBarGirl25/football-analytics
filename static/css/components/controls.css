@@ -1,0 +1,163 @@
+/* === Toggle Buttons === */
+.toggle-btn,
+.phase-btn {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.toggle-btn:hover,
+.phase-btn:hover {
+  background-color: var(--bg-tertiary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-button);
+}
+
+.toggle-btn.active {
+  background-color: var(--accent-blue);
+  color: var(--bg-primary);
+  font-weight: 600;
+  border-color: var(--accent-blue);
+  box-shadow: var(--shadow-blue);
+}
+
+.phase-btn.active {
+  background-color: var(--accent-orange);
+  color: #fff;
+  font-weight: 600;
+  border-color: var(--accent-orange);
+  box-shadow: var(--shadow-orange);
+}
+
+/* === Control Groups === */
+.dominance-toggle-buttons,
+.heatmap-toggle-buttons,
+.phase-toggle-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.phase-toggle-buttons {
+  margin-bottom: 8px;
+}
+
+.heatmap-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.3rem 0;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.control-group {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.control-separator {
+  width: 1px;
+  height: 20px;
+  background-color: var(--border-light);
+  margin: 0 0.5rem;
+}
+
+/* === Switch Toggle === */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: var(--border-light);
+  border-radius: 24px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: var(--transition-slow);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--accent-blue);
+  transition: var(--transition-slow);
+}
+
+input:checked + .slider {
+  background-color: var(--accent-blue);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.toggle-label {
+  font-size: 0.8rem;
+  user-select: none;
+}
+
+/* === Responsive Controls === */
+@media (max-width: 768px) {
+  .heatmap-controls-bar {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+  
+  .control-separator {
+    width: 80%;
+    height: 1px;
+    margin: 0;
+  }
+  
+  .control-group {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .toggle-btn,
+  .phase-btn {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .toggle-btn,
+  .phase-btn {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+  
+  .control-group {
+    gap: 0.15rem;
+  }
+}

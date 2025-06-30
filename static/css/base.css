@@ -1,14 +1,41 @@
-/* === Base Layout === */
+/* === CSS Variables === */
+:root {
+  --bg-primary: #121212;
+  --bg-secondary: #1f1f1f;
+  --bg-tertiary: #2a2a2a;
+  --bg-quaternary: #1e1e1e;
+  --text-primary: #e0e0e0;
+  --text-secondary: #dcdcdc;
+  --text-muted: #ccc;
+  --accent-blue: #90caf9;
+  --accent-orange: #ff6b35;
+  --accent-home: #2196f3;
+  --accent-away: #f44336;
+  --border-color: #333;
+  --border-light: #444;
+  --border-medium: #777;
+  --shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  --shadow-light: 0 0 4px rgba(0, 0, 0, 0.25);
+  --shadow-button: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-blue: 0 2px 6px rgba(144, 202, 249, 0.3);
+  --shadow-orange: 0 2px 6px rgba(255, 107, 53, 0.3);
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s;
+  --transition-slow: 0.4s;
+}
+
+/* === Base Reset === */
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #121212;
-  color: #e0e0e0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
+/* === Main Grid Layout === */
 .wrapper {
   display: grid;
   grid-template-areas:
@@ -20,117 +47,12 @@ html, body {
   overflow: hidden;
 }
 
-/* === Sidebar === */
-.sidebar {
-  grid-area: sidebar;
-  background-color: #1f1f1f;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 60px;
-  overflow-y: auto;
-  gap: 20px;
-}
-
-.icon-button {
-  color: #90caf9;
-  font-size: 1.5rem;
-  transition: transform 0.2s ease;
-}
-.icon-button:hover {
-  transform: scale(1.2);
-}
-
-/* === Top Navbar === */
-.top-navbar {
-  grid-area: top-navbar;
-  background-color: #1f1f1f;
-  display: flex;
-  align-items: center;
-  padding: 5px 20px;
-  border-bottom: 1px solid #333;
-  height: 45px;
-  z-index: 1000;
-  gap: 1rem;
-  flex-wrap: nowrap;
-}
-
-.top-navbar .logo {
-  color: #90caf9;
-  font-size: 1.8rem;
-  font-weight: bold;
-  white-space: nowrap;
-}
-
-.top-navbar .dropdowns {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-left: auto;
-  order: 1;
-}
-
-.top-navbar .dropdowns .select2-container .select2-selection--single {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border: 1px solid #777;
-  border-radius: 6px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
-}
-
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-  color: #000000 !important;
-}
-
-.select2-dropdown,
-.select2-container--default .select2-results > .select2-results__options {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-}
-
-.select2-container--default .select2-results__option--highlighted[aria-selected] {
-  background-color: #90caf9 !important;
-  color: #121212 !important;
-}
-
-.top-navbar .layout-toggle-switch {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  color: #ccc;
-  padding-left: 0;
-  padding-right: 0;
-  order: 2;
-}
-
-@media (max-width: 768px) {
-  .top-navbar {
-    flex-direction: column;
-    align-items: flex-start;
-    height: auto;
-    padding: 10px;
-  }
-  .top-navbar .layout-toggle-switch {
-    justify-content: flex-end;
-    width: 100%;
-    margin-top: 10px;
-  }
-  .top-navbar .dropdowns {
-    flex-wrap: wrap;
-    width: 100%;
-    order: 1;
-  }
-}
-
 /* === Content Area === */
 .content {
   grid-area: content;
   padding: 0.5rem;
-  background-color: #121212;
-  color: #e0e0e0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -143,40 +65,13 @@ html, body {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  background-color: #1e1e1e;
+  background-color: var(--bg-quaternary);
   padding: 0.5rem;
   border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow);
   height: 100%;
   width: 100%;
   box-sizing: border-box;
-}
-
-.analysis-nav {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
-
-.tab-btn {
-  flex: 1;
-  background-color: #2d2d2d;
-  border: none;
-  padding: 0.75rem;
-  border-radius: 8px;
-  color: #dcdcdc;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  text-align: center;
-}
-.tab-btn:hover {
-  background-color: #3d3d3d;
-}
-.tab-btn.active {
-  background-color: #007bff;
-  color: #fff;
 }
 
 .analysis-content {
@@ -188,6 +83,7 @@ html, body {
   height: 100%;
   box-sizing: border-box;
 }
+
 .analysis-content.hidden {
   visibility: hidden;
   position: absolute;
@@ -195,326 +91,4 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-}
-
-
-/* === Graph Layout === */
-.graphs-container.wide-mode {
-  display: grid;
-  grid-template-columns: 1fr 2fr 2fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 1rem;
-  width: 100%;
-  height: 100%;
-  grid-template-areas:
-    "momentum summary heatmap"
-    "xg       summary heatmap";
-}
-
-.graphs-container.compact-mode {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto auto;
-  gap: 1rem;
-  width: 100%;
-  grid-template-areas:
-    "momentum"
-    "xg"
-    "summary"
-    "heatmap";
-}
-
-/* === Graph Components === */
-.graph-container {
-  background-color: #1f1f1f;
-  border: 1px solid #333;
-  border-radius: 8px;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  overflow: hidden;
-  color: #e0e0e0;
-  text-align: center;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  font-size: 0.85rem;
-}
-
-.graph-container.xg {
-  grid-area: xg;
-}
-.graph-container.momentum {
-  grid-area: momentum;
-}
-.graph-container.summary {
-  grid-area: summary;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.5rem;
-  overflow: hidden;
-}
-
-
-
-.graph-container.summary .scoreline {
-  font-size: 2rem;
-  font-weight: bold;
-  margin: 0.1rem 0;
-  display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.graph-container.summary .scoreline .home {
-  color: #2196f3;
-}
-.graph-container.summary .scoreline .away {
-  color: #f44336;
-}
-.graph-container.summary .team-tables {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 1rem;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-.graph-container.summary .team-table {
-  flex: 1;
-  background-color: #2a2a2a;
-  padding: 0.5rem;
-  border-radius: 10px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
-  overflow-y: auto;
-  font-size: calc(0.65rem + 0.5vh);
-  display: flex;
-  flex-direction: column;
-  justify-content: stretch;
-  height: 100%;
-}
-.graph-container.heatmap {
-  grid-area: heatmap;
-}
-
-
-.graph-container.tall {
-  height: 100%;
-  min-height: 400px;
-}
-
-.graph-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: stretch;
-  width: 100%;
-  height: 100%;
-  padding: 0.5rem;
-  gap: 1rem;
-  box-sizing: border-box;
-}
-
-.plotly-wrapper {
-  flex-grow: 1;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
-}
-.plotly-wrapper .js-plotly-plot,
-.plotly-wrapper .plot-container,
-.plotly-wrapper .main-svg {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-@media (max-width: 1024px) {
-  .graphs-container {
-    grid-template-columns: 1fr;
-    grid-auto-rows: auto;
-  }
-}
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 20px;
-}
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  background-color: #444;
-  border-radius: 24px;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  transition: 0.4s;
-}
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 14px;
-  width: 14px;
-  border-radius: 50%;
-  left: 3px;
-  bottom: 3px;
-  background-color: #90caf9;
-  transition: 0.4s;
-}
-input:checked + .slider {
-  background-color: #90caf9;
-}
-input:checked + .slider:before {
-  transform: translateX(20px);
-}
-.toggle-label {
-  font-size: 0.8rem;
-  user-select: none;
-}
-
-
-.dominance-toggle-buttons,
-.heatmap-toggle-buttons,
-.phase-toggle-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  padding-bottom: 10px;
-}
-
-.phase-toggle-buttons {
-  margin-bottom: 8px;
-}
-
-.toggle-btn,
-.phase-btn {
-  background-color: #1f1f1f;
-  color: #e0e0e0;
-  border: 1px solid #444;
-  border-radius: 16px;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  font-weight: 500;
-}
-
-.toggle-btn:hover,
-.phase-btn:hover {
-  background-color: #2a2a2a;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.toggle-btn.active {
-  background-color: #90caf9;
-  color: #121212;
-  font-weight: 600;
-  border-color: #90caf9;
-  box-shadow: 0 2px 6px rgba(144, 202, 249, 0.3);
-}
-
-.phase-btn.active {
-  background-color: #ff6b35;
-  color: #fff;
-  font-weight: 600;
-  border-color: #ff6b35;
-  box-shadow: 0 2px 6px rgba(255, 107, 53, 0.3);
-}
-
-.heatmap-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    height: 100%;
-    width: 100%;
-}
-
-.heatmap-controls-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    padding: 0.3rem 0;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-}
-
-.control-group {
-    display: flex;
-    gap: 0.25rem;
-    align-items: center;
-}
-
-.control-separator {
-    width: 1px;
-    height: 20px;
-    background-color: #444;
-    margin: 0 0.5rem;
-}
-
-.heatmap-plot {
-    flex-grow: 1;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-}
-
-/* Remove old styles that are no longer needed */
-.heatmap-toggle-buttons.top,
-.heatmap-content,
-.phase-toggle-buttons.side {
-    display: none;
-}
-
-/* Responsive design for mobile */
-@media (max-width: 768px) {
-  .heatmap-controls-bar {
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.5rem 0;
-  }
-  
-  .control-separator {
-    width: 80%;
-    height: 1px;
-    margin: 0;
-  }
-  
-  .control-group {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  
-  .toggle-btn,
-  .phase-btn {
-    font-size: 0.75rem;
-    padding: 3px 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .toggle-btn,
-  .phase-btn {
-    font-size: 0.7rem;
-    padding: 2px 6px;
-  }
-  
-  .control-group {
-    gap: 0.15rem;
-  }
 }

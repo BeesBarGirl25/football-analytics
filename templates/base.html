@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <title>{% block title %}Football Dashboard{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <!-- Modular CSS Files -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/navigation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/graphs.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/controls.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/tables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/overview.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/team-analysis.css') }}">
 </head>
 <body>
     <div class="wrapper">
@@ -77,7 +84,32 @@
     <!-- JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
+    <!-- Core modules (load first) -->
+    <script src="{{ url_for('static', filename='js/core/config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/core/utils.js') }}"></script>
+    
+    <!-- Services -->
+    <script src="{{ url_for('static', filename='js/services/plot-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/services/dropdown-service.js') }}"></script>
+    
+    <!-- Components -->
+    <script src="{{ url_for('static', filename='js/components/navigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/heatmap-controls.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/stats-table.js') }}"></script>
+    
+    <!-- Page-specific scripts -->
+    <script src="{{ url_for('static', filename='js/pages/match-analysis.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pages/competition-analysis.js') }}"></script>
+    
+    <!-- Legacy compatibility -->
     <script src="{{ url_for('static', filename='js/dropdowns.js') }}"></script>
+    
+    <!-- Page-specific blocks -->
     {% block scripts %}{% endblock %}
+    
+    <!-- Main app initialization (load last) -->
+    <script src="{{ url_for('static', filename='js/core/app.js') }}"></script>
 </body>
 </html>
