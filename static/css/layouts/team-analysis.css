@@ -1,7 +1,7 @@
 /* === Team Analysis Grid Layout === */
 .team-analysis-grid {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 280px 1fr;
   grid-template-rows: 1fr;
   gap: 1rem;
   width: 100%;

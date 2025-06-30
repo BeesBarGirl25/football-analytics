@@ -53,8 +53,17 @@ class StatsTable {
             return;
         }
         
+        // Debug logging for stats issues
+        Utils.log(`=== TEAM STATS DEBUG (${teamType}) ===`, 'STATS_TABLE');
+        Utils.log(`Available plot keys:`, 'STATS_TABLE');
+        Utils.log(Object.keys(window.cachedPlots), 'STATS_TABLE');
+        
         const statsKey = `${teamType}_stats`;
+        Utils.log(`Looking for stats key: ${statsKey}`, 'STATS_TABLE');
+        
         if (window.cachedPlots[statsKey]) {
+            Utils.log(`Found stats data for ${teamType}:`, 'STATS_TABLE');
+            Utils.log(window.cachedPlots[statsKey], 'STATS_TABLE');
             this.populateTeamStatsTable(teamType, window.cachedPlots[statsKey]);
         } else {
             Utils.log(`${teamType} stats not available`, 'STATS_TABLE', 'warn');

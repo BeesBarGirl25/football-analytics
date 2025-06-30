@@ -150,6 +150,16 @@ class MatchAnalysisPage {
     updateMatchSummary(summary) {
         if (!summary) return;
 
+        // Debug logging for scoreline issues
+        Utils.log('=== MATCH SUMMARY DEBUG ===', 'MATCH_ANALYSIS');
+        Utils.log(`Home Team: ${summary.homeTeam}`, 'MATCH_ANALYSIS');
+        Utils.log(`Away Team: ${summary.awayTeam}`, 'MATCH_ANALYSIS');
+        Utils.log(`Home Score (Normal): ${summary.homeTeamNormalTime}`, 'MATCH_ANALYSIS');
+        Utils.log(`Away Score (Normal): ${summary.awayTeamNormalTime}`, 'MATCH_ANALYSIS');
+        Utils.log(`Scoreline: ${summary.scoreline}`, 'MATCH_ANALYSIS');
+        Utils.log(`Full Summary Object:`, 'MATCH_ANALYSIS');
+        Utils.log(summary, 'MATCH_ANALYSIS');
+
         // Update team names and scores
         const updates = [
             { id: 'home-team-name', value: summary.homeTeam || '–' },
@@ -161,6 +171,7 @@ class MatchAnalysisPage {
         updates.forEach(({ id, value }) => {
             const element = document.getElementById(id);
             if (element) element.textContent = value;
+            Utils.log(`Updated ${id} to: ${value}`, 'MATCH_ANALYSIS');
         });
 
         // Update score separator
