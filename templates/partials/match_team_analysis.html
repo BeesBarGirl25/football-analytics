@@ -1,19 +1,21 @@
 <div id="graph-container-{{ prefix }}" class="graph-container tall hidden" data-plot-group="{{ prefix }}">
-    <div class="graph-inner vertical">
-        <!-- Phase/Type buttons (horizontal) -->
-        <div class="phase-toggle-buttons" data-team="{{ prefix }}">
-            <button class="phase-btn active" data-phase="possession">Possession</button>
-            <button class="phase-btn" data-phase="attack">Attack</button>
-            <button class="phase-btn" data-phase="defense">Defense</button>
-        </div>
-        
-        <!-- Half buttons (horizontal) -->
-        <div class="heatmap-toggle-buttons" data-team="{{ prefix }}">
+    <div class="graph-inner vertical heatmap-layout">
+        <!-- Top: Half toggle buttons -->
+        <div class="heatmap-toggle-buttons top" data-team="{{ prefix }}">
             <button class="toggle-btn active" data-half="full">Full Match</button>
             <button class="toggle-btn" data-half="first">1st Half</button>
             <button class="toggle-btn" data-half="second">2nd Half</button>
         </div>
-        
-        <div id="{{ plot_container_id }}" class="plotly-wrapper"></div>
+
+        <!-- Middle: Sidebar layout with phase buttons on the left -->
+        <div class="heatmap-content">
+            <div class="phase-toggle-buttons side" data-team="{{ prefix }}">
+                <button class="phase-btn active" data-phase="possession">Possession</button>
+                <button class="phase-btn" data-phase="attack">Attack</button>
+                <button class="phase-btn" data-phase="defense">Defense</button>
+            </div>
+
+            <div id="{{ plot_container_id }}" class="plotly-wrapper"></div>
+        </div>
     </div>
 </div>
