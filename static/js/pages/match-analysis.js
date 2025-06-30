@@ -87,6 +87,9 @@ class MatchAnalysisPage {
             // Update team tables
             this.updateTeamTables(result.match_summary);
 
+            // Load team stats
+            this.statsTable.loadAllTeamStats();
+
             // Reset controls and switch to overview
             this.heatmapControls.resetToDefaults();
             this.navigation.switchTab('overview');

@@ -45,20 +45,23 @@ def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
             period = shot.get("period", None)
             is_home = team == home_team
             if period in (1, 2):
-                if df["period"].max() < 3:
-                    home_norm += is_home
-                    away_norm += not is_home
+                # Normal time goals
+                if is_home:
+                    home_norm += 1
                 else:
-                    home_norm += is_home
-                    away_norm += not is_home
-                    home_et += is_home
-                    away_et += not is_home
+                    away_norm += 1
             elif period in (3, 4):
-                home_et += is_home
-                away_et += not is_home
+                # Extra time goals
+                if is_home:
+                    home_et += 1
+                else:
+                    away_et += 1
             elif period == 5:
-                home_pen += is_home
-                away_pen += not is_home
+                # Penalty shootout goals
+                if is_home:
+                    home_pen += 1
+                else:
+                    away_pen += 1
 
         # Assists
         if "pass_goal_assist" in df.columns:
@@ -100,3 +103,69 @@ def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
         home_et, away_et,
         home_pen, away_pen
     )
+
+
+def generate_team_stats(team_data: pd.DataFrame, team_name: str):
+    """Generate team statistics for the stats table"""
+    
+    # Initialize stats
+    stats = []
+    
+    # Goals
+    goals = len(team_data[(team_data['type'] == 'Shot') & (team_data['shot_outcome'] == 'Goal')])
+    stats.append({"stat_name": "Goals", "value": goals})
+    
+    # Total shots
+    total_shots = len(team_data[team_data['type'] == 'Shot'])
+    stats.append({"stat_name": "Total Shots", "value": total_shots})
+    
+    # Shots on target
+    shots_on_target = len(team_data[(team_data['type'] == 'Shot') & 
+                                   (team_data['shot_outcome'].isin(['Goal', 'Saved']))])
+    stats.append({"stat_name": "Shots on Target", "value": shots_on_target})
+    
+    # xG (Expected Goals)
+    xg = team_data[team_data['type'] == 'Shot']['shot_statsbomb_xg'].fillna(0).sum()
+    stats.append({"stat_name": "xG", "value": f"{xg:.2f}"})
+    
+    # Passes
+    total_passes = len(team_data[team_data['type'] == 'Pass'])
+    stats.append({"stat_name": "Passes", "value": total_passes})
+    
+    # Pass accuracy
+    successful_passes = len(team_data[(team_data['type'] == 'Pass') & 
+                                     (team_data['pass_outcome'].isna())])  # NaN means successful
+    pass_accuracy = (successful_passes / total_passes * 100) if total_passes > 0 else 0
+    stats.append({"stat_name": "Pass Accuracy", "value": f"{pass_accuracy:.1f}%"})
+    
+    # Possession (approximate based on successful passes)
+    stats.append({"stat_name": "Possession", "value": f"{pass_accuracy:.1f}%"})
+    
+    # Fouls
+    fouls = len(team_data[team_data['type'] == 'Foul Committed'])
+    stats.append({"stat_name": "Fouls", "value": fouls})
+    
+    # Yellow cards
+    yellow_cards = len(team_data[(team_data['type'] == 'Bad Behaviour') & 
+                                (team_data['bad_behaviour_card'] == 'Yellow Card')])
+    stats.append({"stat_name": "Yellow Cards", "value": yellow_cards})
+    
+    # Red cards
+    red_cards = len(team_data[(team_data['type'] == 'Bad Behaviour') & 
+                             (team_data['bad_behaviour_card'] == 'Red Card')])
+    stats.append({"stat_name": "Red Cards", "value": red_cards})
+    
+    # Corners
+    corners = len(team_data[team_data['type'] == 'Corner'])
+    stats.append({"stat_name": "Corners", "value": corners})
+    
+    # Offsides
+    offsides = len(team_data[team_data['type'] == 'Offside'])
+    stats.append({"stat_name": "Offsides", "value": offsides})
+    
+    return {
+        "team_stats": {
+            "team_name": team_name,
+            "stats": stats
+        }
+    }
