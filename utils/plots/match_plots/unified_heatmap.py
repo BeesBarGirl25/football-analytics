@@ -33,8 +33,48 @@ def _generate_phase_filters(phase: str):
         raise ValueError("phase must be 'attack' or 'defense'")
     return event_types
 
+def _determine_team_attacking_directions(match_data: pd.DataFrame) -> dict:
+    """Determine which direction each team attacks in each half based on shot locations"""
+    shot_data = match_data[match_data['type'] == 'Shot'].copy()
+    
+    if shot_data.empty:
+        # Fallback: assume standard setup if no shots available
+        teams = match_data['team'].unique()
+        return {team: {1: 'right', 2: 'left'} for team in teams}
+    
+    team_directions = {}
+    
+    for team in shot_data['team'].unique():
+        team_shots = shot_data[shot_data['team'] == team]
+        team_directions[team] = {}
+        
+        for period in [1, 2]:
+            period_shots = team_shots[team_shots['period'] == period]
+            
+            if not period_shots.empty:
+                # Extract x-coordinates (length of pitch)
+                x_coords = []
+                for _, row in period_shots.iterrows():
+                    if isinstance(row['location'], list) and len(row['location']) >= 2:
+                        x_coords.append(row['location'][0])
+                
+                if x_coords:
+                    avg_x = sum(x_coords) / len(x_coords)
+                    # If average shot x > 60 (middle), team attacks towards x=120 (right)
+                    # If average shot x < 60, team attacks towards x=0 (left)
+                    team_directions[team][period] = 'right' if avg_x > 60 else 'left'
+                else:
+                    # Fallback based on period
+                    team_directions[team][period] = 'right' if period == 1 else 'left'
+            else:
+                # Fallback based on period
+                team_directions[team][period] = 'right' if period == 1 else 'left'
+    
+    return team_directions
+
+
 def _preprocess_location_data(match_data: pd.DataFrame, half: str = "full") -> pd.DataFrame:
-    """Preprocess and normalize location data so the team always attacks bottom-to-top (120 → 0)"""
+    """Preprocess and normalize location data with correct attacking direction detection"""
     location_data = match_data[['location', 'team', 'period']].dropna()
     location_data = location_data[location_data['location'].apply(lambda loc: isinstance(loc, list) and len(loc) == 2)]
 
@@ -43,13 +83,19 @@ def _preprocess_location_data(match_data: pd.DataFrame, half: str = "full") -> p
         raise ValueError(f"Expected 1 team in match_data, found: {teams}")
     team_name = teams[0]
 
-    # Normalize coordinates to consistent attacking direction
+    # Determine actual attacking directions for this team
+    attacking_directions = _determine_team_attacking_directions(match_data)
+    team_directions = attacking_directions.get(team_name, {1: 'right', 2: 'left'})
+
+    # Normalize coordinates to consistent attacking direction (always towards y=120/top)
     def normalize(loc, team, period):
         x_sb, y_sb = loc  # StatsBomb: x = length (0-120), y = width (0-80)
 
-        # For single team heatmaps, normalize so team always attacks towards y=120 (top of pitch)
-        # Only flip coordinates for second half (period 2)
-        if period == 2:
+        # Get the team's actual attacking direction for this period
+        attacking_direction = team_directions.get(period, 'right')
+        
+        # If team attacks left (towards x=0), flip coordinates to normalize to right attack
+        if attacking_direction == 'left':
             x_sb = 120 - x_sb  # Flip length coordinate
             y_sb = 80 - y_sb   # Flip width coordinate
 
@@ -103,6 +149,52 @@ def _get_dominance_colorscale():
     ]
 
 
+def _get_team_colorscale():
+    """Get consistent colorscale for team heatmaps (possession, attack, defense)"""
+    return [
+        [0.0, "rgb(255,255,255)"],   # White (low activity)
+        [0.1, "rgb(240,249,232)"],
+        [0.2, "rgb(204,235,197)"],
+        [0.3, "rgb(168,221,181)"],
+        [0.4, "rgb(123,204,196)"],
+        [0.5, "rgb(78,179,211)"],
+        [0.6, "rgb(43,140,190)"],
+        [0.7, "rgb(8,104,172)"],
+        [0.8, "rgb(8,64,129)"],
+        [0.9, "rgb(37,52,148)"],
+        [1.0, "rgb(68,1,84)"]        # Dark purple (high activity)
+    ]
+
+
+def _normalize_heatmap_data(data: np.ndarray, normalization_type: str = "percentile") -> tuple:
+    """
+    Normalize heatmap data and return normalized data with consistent zmin/zmax
+    
+    Args:
+        data: Raw heatmap data
+        normalization_type: 'percentile', 'minmax', or 'none'
+    
+    Returns:
+        tuple: (normalized_data, zmin, zmax)
+    """
+    if normalization_type == "percentile":
+        # Use 95th percentile to avoid outliers affecting the scale
+        p95 = np.percentile(data[data > 0], 95) if np.any(data > 0) else 1.0
+        normalized_data = np.clip(data / p95, 0, 1)
+        return normalized_data, 0, 1
+    elif normalization_type == "minmax":
+        # Standard min-max normalization
+        data_min, data_max = data.min(), data.max()
+        if data_max > data_min:
+            normalized_data = (data - data_min) / (data_max - data_min)
+        else:
+            normalized_data = data
+        return normalized_data, 0, 1
+    else:  # normalization_type == "none"
+        # No normalization, use raw data
+        return data, None, None
+
+
 def generate_heatmap(
     match_data: pd.DataFrame,
     heatmap_type: str,
@@ -134,29 +226,29 @@ def generate_heatmap(
         sigma = sigma or 1.5
         colorscale = colorscale or _get_dominance_colorscale()
         title_prefix = title_prefix or "Dominant Team Map"
-        zmin, zmax = 0, 1
+        normalization_type = "none"  # Dominance already normalized to 0-1
     elif heatmap_type == "possession":
         bins = bins or (48, 32)
         sigma = sigma or 2.5
-        colorscale = colorscale or 'Viridis'
-        title_prefix = title_prefix or "Possesion"
-        zmin, zmax = None, None
+        colorscale = colorscale or _get_team_colorscale()
+        title_prefix = title_prefix or "Possession Map"
+        normalization_type = "percentile"
     elif heatmap_type == "attack":
         bins = bins or (48, 32)
         sigma = sigma or 2.5
-        colorscale = colorscale or 'Viridis'
+        colorscale = colorscale or _get_team_colorscale()
         title_prefix = title_prefix or "Attack Map"
-        zmin, zmax = None, None
+        normalization_type = "percentile"
         phase_filter = _generate_phase_filters("attack")
     elif heatmap_type == "defense":
         bins = bins or (48, 32)
         sigma = sigma or 2.5
-        colorscale = colorscale or 'Viridis'
+        colorscale = colorscale or _get_team_colorscale()
         title_prefix = title_prefix or "Defense Map"
-        zmin, zmax = None, None
+        normalization_type = "percentile"
         phase_filter = _generate_phase_filters("defense")
     else:
-        raise ValueError(f"Unknown heatmap_type: {heatmap_type}. Must be 'dominance' or 'possession'")
+        raise ValueError(f"Unknown heatmap_type: {heatmap_type}. Must be 'dominance', 'possession', 'attack', or 'defense'")
     
     # Create bins and centers
     x_bins, y_bins, x_centers, y_centers = _create_bins_and_centers(bins)
@@ -182,20 +274,26 @@ def generate_heatmap(
         
         team_a, team_b = teams
         
-        # Normalize coordinates so teams attack in consistent direction
+        # Determine actual attacking directions for both teams
+        attacking_directions = _determine_team_attacking_directions(match_data)
+        team_a_directions = attacking_directions.get(team_a, {1: 'right', 2: 'left'})
+        team_b_directions = attacking_directions.get(team_b, {1: 'left', 2: 'right'})
+        
+        # Normalize coordinates so teams attack in consistent direction for dominance comparison
         def normalize_dominance(loc, team, period):
             x_sb, y_sb = loc  # StatsBomb: x = length (0-120), y = width (0-80)
             
-            # For team_a: normalize so they always attack towards y=120 (top of pitch)
-            # For team_b: normalize so they always attack towards y=0 (bottom of pitch)
+            # Get the team's actual attacking direction for this period
             if team == team_a:
-                # Team A attacks towards top in period 1, bottom in period 2
-                if period == 2:
+                attacking_direction = team_a_directions.get(period, 'right')
+                # Normalize team_a to always attack towards y=120 (top of pitch)
+                if attacking_direction == 'left':
                     x_sb = 120 - x_sb  # Flip length coordinate
                     y_sb = 80 - y_sb   # Flip width coordinate
             else:  # team_b
-                # Team B attacks towards bottom in period 1, top in period 2
-                if period == 1:
+                attacking_direction = team_b_directions.get(period, 'left')
+                # Normalize team_b to always attack towards y=0 (bottom of pitch)
+                if attacking_direction == 'right':
                     x_sb = 120 - x_sb  # Flip length coordinate
                     y_sb = 80 - y_sb   # Flip width coordinate
             
@@ -223,6 +321,7 @@ def generate_heatmap(
         
         heatmap_data = gaussian_filter(dominance_ratio, sigma=sigma)
         heatmap_data = np.clip(heatmap_data, 0.0, 1.0)
+        zmin, zmax = 0, 1  # Set explicit range for dominance heatmaps
         
     else:
         # For single-team heatmaps (possession, attack, defense), use the preprocessing function
@@ -230,7 +329,7 @@ def generate_heatmap(
         
         if heatmap_type == "possession":
             team_hist, _, _ = np.histogram2d(location_data['y'], location_data['x'], bins=[y_bins, x_bins])
-            heatmap_data = gaussian_filter(team_hist, sigma=sigma)
+            raw_heatmap_data = gaussian_filter(team_hist, sigma=sigma)
         elif heatmap_type == "attack":
             # Check if we have the required column for filtering
             if 'type' in match_data.columns:
@@ -244,7 +343,7 @@ def generate_heatmap(
             else:
                 # Fallback to all location data if no type column
                 attack_hist, _, _ = np.histogram2d(location_data['y'], location_data['x'], bins=[y_bins, x_bins])
-            heatmap_data = gaussian_filter(attack_hist, sigma=sigma)
+            raw_heatmap_data = gaussian_filter(attack_hist, sigma=sigma)
         elif heatmap_type == "defense":
             # Check if we have the required column for filtering
             if 'type' in match_data.columns:
@@ -258,7 +357,10 @@ def generate_heatmap(
             else:
                 # Fallback to all location data if no type column
                 defense_hist, _, _ = np.histogram2d(location_data['y'], location_data['x'], bins=[y_bins, x_bins])
-            heatmap_data = gaussian_filter(defense_hist, sigma=sigma)
+            raw_heatmap_data = gaussian_filter(defense_hist, sigma=sigma)
+        
+        # Apply normalization to team heatmaps
+        heatmap_data, zmin, zmax = _normalize_heatmap_data(raw_heatmap_data, normalization_type)
     
     # Create Plotly data - ensure all numpy arrays are converted to lists
     heatmap_kwargs = {
