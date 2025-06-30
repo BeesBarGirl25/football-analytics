@@ -159,11 +159,12 @@ function renderCurrentTeamHeatmap(teamPrefix) {
 document.addEventListener('click', (event) => {
   if (event.target.classList.contains('phase-btn')) {
     const button = event.target;
-    const phaseButtons = button.closest('.phase-toggle-buttons');
-    const teamPrefix = phaseButtons.getAttribute('data-team');
+    const controlsBar = button.closest('.heatmap-controls-bar');
+    const teamPrefix = controlsBar.getAttribute('data-team');
     
-    // Update active states
-    phaseButtons.querySelectorAll('.phase-btn').forEach(btn => btn.classList.remove('active'));
+    // Update active states within the phase control group
+    const phaseGroup = button.closest('.control-group.phase-controls');
+    phaseGroup.querySelectorAll('.phase-btn').forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
     
     // Update state
@@ -186,17 +187,19 @@ document.addEventListener('click', (event) => {
 document.addEventListener('click', (event) => {
   if (event.target.classList.contains('toggle-btn')) {
     const button = event.target;
-    const toggleButtons = button.closest('.heatmap-toggle-buttons, .dominance-toggle-buttons');
+    const controlsBar = button.closest('.heatmap-controls-bar');
+    const dominanceButtons = button.closest('.dominance-toggle-buttons');
     
-    // Update active states
-    toggleButtons.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
-    
-    // Check if this is a team heatmap or dominance heatmap
-    const teamPrefix = toggleButtons.getAttribute('data-team');
-    
-    if (teamPrefix) {
-      // Team heatmap logic
+    if (controlsBar) {
+      // New team heatmap layout
+      const teamPrefix = controlsBar.getAttribute('data-team');
+      
+      // Update active states within the half control group
+      const halfGroup = button.closest('.control-group.half-controls');
+      halfGroup.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      
+      // Update state
       const newHalf = button.getAttribute('data-half');
       teamHeatmapState[teamPrefix].half = newHalf;
       
@@ -208,8 +211,11 @@ document.addEventListener('click', (event) => {
       }
       
       renderCurrentTeamHeatmap(teamPrefix);
-    } else {
+    } else if (dominanceButtons) {
       // Original dominance heatmap logic
+      dominanceButtons.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      
       const viewKey = button.getAttribute('data-view');
       const container = button.closest('.graph-container');
       const containerId = container?.querySelector('.plotly-wrapper')?.id;
