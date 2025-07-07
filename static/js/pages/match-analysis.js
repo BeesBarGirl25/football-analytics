@@ -5,6 +5,7 @@ class MatchAnalysisPage {
         this.navigation = null;
         this.heatmapControls = null;
         this.statsTable = null;
+        this.layoutManager = null;
         this.currentMatchId = null;
     }
 
@@ -19,6 +20,7 @@ class MatchAnalysisPage {
         this.navigation = new Navigation(this.plotManager);
         this.heatmapControls = new HeatmapControls(this.plotManager);
         this.statsTable = new StatsTable();
+        this.layoutManager = new LayoutManager();
         
         // Set up match selection
         this.setupMatchSelection();
@@ -27,6 +29,10 @@ class MatchAnalysisPage {
         this.navigation.initialize();
         this.heatmapControls.initialize();
         this.statsTable.initialize();
+        this.layoutManager.initialize();
+        
+        // Load saved layout preference
+        this.layoutManager.loadLayoutPreference();
         
         Utils.log('Match analysis page initialized', 'MATCH_ANALYSIS');
     }
