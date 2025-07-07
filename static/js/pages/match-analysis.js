@@ -162,10 +162,10 @@ class MatchAnalysisPage {
 
         // Update team names and scores
         const updates = [
-            { id: 'home-team-name', value: summary.homeTeam || '–' },
-            { id: 'away-team-name', value: summary.awayTeam || '–' },
-            { id: 'home-team-score', value: summary.homeTeamNormalTime || '–' },
-            { id: 'away-team-score', value: summary.awayTeamNormalTime || '–' }
+            { id: 'home-team-name', value: summary.homeTeam ?? '–' },
+            { id: 'away-team-name', value: summary.awayTeam ?? '–' },
+            { id: 'home-team-score', value: summary.homeTeamNormalTime ?? '–' },
+            { id: 'away-team-score', value: summary.awayTeamNormalTime ?? '–' }
         ];
 
         updates.forEach(({ id, value }) => {
