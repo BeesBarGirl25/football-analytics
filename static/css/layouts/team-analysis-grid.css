@@ -119,6 +119,13 @@
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: auto;
+  height: auto;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  line-height: normal;
 }
 
 .team-layout-btn:hover {
