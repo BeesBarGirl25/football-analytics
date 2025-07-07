@@ -6,6 +6,8 @@ class MatchAnalysisPage {
         this.heatmapControls = null;
         this.statsTable = null;
         this.layoutManager = null;
+        this.homeTeamLayoutManager = null;
+        this.awayTeamLayoutManager = null;
         this.currentMatchId = null;
     }
 
@@ -21,6 +23,8 @@ class MatchAnalysisPage {
         this.heatmapControls = new HeatmapControls(this.plotManager);
         this.statsTable = new StatsTable();
         this.layoutManager = new LayoutManager();
+        this.homeTeamLayoutManager = new TeamLayoutManager('home_team');
+        this.awayTeamLayoutManager = new TeamLayoutManager('away_team');
         
         // Set up match selection
         this.setupMatchSelection();
@@ -30,9 +34,13 @@ class MatchAnalysisPage {
         this.heatmapControls.initialize();
         this.statsTable.initialize();
         this.layoutManager.initialize();
+        this.homeTeamLayoutManager.initialize();
+        this.awayTeamLayoutManager.initialize();
         
-        // Load saved layout preference
+        // Load saved layout preferences
         this.layoutManager.loadLayoutPreference();
+        this.homeTeamLayoutManager.loadLayoutPreference();
+        this.awayTeamLayoutManager.loadLayoutPreference();
         
         Utils.log('Match analysis page initialized', 'MATCH_ANALYSIS');
     }
@@ -192,9 +200,11 @@ class MatchAnalysisPage {
         // Update tab button texts with actual team names
         if (summary.homeTeam) {
             this.navigation.updateTabButtonText('home', summary.homeTeam);
+            this.homeTeamLayoutManager.updateTeamName(summary.homeTeam);
         }
         if (summary.awayTeam) {
             this.navigation.updateTabButtonText('away', summary.awayTeam);
+            this.awayTeamLayoutManager.updateTeamName(summary.awayTeam);
         }
 
         // Handle extra time details

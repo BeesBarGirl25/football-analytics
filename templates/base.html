@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/overview.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/overview-grid.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/team-analysis.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/team-analysis-grid.css') }}">
 </head>
 <body>
     <div class="wrapper">
@@ -66,13 +67,6 @@
                 <!-- Child templates will populate these -->
                 {% endblock %}
             </div>
-            <div class="layout-toggle-switch">
-              <label class="switch">
-                <input type="checkbox" id="layout-toggle-checkbox">
-                <span class="slider"></span>
-              </label>
-              <span class="toggle-label">Compact Layout</span>
-            </div>
 
         </header>
 
@@ -100,6 +94,7 @@
     <script src="{{ url_for('static', filename='js/components/heatmap-controls.js') }}"></script>
     <script src="{{ url_for('static', filename='js/components/stats-table.js') }}"></script>
     <script src="{{ url_for('static', filename='js/components/layout-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/team-layout-manager.js') }}"></script>
     
     <!-- Page-specific scripts -->
     <script src="{{ url_for('static', filename='js/pages/match-analysis.js') }}"></script>

@@ -1,4 +1,15 @@
-<div class="team-analysis-grid">
+<!-- Team Layout Controls -->
+<div class="team-layout-controls">
+    <button class="team-layout-btn active" data-layout="classic" data-team="{{ prefix }}">Classic</button>
+    <button class="team-layout-btn" data-layout="vertical" data-team="{{ prefix }}">Vertical</button>
+    <button class="team-layout-btn" data-layout="heatmap-focus" data-team="{{ prefix }}">Heatmap Focus</button>
+    <button class="team-layout-btn" data-layout="stats-focus" data-team="{{ prefix }}">Stats Focus</button>
+    <button class="team-layout-btn" data-layout="balanced" data-team="{{ prefix }}">Balanced</button>
+    <button class="team-layout-btn" data-layout="wide-stats" data-team="{{ prefix }}">Wide Stats</button>
+</div>
+
+<!-- Configurable Team Grid Container -->
+<div class="team-analysis-grid layout-classic" id="{{ prefix }}-analysis-grid">
     <!-- Stats Block -->
     <div class="graph-container team-stats">
         <div class="graph-inner">
@@ -14,6 +25,9 @@
     <!-- Heatmap Block -->
     <div class="graph-container team-heatmap">
         <div class="graph-inner vertical">
+            <div class="heatmap-header">
+                <h4>Team Heatmap</h4>
+            </div>
             <!-- Controls -->
             <div class="heatmap-controls-bar" data-team="{{ prefix }}">
                 <div class="control-group half-controls">

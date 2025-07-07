@@ -7,6 +7,7 @@ A comprehensive football analytics dashboard built with Flask, featuring match a
 - **Match Analysis**: Detailed match breakdowns with xG graphs, momentum tracking, and heatmaps
 - **Team Statistics**: Comprehensive team performance metrics and comparisons
 - **Interactive Heatmaps**: Possession, attack, and defense heatmaps with half-time filtering
+- **Configurable Layouts**: 6 predefined layout options for both overview and team analysis with persistent preferences
 - **Player Analysis**: Individual player contributions and statistics
 - **Competition Overview**: Season-wide analytics and trends
 - **Responsive Design**: Works seamlessly across desktop, tablet, and mobile devices
@@ -138,6 +139,7 @@ Football_Dashboard/
 
 - **[Architecture Guide](docs/ARCHITECTURE.md)** - System design and component interactions
 - **[API Documentation](docs/API.md)** - Complete API reference
+- **[Configurable Layouts](docs/CONFIGURABLE_LAYOUTS.md)** - Layout system guide and customization options
 - **[Deployment Guide](docs/DEPLOYMENT.md)** - Production deployment instructions
 - **[Development Tutorials](docs/tutorials/)** - Step-by-step development guides
 

@@ -93,7 +93,7 @@
 
     <!-- HOME TAB -->
     <div class="analysis-content hidden" id="home">
-        <div class="graphs-container wide-mode">
+        <div class="graphs-container">
             <div id="graph-container-home-team-4" class="graph-container heatmap tall">
                 {% set prefix = 'home_team' %}
                 {% set plot_container_id = 'heatmap-home-plot-container' %}
@@ -104,7 +104,7 @@
 
     <!-- AWAY TAB -->
     <div class="analysis-content hidden" id="away">
-        <div class="graphs-container wide-mode">
+        <div class="graphs-container">
             <div id="graph-container-away-team-4" class="graph-container heatmap tall">
                 {% set prefix = 'away_team' %}
                 {% set plot_container_id = 'heatmap-away-plot-container' %}
@@ -115,7 +115,7 @@
 
     <!-- PLAYER TAB -->
     <div class="analysis-content hidden" id="player">
-        <div class="graphs-container wide-mode">
+        <div class="graphs-container">
             <div class="graph-container block-12x1">
                 <p style="text-align: center;">Player analysis goes here.</p>
             </div>
@@ -129,15 +129,6 @@
 <script>
   $(document).ready(function () {
     $('.searchable-dropdown').select2();
-
-    $('#layout-toggle-checkbox').on('change', function () {
-      const compact = $(this).is(':checked');
-      $('.graphs-container').each(function () {
-        $(this).toggleClass('compact-mode', compact);
-        $(this).toggleClass('wide-mode', !compact);
-      });
-      $('.toggle-label').text(compact ? 'Wide Layout' : 'Compact Layout');
-    });
   });
 </script>
 <script src="{{ url_for('static', filename='js/match_analysis.js') }}"></script>

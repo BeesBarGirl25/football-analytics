@@ -75,15 +75,6 @@
   color: var(--bg-primary) !important;
 }
 
-.top-navbar .layout-toggle-switch {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  color: var(--text-muted);
-  padding-left: 0;
-  padding-right: 0;
-  order: 2;
-}
 
 /* === Tab Navigation === */
 .analysis-nav {
@@ -122,12 +113,6 @@
     align-items: flex-start;
     height: auto;
     padding: 10px;
-  }
-  
-  .top-navbar .layout-toggle-switch {
-    justify-content: flex-end;
-    width: 100%;
-    margin-top: 10px;
   }
   
   .top-navbar .dropdowns {

@@ -205,14 +205,3 @@
     display: none;
   }
 }
-
-/* === Compact Mode Override === */
-.graphs-container.compact-mode .overview-grid {
-  grid-template-columns: 1fr !important;
-  grid-template-rows: auto auto auto auto !important;
-  grid-template-areas:
-    "momentum"
-    "xg"
-    "summary"
-    "heatmap" !important;
-}
