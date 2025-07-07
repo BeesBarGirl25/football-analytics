@@ -156,6 +156,11 @@ class MatchAnalysisPage {
         Utils.log(`Away Team: ${summary.awayTeam}`, 'MATCH_ANALYSIS');
         Utils.log(`Home Score (Normal): ${summary.homeTeamNormalTime}`, 'MATCH_ANALYSIS');
         Utils.log(`Away Score (Normal): ${summary.awayTeamNormalTime}`, 'MATCH_ANALYSIS');
+        Utils.log(`Home Score Type: ${typeof summary.homeTeamNormalTime}`, 'MATCH_ANALYSIS');
+        Utils.log(`Away Score Type: ${typeof summary.awayTeamNormalTime}`, 'MATCH_ANALYSIS');
+        Utils.log(`Away Score === 0: ${summary.awayTeamNormalTime === 0}`, 'MATCH_ANALYSIS');
+        Utils.log(`Away Score == 0: ${summary.awayTeamNormalTime == 0}`, 'MATCH_ANALYSIS');
+        Utils.log(`Away Score === "0": ${summary.awayTeamNormalTime === "0"}`, 'MATCH_ANALYSIS');
         Utils.log(`Scoreline: ${summary.scoreline}`, 'MATCH_ANALYSIS');
         Utils.log(`Full Summary Object:`, 'MATCH_ANALYSIS');
         Utils.log(summary, 'MATCH_ANALYSIS');
@@ -164,8 +169,8 @@ class MatchAnalysisPage {
         const updates = [
             { id: 'home-team-name', value: summary.homeTeam ?? '–' },
             { id: 'away-team-name', value: summary.awayTeam ?? '–' },
-            { id: 'home-team-score', value: summary.homeTeamNormalTime ?? '–' },
-            { id: 'away-team-score', value: summary.awayTeamNormalTime ?? '–' }
+            { id: 'home-team-score', value: (summary.homeTeamNormalTime !== null && summary.homeTeamNormalTime !== undefined) ? summary.homeTeamNormalTime : '–' },
+            { id: 'away-team-score', value: (summary.awayTeamNormalTime !== null && summary.awayTeamNormalTime !== undefined) ? summary.awayTeamNormalTime : '–' }
         ];
 
         updates.forEach(({ id, value }) => {
