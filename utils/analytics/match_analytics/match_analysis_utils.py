@@ -130,7 +130,7 @@ def generate_team_stats(team_data: pd.DataFrame, team_name: str):
                                    (team_data['shot_outcome'].isin(['Goal', 'Saved']))])
     stats.append({"stat_name": "Shots on Target", "value": shots_on_target})
     
-    # xG (Expected Goals)
+    # xG (Expected Goals)F
     xg = team_data[team_data['type'] == 'Shot']['shot_statsbomb_xg'].fillna(0).sum()
     stats.append({"stat_name": "xG", "value": f"{xg:.2f}"})
     
@@ -142,7 +142,7 @@ def generate_team_stats(team_data: pd.DataFrame, team_name: str):
     if total_passes > 0:
         # In StatsBomb data, successful passes have NaN in pass_outcome, failed passes have a value
         successful_passes = len(team_data[(team_data['type'] == 'Pass') & 
-                                         (team_data['pass_outcome'].isna())])
+                                         (team_data['pass_outcome'] == -999)])
         pass_accuracy = (successful_passes / total_passes * 100)
     else:
         pass_accuracy = 0
