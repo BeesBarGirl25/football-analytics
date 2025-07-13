@@ -54,6 +54,16 @@ class MatchAnalysisPage {
             matchSelect.on('change', async (event) => {
                 await this.handleMatchSelection(event.target.value);
             });
+            
+            // Check if there's already a selected match (from auto-selection)
+            // Use a small delay to ensure dropdown service has completed auto-selection
+            setTimeout(() => {
+                const currentValue = matchSelect.val();
+                if (currentValue && currentValue !== "" && currentValue !== "Select match") {
+                    Utils.log(`Found pre-selected match: ${currentValue}, loading plots...`, 'MATCH_ANALYSIS');
+                    this.handleMatchSelection(currentValue);
+                }
+            }, AppConfig.DROPDOWNS.SELECTION_DELAY + 50);
         }
     }
 
@@ -94,6 +104,9 @@ class MatchAnalysisPage {
 
             // Render main plots
             this.plotManager.renderMainPlots();
+
+            // Render default dominance heatmap
+            this.renderDefaultHeatmap();
 
             // Update match summary
             this.updateMatchSummary(result.match_summary);
@@ -312,6 +325,25 @@ class MatchAnalysisPage {
         if (this.plotManager) {
             this.plotManager.resizeAllPlots();
         }
+    }
+
+    /**
+     * Render default dominance heatmap on load
+     */
+    renderDefaultHeatmap() {
+        // Render the default dominance heatmap (full match view)
+        const defaultHeatmapKey = 'dominance_heatmap';
+        const containerId = 'dominance-plot-container';
+        
+        // Small delay to ensure container is ready
+        setTimeout(() => {
+            if (this.plotManager && this.plotManager.hasPlot(defaultHeatmapKey)) {
+                this.plotManager.lazyRenderPlot(containerId, defaultHeatmapKey, true);
+                Utils.log('Default dominance heatmap rendered on load', 'MATCH_ANALYSIS');
+            } else {
+                Utils.log(`Default heatmap data not available: ${defaultHeatmapKey}`, 'MATCH_ANALYSIS', 'warn');
+            }
+        }, AppConfig.UI.PLOT_RENDER_DELAY);
     }
 
     /**

@@ -140,7 +140,8 @@ def generate_team_stats(team_data: pd.DataFrame, team_name: str):
     
     # Pass accuracy - fix the logic for successful passes
     if total_passes > 0:
-        # In StatsBomb data, successful passes have NaN in pass_outcome, failed passes have a value
+        # In StatsBomb data, successful passes have NaN in pass_outcome (replaced with -999 in our ETL), failed passes have a value
+        # Since we fill NaN with -999 in create_match_plots.py, successful passes now have -999 instead of NaN
         successful_passes = len(team_data[(team_data['type'] == 'Pass') & 
                                          (team_data['pass_outcome'] == -999)])
         pass_accuracy = (successful_passes / total_passes * 100)
