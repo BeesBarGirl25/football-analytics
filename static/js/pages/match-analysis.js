@@ -29,6 +29,9 @@ class MatchAnalysisPage {
         // Set up match selection
         this.setupMatchSelection();
         
+        // Also listen for dropdown service completion
+        this.listenForDropdownServiceCompletion();
+        
         // Initialize components
         this.navigation.initialize();
         this.heatmapControls.initialize();
@@ -41,6 +44,9 @@ class MatchAnalysisPage {
         this.layoutManager.loadLayoutPreference();
         this.homeTeamLayoutManager.loadLayoutPreference();
         this.awayTeamLayoutManager.loadLayoutPreference();
+        
+        // Check for default match selection and load plots immediately
+        this.checkAndLoadDefaultMatch();
         
         Utils.log('Match analysis page initialized', 'MATCH_ANALYSIS');
     }
@@ -56,14 +62,26 @@ class MatchAnalysisPage {
             });
             
             // Check if there's already a selected match (from auto-selection)
-            // Use a small delay to ensure dropdown service has completed auto-selection
-            setTimeout(() => {
+            // Use multiple checks with increasing delays to ensure dropdown service has completed auto-selection
+            const checkForPreselectedMatch = (attempt = 1, maxAttempts = 10) => {
                 const currentValue = matchSelect.val();
+                Utils.log(`Attempt ${attempt}: Checking for pre-selected match, current value: "${currentValue}"`, 'MATCH_ANALYSIS');
+                
                 if (currentValue && currentValue !== "" && currentValue !== "Select match") {
                     Utils.log(`Found pre-selected match: ${currentValue}, loading plots...`, 'MATCH_ANALYSIS');
                     this.handleMatchSelection(currentValue);
+                    return;
                 }
-            }, AppConfig.DROPDOWNS.SELECTION_DELAY + 50);
+                
+                if (attempt < maxAttempts) {
+                    setTimeout(() => checkForPreselectedMatch(attempt + 1, maxAttempts), 200);
+                } else {
+                    Utils.log('No pre-selected match found after all attempts', 'MATCH_ANALYSIS', 'warn');
+                }
+            };
+            
+            // Start checking after a short delay
+            setTimeout(() => checkForPreselectedMatch(), 300);
         }
     }
 
@@ -328,6 +346,47 @@ class MatchAnalysisPage {
     }
 
     /**
+     * Listen for dropdown service completion and auto-load first match
+     */
+    listenForDropdownServiceCompletion() {
+        // Listen for the match dropdown to be populated
+        const matchSelect = $('#match-select');
+        
+        // Use MutationObserver to watch for options being added to the dropdown
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    // Check if options were added (excluding the default "Select match" option)
+                    const options = matchSelect.find('option:not([value=""]):not([value="Select match"])');
+                    if (options.length > 0 && !this.currentMatchId) {
+                        Utils.log(`Dropdown populated with ${options.length} matches, auto-selecting first match`, 'MATCH_ANALYSIS');
+                        
+                        // Auto-select the first match
+                        const firstMatchId = options.first().val();
+                        if (firstMatchId) {
+                            matchSelect.val(firstMatchId).trigger('change.select2');
+                            this.handleMatchSelection(firstMatchId);
+                            
+                            // Stop observing once we've auto-selected
+                            observer.disconnect();
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Start observing the match dropdown for changes
+        if (matchSelect.length > 0) {
+            observer.observe(matchSelect[0], {
+                childList: true,
+                subtree: true
+            });
+            
+            Utils.log('Started observing match dropdown for auto-selection', 'MATCH_ANALYSIS');
+        }
+    }
+
+    /**
      * Render default dominance heatmap on load
      */
     renderDefaultHeatmap() {
@@ -344,6 +403,43 @@ class MatchAnalysisPage {
                 Utils.log(`Default heatmap data not available: ${defaultHeatmapKey}`, 'MATCH_ANALYSIS', 'warn');
             }
         }, AppConfig.UI.PLOT_RENDER_DELAY);
+    }
+
+    /**
+     * Check for default match selection and load plots immediately
+     * This runs after page initialization to handle cases where a match is already selected
+     */
+    checkAndLoadDefaultMatch() {
+        // Use multiple attempts with increasing delays to ensure dropdowns are ready
+        const checkForDefaultMatch = (attempt = 1, maxAttempts = 15) => {
+            const matchSelect = $('#match-select');
+            const currentValue = matchSelect.val();
+            
+            Utils.log(`Default match check attempt ${attempt}: current value = "${currentValue}"`, 'MATCH_ANALYSIS');
+            
+            // Check if we have a valid match selected and haven't already loaded it
+            if (currentValue && 
+                currentValue !== "" && 
+                currentValue !== "Select match" && 
+                !this.currentMatchId) {
+                
+                Utils.log(`Found default selected match: ${currentValue}, loading plots immediately...`, 'MATCH_ANALYSIS');
+                this.handleMatchSelection(currentValue);
+                return;
+            }
+            
+            // If no match found yet and we haven't reached max attempts, try again
+            if (attempt < maxAttempts) {
+                setTimeout(() => checkForDefaultMatch(attempt + 1, maxAttempts), 500);
+            } else {
+                Utils.log('No default match found after all attempts - waiting for dropdown service to complete', 'MATCH_ANALYSIS', 'warn');
+            }
+        };
+        
+        // Start checking immediately, then with delays
+        checkForDefaultMatch();
+        
+        Utils.log('Started checking for default match selection', 'MATCH_ANALYSIS');
     }
 
     /**
