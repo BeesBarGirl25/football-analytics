@@ -1,21 +1,60 @@
-<div id="graph-container-{{ prefix }}" class="graph-container tall hidden" data-plot-group="{{ prefix }}">
-    <div class="graph-inner vertical heatmap-layout">
-        <!-- Compact top bar with all controls -->
-        <div class="heatmap-controls-bar" data-team="{{ prefix }}">
-            <div class="control-group half-controls">
-                <button class="toggle-btn active" data-half="full">Full Match</button>
-                <button class="toggle-btn" data-half="first">1st Half</button>
-                <button class="toggle-btn" data-half="second">2nd Half</button>
+<!-- Team Layout Controls -->
+<div class="team-layout-controls">
+    <button class="team-layout-btn active" data-layout="classic" data-team="{{ prefix }}">Classic</button>
+    <button class="team-layout-btn" data-layout="vertical" data-team="{{ prefix }}">Vertical</button>
+    <button class="team-layout-btn" data-layout="heatmap-focus" data-team="{{ prefix }}">Heatmap Focus</button>
+    <button class="team-layout-btn" data-layout="stats-focus" data-team="{{ prefix }}">Stats Focus</button>
+    <button class="team-layout-btn" data-layout="balanced" data-team="{{ prefix }}">Balanced</button>
+    <button class="team-layout-btn" data-layout="wide-stats" data-team="{{ prefix }}">Wide Stats</button>
+</div>
+
+<!-- Configurable Team Grid Container -->
+<div class="team-analysis-grid layout-classic" id="{{ prefix }}-analysis-grid">
+    <!-- Stats Block -->
+    <div class="graph-container team-stats">
+        <div class="graph-inner">
+            <div class="stats-header">
+                <h4>Team Stats</h4>
             </div>
-            <div class="control-separator"></div>
-            <div class="control-group phase-controls">
-                <button class="phase-btn active" data-phase="possession">Possession</button>
-                <button class="phase-btn" data-phase="attack">Attack</button>
-                <button class="phase-btn" data-phase="defense">Defense</button>
+            <div id="{{ prefix }}-stats-container" class="stats-table-container">
+                <div class="stats-loading">Loading stats...</div>
             </div>
         </div>
+    </div>
+    
+    <!-- Heatmap Block -->
+    <div class="graph-container team-heatmap">
+        <div class="graph-inner vertical">
+            <div class="heatmap-header">
+                <h4>Team Heatmap</h4>
+            </div>
+            <!-- Controls -->
+            <div class="heatmap-controls-option3" data-team="{{ prefix }}">
+                <div class="dropdown-group">
+                    <span class="dropdown-label">Half:</span>
+                    <select class="control-dropdown half-dropdown" data-half>
+                        <option value="full" selected>Full Match</option>
+                        <option value="first">1st Half</option>
+                        <option value="second">2nd Half</option>
+                    </select>
+                </div>
+                <div class="dropdown-group">
+                    <span class="dropdown-label">Phase:</span>
+                    <select class="control-dropdown phase-dropdown" data-phase>
+                        <option value="possession" selected>Possession</option>
+                        <option value="attack">Attack</option>
+                        <option value="defense">Defense</option>
+                    </select>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-btn" data-preset="full-possession" title="Full Match Possession">⚽</button>
+                    <button class="quick-btn" data-preset="full-attack" title="Full Match Attack">⚡</button>
+                    <button class="quick-btn" data-preset="full-defense" title="Full Match Defense">🛡</button>
+                </div>
+            </div>
 
-        <!-- Plot area takes remaining space -->
-        <div id="{{ plot_container_id }}" class="plotly-wrapper heatmap-plot"></div>
+            <!-- Plot area -->
+            <div id="{{ plot_container_id }}" class="plotly-wrapper heatmap-plot"></div>
+        </div>
     </div>
 </div>

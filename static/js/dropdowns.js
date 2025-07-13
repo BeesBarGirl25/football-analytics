@@ -1,57 +1,54 @@
+// Backward compatibility layer for dropdowns.js
+// This file maintains the original functionality while delegating to the new DropdownService
+
+console.warn('Using compatibility layer for dropdowns.js - consider updating to use the new DropdownService');
+
+// Wait for the app and dropdown service to be ready
+function waitForDropdownService(callback) {
+    if (window.app && window.app.services && window.app.services.dropdownService) {
+        callback(window.app.services.dropdownService);
+    } else {
+        setTimeout(() => waitForDropdownService(callback), 100);
+    }
+}
+
+// Legacy jQuery document ready handler for backward compatibility
 $(document).ready(() => {
-    console.log("Document is ready.");
-
-    // Initialize Select2 for better UX
-    $('.searchable-dropdown').select2({
-        dropdownParent: $('.content')
-    });
-
-    // Fetch and populate competitions on page load
-    $.get('/api/competitions', function (data) {
-        const uniqueCompetitions = [...new Set(data.map(d => d.competition_name))];
-        uniqueCompetitions.forEach(name => {
-            $('#competition-select').append(
-                `<option value="${name}">${name}</option>`
-            );
-        });
-        console.log("✅ Loaded competitions");
-    }).fail(error => {
-        console.error("❌ Error fetching competitions:", error);
-    });
-
-    // Load seasons when a competition is selected
-    $('#competition-select').on('change', function () {
-        const selectedCompetition = $(this).val();
-        $('#season-select').empty().append('<option>Select season</option>');
-        $('#match-select').empty().append('<option>Select match</option>');
-
-        $.get('/api/competitions', function (data) {
-            const filtered = data.filter(d => d.competition_name === selectedCompetition);
-            filtered.forEach(entry => {
-                $('#season-select').append(
-                    `<option value="${entry.season_id}">${entry.season_name}</option>`
-                );
-            });
-            console.log("✅ Loaded seasons");
-        }).fail(error => {
-            console.error("❌ Error fetching seasons:", error);
-        });
-    });
-
-    // Load matches when a season is selected
-    $('#season-select').on('change', function () {
-        const season_id = $(this).val();
-        $('#match-select').empty().append('<option>Select match</option>');
-
-        $.get(`/api/matches/${season_id}`, function (matches) {
-            matches.forEach(match => {
-                $('#match-select').append(
-                    `<option value="${match.match_id}">${match.home_team} vs ${match.away_team}</option>`
-                );
-            });
-            console.log("✅ Loaded matches");
-        }).fail(error => {
-            console.error("❌ Error fetching matches:", error);
-        });
+    console.log("Document is ready (compatibility layer).");
+    
+    // Wait for the new dropdown service to be ready
+    waitForDropdownService((dropdownService) => {
+        console.log("✅ Dropdown service is ready (compatibility layer)");
+        
+        // The new service handles all the initialization automatically
+        // This compatibility layer just ensures existing code doesn't break
+        
+        // Legacy global functions for backward compatibility
+        window.loadCompetitions = () => {
+            return dropdownService.loadCompetitions();
+        };
+        
+        window.loadSeasons = (competitionName) => {
+            return dropdownService.loadSeasons(competitionName);
+        };
+        
+        window.loadMatches = (seasonId) => {
+            return dropdownService.loadMatches(seasonId);
+        };
+        
+        window.getSelectedValues = () => {
+            return dropdownService.getSelectedValues();
+        };
+        
+        window.clearAllSelections = () => {
+            return dropdownService.clearAllSelections();
+        };
+        
+        window.refreshDropdowns = () => {
+            return dropdownService.refresh();
+        };
     });
 });
+
+// Export legacy functions for backward compatibility
+window.waitForDropdownService = waitForDropdownService;

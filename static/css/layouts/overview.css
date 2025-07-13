@@ -1,0 +1,55 @@
+/* === Overview Layout === */
+.graphs-container.wide-mode {
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+  grid-template-areas:
+    "momentum summary heatmap"
+    "xg       summary heatmap";
+}
+
+.graphs-container.compact-mode {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto auto;
+  gap: 1rem;
+  width: 100%;
+  grid-template-areas:
+    "momentum"
+    "xg"
+    "summary"
+    "heatmap";
+}
+
+/* === Grid Area Assignments === */
+.graph-container.xg {
+  grid-area: xg;
+}
+
+.graph-container.momentum {
+  grid-area: momentum;
+}
+
+.graph-container.summary {
+  grid-area: summary;
+}
+
+.graph-container.heatmap {
+  grid-area: heatmap;
+}
+
+/* === Overview Responsive === */
+@media (max-width: 1024px) {
+  .graphs-container.wide-mode {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "momentum"
+      "xg"
+      "summary"
+      "heatmap";
+  }
+}

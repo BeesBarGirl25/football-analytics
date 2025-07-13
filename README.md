@@ -1,118 +1,223 @@
 # Football Dashboard
-This repository contains the implementation of a Football Dashboard application. The dashboard allows users to visualize various match and player analytics, including xG (expected goals) comparison graphs, team performance insights, and more.
-## Project Structure
-The repository is organized into the following sections:
-### **Static Files**
-This folder contains frontend JavaScript logic that enables dynamic functionality for the web app.
-1. **`static/js/match_analysis.js` **
-    - Handles retrieving and rendering match-specific graphs dynamically in HTML using `Plotly.js` and AJAX requests.
-    - Functions:
-        - **Fetch Match Graph Data:** Fetches the graph data from the backend API for a selected match.
-        - **Dynamic Graph Rendering:** Renders the fetched Plotly graph in the specified container (`#graph-container-1`).
-        - **Match Dropdown Listener:** Handles events when a specific match is selected by the user.
 
-    - Dependencies: `Plotly.js`, jQuery.
+A comprehensive football analytics dashboard built with Flask, featuring match analysis, team statistics, and interactive visualizations using StatsBomb data.
 
-2. **`static/js/dropdowns.js` **
-    - Manages dropdown functionality for selecting matches, competitions, or players.
-    - Provides utility functions to dynamically populate dropdowns with data fetched from the backend.
+## 🏆 Features
 
-### **Backend Routes**
-The server-side logic powering the API and data fetching for the frontend.
-1. **`routes/match_routes.py` **
-    - Contains Flask API routes for match-related operations.
-    - Key Routes:
-        - **`/api/match_graph/<match_id>`**:
-            - Returns Plotly graph data JSON for a specific match ID, fetched from a cached data store.
+- **Match Analysis**: Detailed match breakdowns with xG graphs, momentum tracking, and heatmaps
+- **Team Statistics**: Comprehensive team performance metrics and comparisons
+- **Interactive Heatmaps**: Possession, attack, and defense heatmaps with half-time filtering
+- **Configurable Layouts**: 6 predefined layout options for both overview and team analysis with persistent preferences
+- **Player Analysis**: Individual player contributions and statistics
+- **Competition Overview**: Season-wide analytics and trends
+- **Responsive Design**: Works seamlessly across desktop, tablet, and mobile devices
 
-        - Integrates with the xG plotting logic in `xG_per_game.py`.
+## 🚀 Quick Start
 
-### **Utilities**
-Helper functions and modules for analytics, visualizations, and data operations.
-1. **`utils/plots/match_plots/xG_per_game.py` **
-    - Contains the `generate_match_graph` function that generates interactive Plotly graphs for xG analysis.
-    - Key Features:
-        - Dynamically generates cumulative xG and goals plots for two teams in a match.
-        - Adds visual indicators for extra time and penalties.
-        - Configures interactive graph styling using Plotly.
+### Prerequisites
 
-    - Input: `match_data` (shot and period details for a match).
-    - Output: Plotly graph object.
+- Python 3.8+
+- PostgreSQL (for production) or SQLite (for development)
+- Node.js (optional, for frontend development)
 
-2. **`utils/analytics/match_analytics/match_analysis_utils.py` **
-    - Includes helper functions for various analytics computation tasks.
-    - Could include functions like:
-        - Computing cumulative goals/xG for each team.
-        - Summarizing key statistics for a match.
-        - Formatting data for visualization.
+### Installation
 
-### **Templates**
-HTML templates used for rendering pages in the web app.
-1. **`templates/match_analysis.html` **
-    - Frontend page for match analysis visualization.
-    - Key Elements:
-        - Dropdown for selecting matches.
-        - Graph container (`#graph-container-1`) to dynamically display xG visualizations.
-        - Navigation tabs for switching between overview, teams, and player analysis.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd Football_Dashboard
+   ```
 
-### **How the Application Works**
-1. **Frontend Flow:**
-    - The user selects a match from a dropdown menu in the `match_analysis.html` page.
-    - The selected match triggers an AJAX call (via `match_analysis.js`) to fetch graph data from the backend API.
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-2. **Backend Flow:**
-    - The backend API fetches the relevant match data from the **cache** or another data source.
-    - The `generate_match_graph` function in `xG_per_game.py` creates a Plotly graph object.
-    - The graph data (in JSON format) is returned to the frontend.
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-3. **Graph Rendering:**
-    - The frontend receives the JSON graph data and renders it inside `graph-container-1` using `Plotly.js`.
+4. **Set up database**
+   ```bash
+   python create_tables.py
+   ```
 
-### **Setup and Installation**
-Follow the steps below to run the application locally:
-#### **1. Clone the Repository:**
-``` bash
-git clone https://github.com/username/football_dashboard.git
-cd football_dashboard
+5. **Generate plot data**
+   ```bash
+   python data/etl/create_match_plots.py
+   ```
+
+6. **Run the application**
+   ```bash
+   python app.py
+   ```
+
+7. **Open browser**
+   Navigate to `http://localhost:5000`
+
+## 📁 Project Structure
+
 ```
-#### **2. Install Dependencies:**
-``` bash
-pip install -r requirements.txt
+Football_Dashboard/
+├── app.py                          # Main Flask application
+├── models.py                       # Database models
+├── create_tables.py               # Database initialization
+├── requirements.txt               # Python dependencies
+├── Procfile                       # Heroku deployment config
+│
+├── data/                          # Data processing and ETL
+│   ├── xT_Grid.csv               # Expected Threat grid data
+│   └── etl/                      # ETL scripts
+│       ├── create_match_plots.py # Main plot generation
+│       ├── benchmark_etl.py      # Performance testing
+│       └── competition_season_matches.py
+│
+├── docs/                          # Documentation
+│   ├── README.md                 # This file
+│   ├── ARCHITECTURE.md           # System architecture
+│   ├── API.md                    # API documentation
+│   ├── DEPLOYMENT.md             # Deployment guide
+│   └── tutorials/                # Step-by-step guides
+│
+├── routes/                        # Flask route handlers
+│   ├── competition_routes.py     # Competition endpoints
+│   └── match_routes.py           # Match analysis endpoints
+│
+├── static/                        # Frontend assets
+│   ├── css/                      # Stylesheets
+│   │   ├── base.css             # Global styles
+│   │   ├── components/          # Component-specific styles
+│   │   └── layouts/             # Page layout styles
+│   ├── js/                       # JavaScript
+│   │   ├── core/                # Core utilities
+│   │   ├── components/          # UI components
+│   │   ├── pages/               # Page-specific logic
+│   │   └── services/            # Data services
+│   └── images/                   # Static images
+│
+├── templates/                     # Jinja2 templates
+│   ├── base.html                # Base template
+│   ├── match_analysis.html      # Match analysis page
+│   ├── competition_analysis.html # Competition page
+│   └── partials/                # Reusable template parts
+│
+└── utils/                         # Utility modules
+    ├── db.py                     # Database utilities
+    ├── extensions.py             # Flask extensions
+    ├── statsbomb_utils.py        # StatsBomb API utilities
+    ├── analytics/                # Analytics functions
+    └── plots/                    # Plot generation
 ```
-Ensure you have all necessary Python libraries like Flask, Plotly, and Flask-Caching installed.
-#### **3. Run the Application:**
-``` bash
-flask run
+
+## 🔧 Core Components
+
+### Backend (Flask)
+
+- **Flask Application** (`app.py`): Main application with route registration
+- **Database Models** (`models.py`): SQLAlchemy models for data persistence
+- **Route Handlers** (`routes/`): API endpoints for different features
+- **Analytics Engine** (`utils/analytics/`): Statistical calculations and data processing
+- **Plot Generation** (`utils/plots/`): Plotly-based visualization creation
+
+### Frontend (JavaScript/CSS)
+
+- **Modular Architecture**: Component-based JavaScript with clear separation of concerns
+- **Responsive Design**: CSS Grid and Flexbox for adaptive layouts
+- **Interactive Components**: Dynamic plot updates, filtering, and navigation
+- **Service Layer**: Centralized data fetching and state management
+
+### Data Pipeline
+
+- **ETL Process**: Automated data extraction, transformation, and loading
+- **StatsBomb Integration**: Direct API integration for match data
+- **Plot Caching**: Pre-generated plots stored in database for performance
+- **Data Validation**: Comprehensive error handling and data quality checks
+
+## 📚 Documentation
+
+- **[Architecture Guide](docs/ARCHITECTURE.md)** - System design and component interactions
+- **[API Documentation](docs/API.md)** - Complete API reference
+- **[Configurable Layouts](docs/CONFIGURABLE_LAYOUTS.md)** - Layout system guide and customization options
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Production deployment instructions
+- **[Development Tutorials](docs/tutorials/)** - Step-by-step development guides
+
+## 🛠️ Development
+
+### Adding New Features
+
+1. **Backend**: Add routes in `routes/`, models in `models.py`, analytics in `utils/analytics/`
+2. **Frontend**: Create components in `static/js/components/`, styles in `static/css/`
+3. **Templates**: Add HTML templates in `templates/`
+4. **Documentation**: Update relevant docs in `docs/`
+
+### Code Style
+
+- **Python**: Follow PEP 8, use type hints where appropriate
+- **JavaScript**: ES6+ features, modular design, comprehensive logging
+- **CSS**: BEM methodology, CSS custom properties, mobile-first approach
+- **HTML**: Semantic markup, accessibility considerations
+
+### Testing
+
+```bash
+# Run ETL performance tests
+python data/etl/benchmark_etl.py
+
+# Test plot generation
+python data/etl/create_match_plots.py --test
+
+# Validate database integrity
+python create_tables.py --validate
 ```
-#### **4. Visit the Application:**
-Open your browser and navigate to:
-``` 
-http://127.0.0.1:5000
+
+## 🚀 Deployment
+
+### Local Development
+
+```bash
+export FLASK_ENV=development
+export FLASK_DEBUG=1
+python app.py
 ```
-### **Key Features**
-1. **Expected Goals Analysis:**
-    - Compare cumulative xG and goals for both teams in a match with dynamic graphs.
 
-2. **Dynamic Match Selection:**
-    - Seamlessly switch between matches and update graphs without reloading the page.
+### Production (Heroku)
 
-3. **Customization and Extendibility:**
-    - Modular structure allows for easy addition of new visualizations, analytics, or API endpoints.
+```bash
+git push heroku main
+heroku run python create_tables.py
+heroku run python data/etl/create_match_plots.py
+```
 
-### **Future Enhancements**
-- Cache Implementation:
-    - Automate caching of match data from database or external APIs.
+See [Deployment Guide](docs/DEPLOYMENT.md) for detailed instructions.
 
-- Expanded Analytics:
-    - Add additional tabs for player-specific and competition-wide analytics.
+## 🤝 Contributing
 
-- Responsive Design:
-    - Enhance the frontend to ensure compatibility across all device sizes.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### **Credits**
-- **Frameworks & Libraries:**
-    - Flask
-    - Plotly.js
-    - Flask-Caching
+## 📄 License
 
-Feel free to contribute to this project by submitting pull requests or reporting issues!
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- **StatsBomb** for providing comprehensive football data
+- **Plotly** for interactive visualization capabilities
+- **Flask** community for excellent documentation and examples
+
+## 📞 Support
+
+For questions, issues, or contributions:
+
+1. Check existing [Issues](../../issues)
+2. Review [Documentation](docs/)
+3. Create a new issue with detailed description
+
+---
+
+**Built with ⚽ and 💻 for football analytics enthusiasts**

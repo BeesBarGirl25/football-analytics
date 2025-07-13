@@ -17,15 +17,41 @@
 
     <!-- OVERVIEW TAB -->
     <div class="analysis-content" id="overview">
-        <div class="graphs-container wide-mode">
+        <!-- Layout Controls -->
+        <div class="layout-controls">
+            <button class="layout-btn active" data-layout="classic">Classic</button>
+            <button class="layout-btn" data-layout="horizontal">Horizontal</button>
+            <button class="layout-btn" data-layout="vertical">Vertical</button>
+            <button class="layout-btn" data-layout="summary-focus">Summary Focus</button>
+            <button class="layout-btn" data-layout="charts-focus">Charts Focus</button>
+            <button class="layout-btn" data-layout="balanced">Balanced</button>
+        </div>
+        
+        <!-- Configurable Grid Container -->
+        <div class="overview-grid layout-classic" id="overview-grid">
             <div id="graph-container-xg" class="graph-container xg hidden">
-                <div id="xg-plot-container" class="plotly-wrapper"></div>
+                <div class="graph-inner">
+                    <div class="graph-header">
+                        <h4>Expected Goals (xG)</h4>
+                    </div>
+                    <div id="xg-plot-container" class="plotly-wrapper"></div>
+                </div>
             </div>
+            
             <div id="graph-container-momentum" class="graph-container momentum hidden">
-                <div id="momentum-plot-container" class="plotly-wrapper"></div>
+                <div class="graph-inner">
+                    <div class="graph-header">
+                        <h4>Match Momentum</h4>
+                    </div>
+                    <div id="momentum-plot-container" class="plotly-wrapper"></div>
+                </div>
             </div>
+            
             <div id="graph-container-summary" class="graph-container summary hidden">
                 <div class="graph-inner">
+                    <div class="graph-header">
+                        <h4>Match Summary</h4>
+                    </div>
                     <div id="match-summary">
                         <div class="score-header">
                             <h3 id="combined-score-header" class="scoreline">
@@ -48,8 +74,12 @@
                     </div>
                 </div>
             </div>
+            
             <div id="graph-container-heatmap" class="graph-container heatmap hidden" data-plot-group="dominance">
                 <div class="graph-inner vertical">
+                    <div class="graph-header">
+                        <h4>Field Dominance</h4>
+                    </div>
                     <div class="dominance-toggle-buttons">
                         <button class="toggle-btn active" data-view="dominance_heatmap">Full Match</button>
                         <button class="toggle-btn" data-view="dominance_heatmap_first">1st Half</button>
@@ -63,8 +93,8 @@
 
     <!-- HOME TAB -->
     <div class="analysis-content hidden" id="home">
-        <div class="graphs-container wide-mode">
-            <div id="graph-container-home-team-4" class="graph-container heatmap">
+        <div class="graphs-container">
+            <div id="graph-container-home-team-4" class="graph-container heatmap tall">
                 {% set prefix = 'home_team' %}
                 {% set plot_container_id = 'heatmap-home-plot-container' %}
                 {% include 'partials/match_team_analysis.html' with context %}
@@ -74,8 +104,8 @@
 
     <!-- AWAY TAB -->
     <div class="analysis-content hidden" id="away">
-        <div class="graphs-container wide-mode">
-            <div id="graph-container-away-team-4" class="graph-container heatmap">
+        <div class="graphs-container">
+            <div id="graph-container-away-team-4" class="graph-container heatmap tall">
                 {% set prefix = 'away_team' %}
                 {% set plot_container_id = 'heatmap-away-plot-container' %}
                 {% include 'partials/match_team_analysis.html' with context %}
@@ -85,7 +115,7 @@
 
     <!-- PLAYER TAB -->
     <div class="analysis-content hidden" id="player">
-        <div class="graphs-container wide-mode">
+        <div class="graphs-container">
             <div class="graph-container block-12x1">
                 <p style="text-align: center;">Player analysis goes here.</p>
             </div>
@@ -99,15 +129,6 @@
 <script>
   $(document).ready(function () {
     $('.searchable-dropdown').select2();
-
-    $('#layout-toggle-checkbox').on('change', function () {
-      const compact = $(this).is(':checked');
-      $('.graphs-container').each(function () {
-        $(this).toggleClass('compact-mode', compact);
-        $(this).toggleClass('wide-mode', !compact);
-      });
-      $('.toggle-label').text(compact ? 'Wide Layout' : 'Compact Layout');
-    });
   });
 </script>
 <script src="{{ url_for('static', filename='js/match_analysis.js') }}"></script>

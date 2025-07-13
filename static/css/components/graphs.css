@@ -1,0 +1,136 @@
+/* === Graph Containers === */
+.graph-container {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--text-primary);
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  font-size: 0.85rem;
+}
+
+.graph-container.tall {
+  height: 100%;
+  min-height: 400px;
+}
+
+.graph-container.xg {
+  grid-area: xg;
+}
+
+.graph-container.momentum {
+  grid-area: momentum;
+}
+
+.graph-container.summary {
+  grid-area: summary;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.graph-container.heatmap {
+  grid-area: heatmap;
+}
+
+/* === Graph Inner Layout === */
+.graph-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: stretch;
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem;
+  gap: 1rem;
+  box-sizing: border-box;
+}
+
+.graph-inner.vertical {
+  flex-direction: column;
+}
+
+/* === Plotly Wrapper === */
+.plotly-wrapper {
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.plotly-wrapper .js-plotly-plot,
+.plotly-wrapper .plot-container,
+.plotly-wrapper .main-svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* === Summary Graph Specific === */
+.graph-container.summary .scoreline {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0.1rem 0;
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.graph-container.summary .scoreline .home {
+  color: var(--accent-home);
+}
+
+.graph-container.summary .scoreline .away {
+  color: var(--accent-away);
+}
+
+/* === Heatmap Layout === */
+.heatmap-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  height: 100%;
+  width: 100%;
+}
+
+.heatmap-plot {
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 500px; /* Ensure minimum height for heatmaps */
+}
+
+.heatmap-plot .js-plotly-plot,
+.heatmap-plot .plot-container,
+.heatmap-plot .main-svg {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 400px !important;
+}
+
+/* === Responsive Graphs === */
+@media (max-width: 1024px) {
+  .graphs-container {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+}
+
+/* Remove old styles that are no longer needed */
+.heatmap-toggle-buttons.top,
+.heatmap-content,
+.phase-toggle-buttons.side {
+  display: none;
+}
