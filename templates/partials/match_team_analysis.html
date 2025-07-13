@@ -29,17 +29,27 @@
                 <h4>Team Heatmap</h4>
             </div>
             <!-- Controls -->
-            <div class="heatmap-controls-bar" data-team="{{ prefix }}">
-                <div class="control-group half-controls">
-                    <button class="toggle-btn active" data-half="full">Full Match</button>
-                    <button class="toggle-btn" data-half="first">1st Half</button>
-                    <button class="toggle-btn" data-half="second">2nd Half</button>
+            <div class="heatmap-controls-option3" data-team="{{ prefix }}">
+                <div class="dropdown-group">
+                    <span class="dropdown-label">Half:</span>
+                    <select class="control-dropdown half-dropdown" data-half>
+                        <option value="full" selected>Full Match</option>
+                        <option value="first">1st Half</option>
+                        <option value="second">2nd Half</option>
+                    </select>
                 </div>
-                <div class="control-separator"></div>
-                <div class="control-group phase-controls">
-                    <button class="phase-btn active" data-phase="possession">Possession</button>
-                    <button class="phase-btn" data-phase="attack">Attack</button>
-                    <button class="phase-btn" data-phase="defense">Defense</button>
+                <div class="dropdown-group">
+                    <span class="dropdown-label">Phase:</span>
+                    <select class="control-dropdown phase-dropdown" data-phase>
+                        <option value="possession" selected>Possession</option>
+                        <option value="attack">Attack</option>
+                        <option value="defense">Defense</option>
+                    </select>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-btn" data-preset="full-possession" title="Full Match Possession">⚽</button>
+                    <button class="quick-btn" data-preset="full-attack" title="Full Match Attack">⚡</button>
+                    <button class="quick-btn" data-preset="full-defense" title="Full Match Defense">🛡</button>
                 </div>
             </div>
 

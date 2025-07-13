@@ -1,0 +1,99 @@
+/* === OPTION 2: Sidebar Controls === */
+.heatmap-container-option2 {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 8px;
+}
+
+.heatmap-controls-option2 {
+  width: 80px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 12px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+
+.heatmap-controls-option2 .control-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.heatmap-controls-option2 .section-title {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.heatmap-controls-option2 .sidebar-btn {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 6px 4px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  font-weight: 500;
+  text-align: center;
+  writing-mode: horizontal-tb;
+}
+
+.heatmap-controls-option2 .sidebar-btn:hover {
+  background-color: var(--bg-tertiary);
+  transform: translateX(2px);
+}
+
+.heatmap-controls-option2 .sidebar-btn.active.half-btn {
+  background-color: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.heatmap-controls-option2 .sidebar-btn.active.phase-btn {
+  background-color: var(--accent-orange);
+  color: white;
+  border-color: var(--accent-orange);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+}
+
+.heatmap-plot-option2 {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .heatmap-container-option2 {
+    flex-direction: column;
+  }
+  
+  .heatmap-controls-option2 {
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    padding: 8px 12px;
+    height: auto;
+  }
+  
+  .heatmap-controls-option2 .control-section {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .heatmap-controls-option2 .section-title {
+    margin-bottom: 0;
+    margin-right: 8px;
+  }
+}

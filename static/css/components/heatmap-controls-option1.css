@@ -1,0 +1,72 @@
+/* === OPTION 1: Floating Corner Controls === */
+.heatmap-controls-option1 {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.heatmap-controls-option1 .control-row {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.heatmap-controls-option1 .control-row:last-child {
+  margin-bottom: 0;
+}
+
+.heatmap-controls-option1 .control-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-right: 6px;
+  min-width: 35px;
+  display: flex;
+  align-items: center;
+}
+
+.heatmap-controls-option1 .mini-btn {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  font-weight: 500;
+  min-width: 28px;
+  text-align: center;
+}
+
+.heatmap-controls-option1 .mini-btn:hover {
+  background-color: var(--bg-tertiary);
+  transform: translateY(-1px);
+}
+
+.heatmap-controls-option1 .mini-btn.active.half-btn {
+  background-color: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+.heatmap-controls-option1 .mini-btn.active.phase-btn {
+  background-color: var(--accent-orange);
+  color: white;
+  border-color: var(--accent-orange);
+}
+
+/* Plot container positioning */
+.heatmap-plot-container-option1 {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,146 @@
+/* === OPTION 4: Collapsible Header Controls === */
+.heatmap-controls-option4 {
+  background: var(--bg-secondary);
+  border-radius: 8px 8px 0 0;
+  border: 1px solid var(--border-light);
+  border-bottom: none;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.heatmap-controls-option4 .controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.heatmap-controls-option4 .controls-header:hover {
+  background: var(--bg-primary);
+}
+
+.heatmap-controls-option4 .controls-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.heatmap-controls-option4 .current-selection {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.heatmap-controls-option4 .collapse-icon {
+  width: 12px;
+  height: 12px;
+  transition: transform var(--transition-fast);
+  color: var(--text-secondary);
+}
+
+.heatmap-controls-option4.collapsed .collapse-icon {
+  transform: rotate(-90deg);
+}
+
+.heatmap-controls-option4 .controls-content {
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  transition: all var(--transition-normal);
+  max-height: 60px;
+  opacity: 1;
+}
+
+.heatmap-controls-option4.collapsed .controls-content {
+  max-height: 0;
+  padding: 0 12px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.heatmap-controls-option4 .control-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.heatmap-controls-option4 .section-label {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.heatmap-controls-option4 .button-group {
+  display: flex;
+  gap: 2px;
+}
+
+.heatmap-controls-option4 .compact-btn {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  font-weight: 500;
+  min-width: 24px;
+  text-align: center;
+}
+
+.heatmap-controls-option4 .compact-btn:hover {
+  background-color: var(--bg-tertiary);
+  transform: translateY(-1px);
+}
+
+.heatmap-controls-option4 .compact-btn.active.half-btn {
+  background-color: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.heatmap-controls-option4 .compact-btn.active.phase-btn {
+  background-color: var(--accent-orange);
+  color: white;
+  border-color: var(--accent-orange);
+  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.3);
+}
+
+.heatmap-plot-option4 {
+  border: 1px solid var(--border-light);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+/* Auto-collapse on small screens */
+@media (max-width: 768px) {
+  .heatmap-controls-option4 {
+    /* Start collapsed on mobile */
+  }
+  
+  .heatmap-controls-option4 .controls-content {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .heatmap-controls-option4 .control-section {
+    flex-direction: row;
+    gap: 8px;
+  }
+}

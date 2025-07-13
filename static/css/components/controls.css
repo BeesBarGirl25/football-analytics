@@ -111,3 +111,123 @@
     gap: 0.15rem;
   }
 }
+
+/* === DROPDOWN CONTROLS (Option 3) === */
+.heatmap-controls-option3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border-light);
+  gap: 12px;
+}
+
+.heatmap-controls-option3 .dropdown-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.heatmap-controls-option3 .dropdown-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.heatmap-controls-option3 .control-dropdown {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 80px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 6px center;
+  background-repeat: no-repeat;
+  background-size: 12px;
+  padding-right: 24px;
+}
+
+.heatmap-controls-option3 .control-dropdown:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--accent-blue);
+}
+
+.heatmap-controls-option3 .control-dropdown:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.heatmap-controls-option3 .control-dropdown.half-dropdown option:checked {
+  background-color: var(--accent-blue);
+  color: white;
+}
+
+.heatmap-controls-option3 .control-dropdown.phase-dropdown option:checked {
+  background-color: var(--accent-orange);
+  color: white;
+}
+
+/* Quick action buttons for common combinations */
+.heatmap-controls-option3 .quick-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.heatmap-controls-option3 .quick-btn {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.heatmap-controls-option3 .quick-btn:hover {
+  background-color: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+/* Responsive adjustments for dropdown controls */
+@media (max-width: 768px) {
+  .heatmap-controls-option3 {
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+  }
+  
+  .heatmap-controls-option3 .dropdown-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .heatmap-controls-option3 .control-dropdown {
+    flex: 1;
+    min-width: 60px;
+  }
+  
+  .heatmap-controls-option3 .quick-actions {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .heatmap-controls-option3 .quick-actions {
+    display: none; /* Hide quick actions on very small screens */
+  }
+}
