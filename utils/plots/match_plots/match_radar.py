@@ -22,16 +22,26 @@ def extract_and_filter_stats(stats_list, desired_stats):
     return raw
 
 def normalize_stats(stats_a, stats_b, radar_stats):
-    """Normalize stats between two teams for radar chart"""
+    """Normalize stats between two teams for radar chart with improved scaling"""
     df = pd.DataFrame([stats_a, stats_b])
     df = df[radar_stats]
-    norm_df = (df - df.min()) / (df.max() - df.min())
+    
+    # Get min and max for normalization
+    min_val = df.min()
+    max_val = df.max()
+    
+    # Add a small buffer to max to avoid extreme scaling when values are close
+    range_val = max_val - min_val
+    max_val = max_val + range_val * 0.1
+    
+    # Normalize with a more balanced approach
+    norm_df = (df - min_val) / (max_val - min_val)
     norm_df = norm_df.fillna(0)
-
-    # Apply floor boost so low values don't become zero
-    min_floor = 0.15
-    norm_df = norm_df * (1 - min_floor) + min_floor
-
+    
+    # Apply a smaller floor boost and slight scaling to avoid extreme min/max
+    min_floor = 0.05
+    norm_df = norm_df * 0.9 + min_floor
+    
     return norm_df.iloc[0].to_dict(), norm_df.iloc[1].to_dict()
 
 def generate_team_radar_plot(home_team_stats, away_team_stats, home_team_name, away_team_name):
@@ -86,19 +96,25 @@ def generate_team_radar_plot(home_team_stats, away_team_stats, home_team_name, a
                 radialaxis=dict(
                     visible=True,
                     range=[0, 1],
-                    showticklabels=False
+                    showticklabels=False,
+                    gridcolor='rgba(255, 255, 255, 0.2)'
                 ),
                 angularaxis=dict(
-                    tickfont=dict(size=10)
-                )
+                    tickfont=dict(size=10),
+                    gridcolor='rgba(255, 255, 255, 0.2)'
+                ),
+                bgcolor='rgba(0, 0, 0, 0)'
             ),
+            paper_bg='rgba(0, 0, 0, 0)',
+            plot_bg='rgba(0, 0, 0, 0)',
             showlegend=True,
             title={
                 'text': "Team Performance Comparison",
                 'x': 0.5,
-                'xanchor': 'center'
+                'xanchor': 'center',
+                'font': dict(color='white')
             },
-            font=dict(size=12),
+            font=dict(size=12, color='white'),
             margin=dict(l=80, r=80, t=80, b=80),
             height=400
         )
