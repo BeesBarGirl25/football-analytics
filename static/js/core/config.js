@@ -11,6 +11,7 @@ const AppConfig = {
     PLOT_TYPES: {
         XG_GRAPH: 'xg_graph',
         MOMENTUM_GRAPH: 'momentum_graph',
+        RADAR_CHART: 'radar_chart',
         DOMINANCE_HEATMAP: 'dominance_heatmap',
         HOME_TEAM_STATS: 'home_team_stats',
         AWAY_TEAM_STATS: 'away_team_stats'
@@ -43,6 +44,7 @@ const AppConfig = {
     CONTAINERS: {
         XG_PLOT: 'xg-plot-container',
         MOMENTUM_PLOT: 'momentum-plot-container',
+        RADAR_PLOT: 'radar-plot-container',
         DOMINANCE_PLOT: 'dominance-plot-container',
         HEATMAP_HOME: 'heatmap-home-plot-container',
         HEATMAP_AWAY: 'heatmap-away-plot-container'

@@ -8,9 +8,8 @@ from flask import Flask
 from app import app
 from utils.db import db
 from models import Match, MatchPlot, Season
-from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
-from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
-from utils.analytics.match_analytics.match_analysis_utils import goal_assist_stats, generate_team_stats
+from utils.plots.plot_factory import MatchDataProcessor, generate_all_plots_sync
+from utils.analytics.match_analytics.match_analysis_utils import generate_team_stats
 from utils.plots.match_plots.unified_heatmap import generate_dominance_heatmap_json, generate_team_match_heatmap, generate_team_attack_heatmap, generate_team_defense_heatmap
 
 # Suppress common warning spam
@@ -48,92 +47,65 @@ def create_all_match_plots():
 
                 events = sb.events(match.id).fillna(-999)
                 match_df = pd.DataFrame(events)
-                home_team, away_team = match_df['team'].unique()
-
-                xg_plot = generate_match_graph_plot(match_df, home_team, away_team)
-                momentum_plot = generate_momentum_graph_plot(match_df, home_team, away_team)
-                home_df, away_df, home_team, away_team, home_norm, away_norm, home_et, away_et, home_pen, away_pen = goal_assist_stats(match_df, home_team, away_team)
-
-
-                # Match summary JSON
-                home_data = [{"player": row["player"], "contributions": list(row["contributions"])} for _, row in home_df.iterrows()]
-                away_data = [{"player": row["player"], "contributions": list(row["contributions"])} for _, row in away_df.iterrows()]
-
-                home_team_data = match_df[match_df['team'] == home_team]
-                away_team_data = match_df[match_df['team'] == away_team]
-
-                # Generate team stats
-                home_team_stats = generate_team_stats(home_team_data, home_team)
-                away_team_stats = generate_team_stats(away_team_data, away_team)
-
-                scoreline = f"{home_team} {home_norm} - {away_norm} {away_team}"
-                extra = None
-                if home_et or away_et:
-                    extra = f"(ET: {home_et} - {away_et})"
-                if home_pen or away_pen:
-                    pens = f"(Pen: {home_pen} - {away_pen})"
-                    extra = f"{extra}, {pens}" if extra else pens
-
-                match_summary = {
-                    "home": home_data,
-                    "away": away_data,
-                    "homeTeam": home_team,
-                    "awayTeam": away_team,
-                    "homeTeamNormalTime": home_norm,
-                    "awayTeamNormalTime": away_norm,
-                    "homeTeamExtraTime": home_et,
-                    "awayTeamExtraTime": away_et,
-                    "homeTeamPenalties": home_pen,
-                    "awayTeamPenalties": away_pen,
-                    "scoreline": scoreline,
-                    "extraTimeDetails": extra
-                }
+                
+                # Create processor for efficient plot generation
+                processor = MatchDataProcessor(match_df)
+                
+                # Generate all plots using the plot factory
+                factory_plots = generate_all_plots_sync(processor)
+                
+                # Generate additional plots not yet in factory
+                home_team_data = processor.home_team_data
+                away_team_data = processor.away_team_data
+                
+                # Generate team stats for backward compatibility
+                home_team_stats = generate_team_stats(home_team_data, processor.home_team)
+                away_team_stats = generate_team_stats(away_team_data, processor.away_team)
 
                 plot_dict = {
-                    "xg_graph": json.dumps(xg_plot),
-                    "momentum_graph": json.dumps(momentum_plot),
-                    "dominance_heatmap": json.dumps(
-                        generate_dominance_heatmap_json(match_df, "full")),
-                    "dominance_heatmap_first": json.dumps(
-                        generate_dominance_heatmap_json(match_df, "first")),
-                    "dominance_heatmap_second": json.dumps(
-                        generate_dominance_heatmap_json(match_df, "second")),
+                    # Factory-generated plots
+                    "xg_graph": json.dumps(factory_plots['xg_graph']),
+                    "momentum_graph": json.dumps(factory_plots['momentum_graph']),
+                    "radar_chart": json.dumps(factory_plots['radar_chart']),
+                    "match_summary": json.dumps(factory_plots['match_summary'], indent=2),
                     
-                    # Home team heatmaps with JavaScript-expected keys
-                    "home_team_possession_full": json.dumps(generate_team_match_heatmap(home_team_data, "full")),
-                    "home_team_possession_first": json.dumps(generate_team_match_heatmap(home_team_data, "first")),
-                    "home_team_possession_second": json.dumps(generate_team_match_heatmap(home_team_data, "second")),
-                    "home_team_attack_full": json.dumps(generate_team_attack_heatmap(home_team_data, "full")),
-                    "home_team_attack_first": json.dumps(generate_team_attack_heatmap(home_team_data, "first")),
-                    "home_team_attack_second": json.dumps(generate_team_attack_heatmap(home_team_data, "second")),
-                    "home_team_defense_full": json.dumps(generate_team_defense_heatmap(home_team_data, "full")),
-                    "home_team_defense_first": json.dumps(generate_team_defense_heatmap(home_team_data, "first")),
-                    "home_team_defense_second": json.dumps(generate_team_defense_heatmap(home_team_data, "second")),
+                    # Dominance heatmaps from factory
+                    "dominance_heatmap": json.dumps(factory_plots['dominance_heatmap']),
+                    "dominance_heatmap_first": json.dumps(factory_plots['dominance_heatmap_first']),
+                    "dominance_heatmap_second": json.dumps(factory_plots['dominance_heatmap_second']),
                     
-                    # Away team heatmaps with JavaScript-expected keys
-                    "away_team_possession_full": json.dumps(generate_team_match_heatmap(away_team_data, "full")),
-                    "away_team_possession_first": json.dumps(generate_team_match_heatmap(away_team_data, "first")),
-                    "away_team_possession_second": json.dumps(generate_team_match_heatmap(away_team_data, "second")),
-                    "away_team_attack_full": json.dumps(generate_team_attack_heatmap(away_team_data, "full")),
-                    "away_team_attack_first": json.dumps(generate_team_attack_heatmap(away_team_data, "first")),
-                    "away_team_attack_second": json.dumps(generate_team_attack_heatmap(away_team_data, "second")),
-                    "away_team_defense_full": json.dumps(generate_team_defense_heatmap(away_team_data, "full")),
-                    "away_team_defense_first": json.dumps(generate_team_defense_heatmap(away_team_data, "first")),
-                    "away_team_defense_second": json.dumps(generate_team_defense_heatmap(away_team_data, "second")),
+                    # Team heatmaps from factory
+                    "home_team_possession_full": json.dumps(factory_plots['home_team_possession_full']),
+                    "home_team_possession_first": json.dumps(factory_plots['home_team_possession_first']),
+                    "home_team_possession_second": json.dumps(factory_plots['home_team_possession_second']),
+                    "home_team_attack_full": json.dumps(factory_plots['home_team_attack_full']),
+                    "home_team_attack_first": json.dumps(factory_plots['home_team_attack_first']),
+                    "home_team_attack_second": json.dumps(factory_plots['home_team_attack_second']),
+                    "home_team_defense_full": json.dumps(factory_plots['home_team_defense_full']),
+                    "home_team_defense_first": json.dumps(factory_plots['home_team_defense_first']),
+                    "home_team_defense_second": json.dumps(factory_plots['home_team_defense_second']),
                     
-                    # Backward compatibility keys (old naming convention)
-                    "home_team_heatmap": json.dumps(generate_team_match_heatmap(home_team_data)),
-                    "home_team_heatmap_first": json.dumps(generate_team_match_heatmap(home_team_data, "first")),
-                    "home_team_heatmap_second": json.dumps(generate_team_match_heatmap(home_team_data, "second")),
-                    "away_team_heatmap": json.dumps(generate_team_match_heatmap(away_team_data)),
-                    "away_team_heatmap_first": json.dumps(generate_team_match_heatmap(away_team_data, "first")),
-                    "away_team_heatmap_second": json.dumps(generate_team_match_heatmap(away_team_data, "second")),
+                    "away_team_possession_full": json.dumps(factory_plots['away_team_possession_full']),
+                    "away_team_possession_first": json.dumps(factory_plots['away_team_possession_first']),
+                    "away_team_possession_second": json.dumps(factory_plots['away_team_possession_second']),
+                    "away_team_attack_full": json.dumps(factory_plots['away_team_attack_full']),
+                    "away_team_attack_first": json.dumps(factory_plots['away_team_attack_first']),
+                    "away_team_attack_second": json.dumps(factory_plots['away_team_attack_second']),
+                    "away_team_defense_full": json.dumps(factory_plots['away_team_defense_full']),
+                    "away_team_defense_first": json.dumps(factory_plots['away_team_defense_first']),
+                    "away_team_defense_second": json.dumps(factory_plots['away_team_defense_second']),
                     
-                    # Team stats
+                    # Backward compatibility keys from factory
+                    "home_team_heatmap": json.dumps(factory_plots['home_team_heatmap']),
+                    "home_team_heatmap_first": json.dumps(factory_plots['home_team_heatmap_first']),
+                    "home_team_heatmap_second": json.dumps(factory_plots['home_team_heatmap_second']),
+                    "away_team_heatmap": json.dumps(factory_plots['away_team_heatmap']),
+                    "away_team_heatmap_first": json.dumps(factory_plots['away_team_heatmap_first']),
+                    "away_team_heatmap_second": json.dumps(factory_plots['away_team_heatmap_second']),
+                    
+                    # Team stats for backward compatibility
                     "home_team_stats": json.dumps(home_team_stats),
-                    "away_team_stats": json.dumps(away_team_stats),
-                    
-                    "match_summary": json.dumps(match_summary, indent=2)
+                    "away_team_stats": json.dumps(away_team_stats)
                 }
 
                 for plot_type, plot_json in plot_dict.items():

@@ -113,78 +113,126 @@ def goal_assist_stats(match_data: pd.DataFrame, home_team: str, away_team: str):
 
 def generate_team_stats(team_data: pd.DataFrame, team_name: str):
     """Generate team statistics for the stats table"""
-    
-    # Initialize stats
     stats = []
-    
+
     # Goals
     goals = len(team_data[(team_data['type'] == 'Shot') & (team_data['shot_outcome'] == 'Goal')])
     stats.append({"stat_name": "Goals", "value": goals})
-    
+
     # Total shots
     total_shots = len(team_data[team_data['type'] == 'Shot'])
     stats.append({"stat_name": "Total Shots", "value": total_shots})
-    
+
     # Shots on target
     shots_on_target = len(team_data[(team_data['type'] == 'Shot') & 
-                                   (team_data['shot_outcome'].isin(['Goal', 'Saved']))])
+                                     (team_data['shot_outcome'].isin(['Goal', 'Saved']))])
     stats.append({"stat_name": "Shots on Target", "value": shots_on_target})
-    
-    # xG (Expected Goals)F
+
+    # xG
     xg = team_data[team_data['type'] == 'Shot']['shot_statsbomb_xg'].fillna(0).sum()
     stats.append({"stat_name": "xG", "value": f"{xg:.2f}"})
-    
+
     # Passes
-    total_passes = len(team_data[team_data['type'] == 'Pass'])
+    passes = team_data[(team_data['type'] == 'Pass') & (team_data['location'].notna())]
+    total_passes = len(passes)
     stats.append({"stat_name": "Passes", "value": total_passes})
-    
-    # Pass accuracy - fix the logic for successful passes
+
+    # Pass accuracy
     if total_passes > 0:
-        # In StatsBomb data, successful passes have NaN in pass_outcome (replaced with -999 in our ETL), failed passes have a value
-        # Since we fill NaN with -999 in create_match_plots.py, successful passes now have -999 instead of NaN
-        successful_passes = len(team_data[(team_data['type'] == 'Pass') & 
-                                         (team_data['pass_outcome'] == -999)])
-        pass_accuracy = (successful_passes / total_passes * 100)
+        successful_passes = len(passes[passes['pass_outcome'] == -999])
+        pass_accuracy = (successful_passes / total_passes) * 100
     else:
         pass_accuracy = 0
     stats.append({"stat_name": "Pass Accuracy", "value": f"{pass_accuracy:.1f}%"})
-    
-    # Possession - calculate based on total events, not just pass accuracy
+
+    # Passes by third
+    passes_def_third = len(passes[passes['location'].apply(lambda loc: loc[0] <= 40)])
+    passes_mid_third = len(passes[passes['location'].apply(lambda loc: 40 < loc[0] <= 80)])
+    passes_att_third = len(passes[passes['location'].apply(lambda loc: loc[0] > 80)])
+    stats.append({"stat_name": "Passes in Defensive Third", "value": passes_def_third})
+    stats.append({"stat_name": "Passes in Middle Third", "value": passes_mid_third})
+    stats.append({"stat_name": "Passes in Attacking Third", "value": passes_att_third})
+
+    # Progressive passes
+    progressive_passes = passes[
+        passes['pass_end_location'].notna() & 
+        passes.apply(lambda row: row['pass_end_location'][0] - row['location'][0] > 10, axis=1)
+    ]
+    stats.append({"stat_name": "Progressive Passes", "value": len(progressive_passes)})
+
+    # Key passes
+    key_passes = len(passes[passes['pass_assisted_shot_id'] != -999])
+    stats.append({"stat_name": "Key Passes", "value": key_passes})
+
+    # Final third entries
+    entries_final_third = len(team_data[
+        team_data['location'].apply(lambda loc: isinstance(loc, list) and loc[0] > 80)
+    ])
+    stats.append({"stat_name": "Final Third Entries", "value": entries_final_third})
+
+    # Carries into final third
+    carries = team_data[(team_data['type'] == 'Carry') & team_data['carry_end_location'].notna()]
+    carries_final_third = len(carries[carries['carry_end_location'].apply(lambda loc: loc[0] > 80)])
+    stats.append({"stat_name": "Carries into Final Third", "value": carries_final_third})
+
+    # Crosses
+    crosses = len(passes[passes.get('pass_cross', False) == True])
+    stats.append({"stat_name": "Crosses", "value": crosses})
+
+    # Possession (rough proxy)
     total_events = len(team_data)
-    possession_pct = (total_events / (total_events + 1) * 50) if total_events > 0 else 0  # Rough approximation
+    possession_pct = (total_events / (total_events + 1) * 50) if total_events > 0 else 0
     stats.append({"stat_name": "Possession", "value": f"{possession_pct:.1f}%"})
-    
+
+    # Pressures
+    pressures = len(team_data[team_data['type'] == 'Pressure'])
+    stats.append({"stat_name": "Pressures", "value": pressures})
+
+    # Tackles won
+    tackles_won = len(team_data[
+        (team_data['type'] == 'Duel') & 
+        (team_data['duel_type'] == 'Tackle') & 
+        (team_data['duel_outcome'] == 'Won')
+    ])
+    stats.append({"stat_name": "Tackles Won", "value": tackles_won})
+
+    # Interceptions
+    interceptions = len(team_data[
+        (team_data['type'] == 'Interception') | 
+        ((team_data['type'] == 'Ball Recovery') & (team_data['interception_outcome'].notna()))
+    ])
+    stats.append({"stat_name": "Interceptions", "value": interceptions})
+
     # Fouls
     fouls = len(team_data[team_data['type'] == 'Foul Committed'])
     stats.append({"stat_name": "Fouls", "value": fouls})
-    
+
     # Yellow cards
-    if 'bad_behaviour_card' in team_data.columns:
-        yellow_cards = len(team_data[(team_data['type'] == 'Bad Behaviour') & 
-                                    (team_data['bad_behaviour_card'] == 'Yellow Card')])
-    else:
-        yellow_cards = 0
+    yellow_cards = len(team_data[
+        (team_data['type'] == 'Bad Behaviour') & 
+        (team_data.get('bad_behaviour_card') == 'Yellow Card')
+    ]) if 'bad_behaviour_card' in team_data.columns else 0
     stats.append({"stat_name": "Yellow Cards", "value": yellow_cards})
-    
+
     # Red cards
-    if 'bad_behaviour_card' in team_data.columns:
-        red_cards = len(team_data[(team_data['type'] == 'Bad Behaviour') & 
-                                 (team_data['bad_behaviour_card'] == 'Red Card')])
-    else:
-        red_cards = 0
+    red_cards = len(team_data[
+        (team_data['type'] == 'Bad Behaviour') & 
+        (team_data.get('bad_behaviour_card') == 'Red Card')
+    ]) if 'bad_behaviour_card' in team_data.columns else 0
     stats.append({"stat_name": "Red Cards", "value": red_cards})
-    
+
     # Corners
     corners = len(team_data[team_data['type'] == 'Corner'])
     stats.append({"stat_name": "Corners", "value": corners})
-    
+
     # Offsides
     offsides = len(team_data[team_data['type'] == 'Offside'])
     stats.append({"stat_name": "Offsides", "value": offsides})
-    
+
     return {
         "team_stats": {
             "team_name": team_name,
             "stats": stats
         }
     }
+

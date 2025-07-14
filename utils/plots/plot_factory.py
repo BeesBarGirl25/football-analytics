@@ -8,7 +8,8 @@ from typing import Dict, Any, Tuple
 from utils.plots.match_plots.xG_per_game import generate_match_graph_plot
 from utils.plots.match_plots.momentum_per_game import generate_momentum_graph_plot
 from utils.plots.match_plots.unified_heatmap import generate_heatmap
-from utils.analytics.match_analytics.match_analysis_utils import goal_assist_stats
+from utils.plots.match_plots.match_radar import generate_team_radar_plot
+from utils.analytics.match_analytics.match_analysis_utils import goal_assist_stats, generate_team_stats
 
 
 class MatchDataProcessor:
@@ -125,6 +126,19 @@ class PlotFactory:
             "scoreline": scoreline,
             "extraTimeDetails": extra
         }
+    
+    @staticmethod
+    def generate_radar_plot(processor: MatchDataProcessor) -> Dict[str, Any]:
+        """Generate team comparison radar plot"""
+        # Generate team stats for both teams
+        home_team_stats = generate_team_stats(processor.home_team_data, processor.home_team)
+        away_team_stats = generate_team_stats(processor.away_team_data, processor.away_team)
+        
+        # Generate radar plot
+        return generate_team_radar_plot(
+            home_team_stats, away_team_stats, 
+            processor.home_team, processor.away_team
+        )
 
 
 async def generate_all_plots_async(processor: MatchDataProcessor) -> Dict[str, Any]:
@@ -136,6 +150,7 @@ async def generate_all_plots_async(processor: MatchDataProcessor) -> Dict[str, A
         tasks = {
             'xg_plot': loop.run_in_executor(executor, PlotFactory.generate_xg_plot, processor),
             'momentum_plot': loop.run_in_executor(executor, PlotFactory.generate_momentum_plot, processor),
+            'radar_plot': loop.run_in_executor(executor, PlotFactory.generate_radar_plot, processor),
             'dominance_plots': loop.run_in_executor(executor, PlotFactory.generate_dominance_heatmaps, processor),
             'team_plots': loop.run_in_executor(executor, PlotFactory.generate_team_heatmaps, processor),
             'match_summary': loop.run_in_executor(executor, PlotFactory.generate_match_summary, processor)
@@ -145,7 +160,7 @@ async def generate_all_plots_async(processor: MatchDataProcessor) -> Dict[str, A
         results = await asyncio.gather(*tasks.values(), return_exceptions=True)
         
         # Combine results
-        xg_plot, momentum_plot, dominance_plots, team_plots, match_summary = results
+        xg_plot, momentum_plot, radar_plot, dominance_plots, team_plots, match_summary = results
         
         # Handle any exceptions
         for i, result in enumerate(results):
@@ -156,6 +171,7 @@ async def generate_all_plots_async(processor: MatchDataProcessor) -> Dict[str, A
         all_plots = {
             'xg_graph': xg_plot,
             'momentum_graph': momentum_plot,
+            'radar_chart': radar_plot,
             'match_summary': match_summary
         }
         all_plots.update(dominance_plots)
@@ -169,6 +185,7 @@ def generate_all_plots_sync(processor: MatchDataProcessor) -> Dict[str, Any]:
     return {
         'xg_graph': PlotFactory.generate_xg_plot(processor),
         'momentum_graph': PlotFactory.generate_momentum_plot(processor),
+        'radar_chart': PlotFactory.generate_radar_plot(processor),
         'match_summary': PlotFactory.generate_match_summary(processor),
         **PlotFactory.generate_dominance_heatmaps(processor),
         **PlotFactory.generate_team_heatmaps(processor)

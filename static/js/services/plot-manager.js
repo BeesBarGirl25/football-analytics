@@ -84,11 +84,12 @@ class PlotManager {
     }
 
     /**
-     * Render main plots (XG and Momentum)
+     * Render main plots (XG, Momentum, and Radar)
      */
     renderMainPlots() {
         const xgPlot = this.cachedPlots[AppConfig.PLOT_TYPES.XG_GRAPH];
         const momentumPlot = this.cachedPlots[AppConfig.PLOT_TYPES.MOMENTUM_GRAPH];
+        const radarPlot = this.cachedPlots[AppConfig.PLOT_TYPES.RADAR_CHART];
 
         if (xgPlot?.data && xgPlot?.layout && window.Plotly) {
             window.Plotly.newPlot(AppConfig.CONTAINERS.XG_PLOT, xgPlot.data, xgPlot.layout, {
@@ -104,6 +105,14 @@ class PlotManager {
                 displayModeBar: false
             });
             Utils.log('Momentum plot rendered', 'PLOT_MANAGER');
+        }
+
+        if (radarPlot?.data && radarPlot?.layout && window.Plotly) {
+            window.Plotly.newPlot(AppConfig.CONTAINERS.RADAR_PLOT, radarPlot.data, radarPlot.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+            Utils.log('Radar plot rendered', 'PLOT_MANAGER');
         }
     }
 
@@ -166,6 +175,7 @@ class PlotManager {
             'graph-container-xg',
             'graph-container-momentum', 
             'graph-container-summary',
+            'graph-container-radar',
             'graph-container-heatmap'
         ];
         

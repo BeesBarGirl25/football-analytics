@@ -38,6 +38,10 @@
   overflow: hidden;
 }
 
+.graph-container.radar {
+  grid-area: radar;
+}
+
 .graph-container.heatmap {
   grid-area: heatmap;
 }

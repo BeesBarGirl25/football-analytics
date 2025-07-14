@@ -13,27 +13,29 @@
 
 /* Layout 1: Classic (current default) */
 .overview-grid.layout-classic {
-  grid-template-columns: 1fr 2fr 2fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 2fr;
+  grid-template-rows: 1fr 1fr 1fr;
   grid-template-areas:
-    "momentum summary heatmap"
-    "xg       summary heatmap";
+    "momentum xg      summary"
+    "radar    radar   summary"
+    "heatmap  heatmap heatmap";
 }
 
 /* Layout 2: Horizontal Stack */
 .overview-grid.layout-horizontal {
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr;
-  grid-template-areas: "momentum xg summary heatmap";
+  grid-template-areas: "momentum xg radar summary heatmap";
 }
 
 /* Layout 3: Vertical Stack */
 .overview-grid.layout-vertical {
   grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto auto;
+  grid-template-rows: auto auto auto auto auto;
   grid-template-areas:
     "momentum"
     "xg"
+    "radar"
     "summary"
     "heatmap";
 }
@@ -41,30 +43,33 @@
 /* Layout 4: Summary Focus */
 .overview-grid.layout-summary-focus {
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 2fr 1fr 1fr;
+  grid-template-rows: 2fr 1fr 1fr 1fr;
   grid-template-areas:
     "summary summary"
-    "momentum heatmap"
-    "xg heatmap";
+    "momentum xg"
+    "radar heatmap"
+    "heatmap heatmap";
 }
 
 /* Layout 5: Charts Focus */
 .overview-grid.layout-charts-focus {
   grid-template-columns: 2fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
   grid-template-areas:
     "momentum summary"
     "xg summary"
+    "radar summary"
     "heatmap heatmap";
 }
 
 /* Layout 6: Balanced 2x2 */
 .overview-grid.layout-balanced {
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
   grid-template-areas:
     "momentum xg"
-    "summary heatmap";
+    "radar summary"
+    "heatmap heatmap";
 }
 
 /* Layout 7: Custom Grid (12-column system) */
@@ -86,6 +91,10 @@
 
 .graph-container.summary {
   grid-area: summary;
+}
+
+.graph-container.radar {
+  grid-area: radar;
 }
 
 .graph-container.heatmap {
@@ -173,30 +182,33 @@
   .overview-grid.layout-summary-focus,
   .overview-grid.layout-charts-focus {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto auto auto auto auto;
     grid-template-areas:
       "momentum"
       "xg"
+      "radar"
       "summary"
       "heatmap";
   }
   
   .overview-grid.layout-horizontal {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
     grid-template-areas:
       "momentum xg"
-      "summary heatmap";
+      "radar summary"
+      "heatmap heatmap";
   }
 }
 
 @media (max-width: 768px) {
   .overview-grid {
     grid-template-columns: 1fr !important;
-    grid-template-rows: auto auto auto auto !important;
+    grid-template-rows: auto auto auto auto auto !important;
     grid-template-areas:
       "momentum"
       "xg"
+      "radar"
       "summary"
       "heatmap" !important;
   }
