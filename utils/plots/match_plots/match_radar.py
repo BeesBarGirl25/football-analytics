@@ -76,32 +76,33 @@ def generate_team_radar_plot(home_team_stats, away_team_stats, home_team_name, a
         fillcolor='rgba(255, 127, 14, 0.3)'
     )
 
-    layout = go.Layout(
-        polar=dict(
-            radialaxis=dict(
-                visible=True,
-                range=[0, 1],
-                showticklabels=False
+    fig = go.Figure(
+        data=[trace_home, trace_away],
+        layout=go.Layout(
+            polar=dict(
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, 1],
+                    showticklabels=False
+                ),
+                angularaxis=dict(
+                    tickfont=dict(size=10)
+                )
             ),
-            angularaxis=dict(
-                tickfont=dict(size=10)
-            )
-        ),
-        showlegend=True,
-        title={
-            'text': "Team Performance Comparison",
-            'x': 0.5,
-            'xanchor': 'center'
-        },
-        font=dict(size=12),
-        margin=dict(l=80, r=80, t=80, b=80),
-        height=400
+            showlegend=True,
+            title={
+                'text': "Team Performance Comparison",
+                'x': 0.5,
+                'xanchor': 'center'
+            },
+            font=dict(size=12),
+            margin=dict(l=80, r=80, t=80, b=80),
+            height=400
+        )
     )
-
-    return {
-        'data': [trace_home, trace_away],
-        'layout': layout
-    }
+    
+    # Convert the figure to a JSON-serializable format
+    return fig.to_dict()
 
 # Legacy functions for backward compatibility
 def plot_team_comparison_radar_from_raw(stats_a_list, stats_b_list, team_a_name="Team A", team_b_name="Team B"):
