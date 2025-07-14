@@ -102,11 +102,11 @@ def generate_team_radar_plot(home_team_stats, away_team_stats, home_team_name, a
                 angularaxis=dict(
                     tickfont=dict(size=10),
                     gridcolor='rgba(255, 255, 255, 0.2)'
-                ),
-                bgcolor='rgba(0, 0, 0, 0)'
+                )
             ),
-            paper_bg='rgba(0, 0, 0, 0)',
-            plot_bg='rgba(0, 0, 0, 0)',
+            paper_bgcolor='rgba(0, 0, 0, 0)',
+            plot_bgcolor='rgba(0, 0, 0, 0)',
+            polar_bgcolor='rgba(0, 0, 0, 0)',
             showlegend=True,
             title={
                 'text': "Team Performance Comparison",
