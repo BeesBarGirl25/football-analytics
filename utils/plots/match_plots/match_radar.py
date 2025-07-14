@@ -1,5 +1,6 @@
 import plotly.graph_objects as go
 import pandas as pd
+import json
 
 def extract_and_filter_stats(stats_list, desired_stats):
     """Extract and filter stats from team stats list"""
@@ -76,6 +77,8 @@ def generate_team_radar_plot(home_team_stats, away_team_stats, home_team_name, a
         fillcolor='rgba(255, 127, 14, 0.3)'
     )
 
+    import plotly.io as pio
+    
     fig = go.Figure(
         data=[trace_home, trace_away],
         layout=go.Layout(
@@ -101,8 +104,8 @@ def generate_team_radar_plot(home_team_stats, away_team_stats, home_team_name, a
         )
     )
     
-    # Convert the figure to a JSON-serializable format
-    return fig.to_dict()
+    # Convert the figure to a JSON-serializable format using plotly.io
+    return json.loads(pio.to_json(fig, validate=False, engine="json"))
 
 # Legacy functions for backward compatibility
 def plot_team_comparison_radar_from_raw(stats_a_list, stats_b_list, team_a_name="Team A", team_b_name="Team B"):
