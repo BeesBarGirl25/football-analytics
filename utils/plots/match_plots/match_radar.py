@@ -24,28 +24,34 @@ def extract_and_filter_stats(stats_list, desired_stats):
 def normalize_stats(stats_a, stats_b, radar_stats):
     """Normalize stats between two teams for radar chart with logarithmic scaling"""
     import numpy as np
+
+    min_max_dict = {
+    "Goals": (0, 10),
+    "xG": (0, 3),
+    "Total Shots": (0, 50),
+    "Shots on Target": (0, 50),
+    "Key Passes": (1, 20),
+    "Progressive Passes": (5, 500),
+    "Carries into Final Third": (0, 500),
+    "Final Third Entries": (5, 1000),
+    "Tackles Won": (3, 25),
+    "Interceptions": (2, 100)
+}
     
-    df = pd.DataFrame([stats_a, stats_b])
-    df = df[radar_stats]
-    
-    # Add 1 to all values to avoid log(0) issues
-    df_log = df + 1
-    
-    # Apply logarithmic transformation
-    df_log = np.log(df_log)
-    
-    # Get min and max for normalization after log transformation
-    min_val = df_log.min()
-    max_val = df_log.max()
-    
-    # Normalize the log-transformed values
-    norm_df = (df_log - min_val) / (max_val - min_val)
-    norm_df = norm_df.fillna(0.5)  # Use middle value for NaN
-    
-    # Apply a reasonable range to avoid extreme values
-    # Scale to use 20% to 95% of the radar range for better visualization
-    norm_df = norm_df * 0.75 + 0.2
-    
+    df = pd.DataFrame([stats_a, stats_b])[radar_stats]
+    df_log = np.log(df + 1)  # Add 1 to avoid log(0)
+
+    norm_df = pd.DataFrame(index=df_log.index, columns=radar_stats)
+
+    for stat in radar_stats:
+        pre_min, pre_max = min_max_dict.get(stat, (0, df[stat].max()))
+        stat_min = np.log(pre_min + 1)
+        stat_max = np.log(pre_max + 1)
+        range_val = stat_max - stat_min if stat_max != stat_min else 1e-6
+        norm_df[stat] = (df_log[stat] - stat_min) / range_val
+
+    norm_df = norm_df.fillna(0.5)
+    norm_df = norm_df * 0.75 + 0.2  # Scale to range [0.2, 0.95]
     return norm_df.iloc[0].to_dict(), norm_df.iloc[1].to_dict()
 
 def generate_team_radar_plot(home_team_stats, away_team_stats, home_team_name, away_team_name):
