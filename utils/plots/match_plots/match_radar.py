@@ -22,25 +22,29 @@ def extract_and_filter_stats(stats_list, desired_stats):
     return raw
 
 def normalize_stats(stats_a, stats_b, radar_stats):
-    """Normalize stats between two teams for radar chart with improved scaling"""
+    """Normalize stats between two teams for radar chart with logarithmic scaling"""
+    import numpy as np
+    
     df = pd.DataFrame([stats_a, stats_b])
     df = df[radar_stats]
     
-    # Get min and max for normalization
-    min_val = df.min()
-    max_val = df.max()
+    # Add 1 to all values to avoid log(0) issues
+    df_log = df + 1
     
-    # Add a small buffer to max to avoid extreme scaling when values are close
-    range_val = max_val - min_val
-    max_val = max_val + range_val * 0.1
+    # Apply logarithmic transformation
+    df_log = np.log(df_log)
     
-    # Normalize with a more balanced approach
-    norm_df = (df - min_val) / (max_val - min_val)
-    norm_df = norm_df.fillna(0)
+    # Get min and max for normalization after log transformation
+    min_val = df_log.min()
+    max_val = df_log.max()
     
-    # Apply a smaller floor boost and slight scaling to avoid extreme min/max
-    min_floor = 0.05
-    norm_df = norm_df * 0.9 + min_floor
+    # Normalize the log-transformed values
+    norm_df = (df_log - min_val) / (max_val - min_val)
+    norm_df = norm_df.fillna(0.5)  # Use middle value for NaN
+    
+    # Apply a reasonable range to avoid extreme values
+    # Scale to use 20% to 95% of the radar range for better visualization
+    norm_df = norm_df * 0.75 + 0.2
     
     return norm_df.iloc[0].to_dict(), norm_df.iloc[1].to_dict()
 
