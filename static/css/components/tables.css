@@ -12,11 +12,11 @@
 .team-table {
   flex: 1;
   background-color: var(--bg-tertiary);
-  padding: 0.5rem;
+  padding: clamp(0.2rem, 0.5vh, 0.4rem); /* Reduced padding */
   border-radius: 10px;
   box-shadow: var(--shadow-light);
   overflow: hidden; /* Remove scrollbars */
-  font-size: clamp(0.5rem, 1.5vh, 0.9rem); /* Responsive font scaling */
+  font-size: clamp(0.4rem, 1.2vh, 0.7rem); /* Smaller font for better fit */
   display: flex;
   flex-direction: column;
   justify-content: stretch;
@@ -30,31 +30,51 @@
   height: 100%;
   border-collapse: collapse;
   table-layout: fixed; /* Fixed layout for better control */
+  font-size: inherit;
 }
 
 .team-table td,
 .team-table th {
-  padding: clamp(0.2rem, 0.8vh, 0.6rem); /* Responsive padding */
-  font-size: inherit;
-  line-height: 1.2;
+  padding: clamp(0.1rem, 0.4vh, 0.3rem); /* Much smaller padding */
+  font-size: clamp(0.4rem, 1vh, 0.65rem); /* Smaller responsive font */
+  line-height: 1.1; /* Tighter line height */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  vertical-align: middle;
 }
 
 /* Player name column should be wider */
 .team-table td:first-child,
 .team-table th:first-child {
-  width: 60%;
+  width: 65%;
   white-space: normal; /* Allow wrapping for names if needed */
   word-wrap: break-word;
+  font-size: clamp(0.35rem, 0.9vh, 0.6rem); /* Even smaller for names */
 }
 
 /* Status/position columns */
 .team-table td:not(:first-child),
 .team-table th:not(:first-child) {
-  width: 20%;
+  width: 17.5%;
   text-align: center;
+  font-size: clamp(0.3rem, 0.8vh, 0.55rem); /* Smallest for icons/status */
+}
+
+/* Table headers */
+.team-table th {
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+}
+
+/* Ensure table fills container properly */
+.team-table tbody {
+  height: 100%;
+}
+
+.team-table tr {
+  height: auto;
 }
 
 /* === Stats Sidebar Table === */

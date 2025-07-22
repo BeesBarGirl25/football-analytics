@@ -91,11 +91,20 @@
   height: 100% !important;
 }
 
-/* Ensure radar charts scale properly */
+/* Ensure radar charts scale properly - remove aspect ratio constraint */
 .graph-container.radar .plotly-wrapper {
-  aspect-ratio: 1;
+  width: 100%;
+  height: 100%;
   max-height: 100%;
   max-width: 100%;
+}
+
+/* Allow radar charts to fill available space */
+.graph-container.radar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
 }
 
 /* === Summary Graph Specific === */
@@ -138,10 +147,11 @@
 .heatmap-layout {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.1rem; /* Minimal gap */
   height: 100%;
   width: 100%;
   min-height: 0; /* Allow flex shrinking */
+  padding: 0; /* Remove any padding */
 }
 
 .heatmap-plot {
@@ -150,6 +160,9 @@
   height: 100%;
   min-height: 0; /* Remove fixed minimum height for better scaling */
   overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
 }
 
 .heatmap-plot .js-plotly-plot,
@@ -159,18 +172,46 @@
   height: 100% !important;
   min-height: 0 !important; /* Allow full scaling */
   min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Force heatmap to use full container width */
+.graph-container.heatmap {
+  padding: 0.1rem; /* Minimal padding */
+}
+
+.graph-container.heatmap .graph-inner {
+  padding: 0.1rem; /* Minimal padding */
+  gap: 0.1rem;
 }
 
 /* Ensure heatmap controls scale with container */
 .heatmap-controls {
   flex-shrink: 0;
-  font-size: clamp(0.6rem, 1.2vh, 0.85rem);
-  padding: clamp(0.2rem, 0.5vh, 0.5rem);
+  font-size: clamp(0.5rem, 1vh, 0.75rem); /* Smaller controls */
+  padding: clamp(0.1rem, 0.3vh, 0.3rem); /* Minimal padding */
+  margin: 0;
 }
 
 .heatmap-controls button {
   font-size: inherit;
-  padding: clamp(0.2rem, 0.4vh, 0.4rem) clamp(0.4rem, 0.8vh, 0.8rem);
+  padding: clamp(0.1rem, 0.3vh, 0.3rem) clamp(0.3rem, 0.6vh, 0.6rem);
+  margin: 0.1rem;
+}
+
+/* Remove any margins from plotly elements in heatmap */
+.graph-container.heatmap .plotly-wrapper .js-plotly-plot .plotly .main-svg {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure heatmap plot area uses full width */
+.graph-container.heatmap .plotly-wrapper .js-plotly-plot .plotly .plot-container .svg-container {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* === Responsive Graphs === */
