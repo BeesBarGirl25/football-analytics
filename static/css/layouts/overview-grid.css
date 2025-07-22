@@ -16,8 +16,9 @@
   grid-template-columns: 1fr 1fr 2fr 2fr;
   grid-template-rows: 1fr 1fr 1fr;
   grid-template-areas:
-    "momentum radar      summary" "heatmap"
-    "xg    radar   summary" "heatmap";
+    "momentum radar summary heatmap"
+    "xg       radar summary heatmap"
+    "xg       radar summary heatmap";
 }
 
 /* Layout 2: Horizontal Stack */
