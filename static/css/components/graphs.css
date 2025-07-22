@@ -34,8 +34,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 0.5rem;
+  gap: 0.25rem; /* Reduced gap to minimize empty space */
   overflow: hidden;
+  padding: 0.25rem; /* Reduced padding to minimize empty space */
 }
 
 .graph-container.radar {
@@ -54,8 +55,8 @@
   justify-content: stretch;
   width: 100%;
   height: 100%;
-  padding: 0.5rem;
-  gap: 1rem;
+  padding: 0.25rem; /* Reduced padding to minimize empty space */
+  gap: 0.25rem; /* Reduced gap to minimize empty space */
   box-sizing: border-box;
 }
 
@@ -72,6 +73,7 @@
   display: flex;
   align-items: stretch;
   justify-content: stretch;
+  min-height: 0; /* Allow flex shrinking */
 }
 
 .plotly-wrapper .js-plotly-plot,
@@ -79,17 +81,33 @@
 .plotly-wrapper .main-svg {
   width: 100% !important;
   height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+/* Force all plotly plots to be responsive */
+.plotly-wrapper .js-plotly-plot .plotly {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Ensure radar charts scale properly */
+.graph-container.radar .plotly-wrapper {
+  aspect-ratio: 1;
+  max-height: 100%;
+  max-width: 100%;
 }
 
 /* === Summary Graph Specific === */
 .graph-container.summary .scoreline {
-  font-size: 2rem;
+  font-size: clamp(1.2rem, 4vh, 3rem); /* Responsive scoreline scaling */
   font-weight: bold;
-  margin: 0.1rem 0;
+  margin: clamp(0.1rem, 0.5vh, 0.5rem) 0;
   display: flex;
-  gap: 0.25rem;
+  gap: clamp(0.1rem, 0.5vh, 0.5rem);
   flex-wrap: wrap;
   justify-content: center;
+  line-height: 1.1;
 }
 
 .graph-container.summary .scoreline .home {
@@ -100,6 +118,22 @@
   color: var(--accent-away);
 }
 
+/* Scale all text content in summary */
+.graph-container.summary {
+  font-size: clamp(0.6rem, 1.2vh, 0.9rem);
+}
+
+.graph-container.summary h3,
+.graph-container.summary h4 {
+  font-size: clamp(0.8rem, 1.8vh, 1.2rem);
+  margin: clamp(0.2rem, 0.5vh, 0.5rem) 0;
+}
+
+.graph-container.summary .team-name {
+  font-size: clamp(0.7rem, 1.5vh, 1rem);
+  font-weight: 600;
+}
+
 /* === Heatmap Layout === */
 .heatmap-layout {
   display: flex;
@@ -107,13 +141,15 @@
   gap: 0.2rem;
   height: 100%;
   width: 100%;
+  min-height: 0; /* Allow flex shrinking */
 }
 
 .heatmap-plot {
   flex-grow: 1;
   width: 100%;
   height: 100%;
-  min-height: 500px; /* Ensure minimum height for heatmaps */
+  min-height: 0; /* Remove fixed minimum height for better scaling */
+  overflow: hidden;
 }
 
 .heatmap-plot .js-plotly-plot,
@@ -121,7 +157,20 @@
 .heatmap-plot .main-svg {
   width: 100% !important;
   height: 100% !important;
-  min-height: 400px !important;
+  min-height: 0 !important; /* Allow full scaling */
+  min-width: 0 !important;
+}
+
+/* Ensure heatmap controls scale with container */
+.heatmap-controls {
+  flex-shrink: 0;
+  font-size: clamp(0.6rem, 1.2vh, 0.85rem);
+  padding: clamp(0.2rem, 0.5vh, 0.5rem);
+}
+
+.heatmap-controls button {
+  font-size: inherit;
+  padding: clamp(0.2rem, 0.4vh, 0.4rem) clamp(0.4rem, 0.8vh, 0.8rem);
 }
 
 /* === Responsive Graphs === */

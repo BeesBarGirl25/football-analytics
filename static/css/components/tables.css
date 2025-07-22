@@ -15,12 +15,46 @@
   padding: 0.5rem;
   border-radius: 10px;
   box-shadow: var(--shadow-light);
-  overflow-y: auto;
-  font-size: calc(0.65rem + 0.5vh);
+  overflow: hidden; /* Remove scrollbars */
+  font-size: clamp(0.5rem, 1.5vh, 0.9rem); /* Responsive font scaling */
   display: flex;
   flex-direction: column;
   justify-content: stretch;
   height: 100%;
+  min-height: 0; /* Allow flex shrinking */
+}
+
+/* Auto-scaling table content */
+.team-table table {
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* Fixed layout for better control */
+}
+
+.team-table td,
+.team-table th {
+  padding: clamp(0.2rem, 0.8vh, 0.6rem); /* Responsive padding */
+  font-size: inherit;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Player name column should be wider */
+.team-table td:first-child,
+.team-table th:first-child {
+  width: 60%;
+  white-space: normal; /* Allow wrapping for names if needed */
+  word-wrap: break-word;
+}
+
+/* Status/position columns */
+.team-table td:not(:first-child),
+.team-table th:not(:first-child) {
+  width: 20%;
+  text-align: center;
 }
 
 /* === Stats Sidebar Table === */
