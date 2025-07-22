@@ -13,12 +13,11 @@
 
 /* Layout 1: Classic (current default) */
 .overview-grid.layout-classic {
-  grid-template-columns: 1fr 1fr 2fr;
+  grid-template-columns: 1fr 1fr 2fr 2fr;
   grid-template-rows: 1fr 1fr 1fr;
   grid-template-areas:
-    "momentum xg      summary"
-    "radar    radar   summary"
-    "heatmap  heatmap heatmap";
+    "momentum radar      summary" "heatmap"
+    "xg    radar   summary" "heatmap";
 }
 
 /* Layout 2: Horizontal Stack */
